@@ -1,0 +1,134 @@
+package ui.home
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import ui.commonComponents.Greetings
+import ui.commonComponents.Header
+import ui.home.components.FriendsSection
+import ui.home.components.ProgressCard
+import ui.home.components.RecomendationSection
+import ui.home.components.TodayWorkoutSection
+
+@Composable
+fun HomeCompactLayout() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 40.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        //Borrar luego
+        var durationMinutes by remember { mutableStateOf(60) }
+
+        Header(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .height(40.dp)
+        )
+        LazyColumn (
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentPadding = PaddingValues(
+                start = 20.dp,
+                end = 20.dp,
+                bottom = 20.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item { ProgressCard() }
+            item { TodayWorkoutSection(
+                title = "Tren Superior",
+                exerciseCount = 10,
+                durationMinutes = durationMinutes,
+                onClick = { durationMinutes += 1 }
+            ) }
+            item { FriendsSection(
+                friendName = "Pedro",
+                onClick = { }
+            ) }
+            item { FriendsSection(
+                friendName = "Juan",
+                onClick = { }
+            ) }
+            item { FriendsSection(
+                friendName = "Maria",
+                onClick = { }
+            ) }
+            item { FriendsSection(
+                friendName = "Paula",
+                onClick = { }
+            ) }
+            item { RecomendationSection() }
+        }
+    }
+}
+
+@Composable
+fun HomeMediumLayout() {
+}
+
+@Composable
+fun HomeExtendedLayout() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 40.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Header(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .height(40.dp)
+        )
+        Row(
+            modifier = Modifier.fillMaxHeight(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ProgressCard()
+                RecomendationSection()
+            }
+
+            Column(
+                modifier = Modifier.weight(3f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                var durationMinutes by remember { mutableStateOf(60)}
+                Greetings(name = "Jaime")
+                TodayWorkoutSection(
+                    title = "Tren Superior",
+                    exerciseCount = 10,
+                    durationMinutes = durationMinutes,
+                    onClick = { durationMinutes += 1 }
+                )
+                FriendsSection(
+                    friendName = "Juan",
+                    onClick = { }
+                )
+            }
+        }
+    }
+}

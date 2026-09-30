@@ -23,14 +23,20 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import org.jetbrains.compose.resources.painterResource
 
 import myapp.shared.generated.resources.Res
@@ -40,94 +46,9 @@ import myapp.shared.generated.resources.iconHouse
 import myapp.shared.generated.resources.iconLogo1
 import myapp.shared.generated.resources.iconProfile
 import myapp.shared.generated.resources.iconScanner
+import myapp.shared.generated.resources.logo
 import myapp.shared.generated.resources.placeholder
-
-
-//fun App() {
-//    MaterialTheme {
-//        var showContent by remember { mutableStateOf(false) }
-//        var showContent2 by remember { mutableStateOf(false) }
-//        Column(
-//            modifier = Modifier
-//                .background(MaterialTheme.colorScheme.primaryContainer)
-//                .safeContentPadding()
-//                .fillMaxSize(),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//        ) {
-//            Button(
-//                onClick = { showContent = !showContent}
-//            ) {
-//                Text("Click me!")
-//            }
-//            Button(onClick = { showContent2 = !showContent2}) {
-//                Text("Click me too!")
-//            }
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-//            AnimatedVisibility(showContent2) {
-//                val message = remember { "Trials" }
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    Image(painterResource(Res.drawable.image_1), null)
-//                    Text("Compose: $message")
-//                }
-//            }
-//        }
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .safeContentPadding()
-//        ) {
-//            FloatingActionButton (
-//                onClick = { showContent = !showContent },
-//                modifier = Modifier
-//                    .padding(16.dp)
-//                    .background(
-//                        MaterialTheme.colorScheme.primaryContainer,
-//                        shape = CircleShape
-//                    )
-//                    .size(50.dp),
-//                shape = CircleShape,
-//            ) {
-//                Image(
-//                    painterResource(Res.drawable.iconLogo1),
-//                    null,
-//                    modifier = Modifier.fillMaxSize(0.6f)
-//                )
-//            }
-//            LazyVerticalGrid(
-//                columns = GridCells.Fixed(3),
-//                modifier = Modifier
-//                    .align(Alignment.Center)
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 16.dp),
-//            ) {
-//
-//            }
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-//
-//        }
-//    }
-//}
+import ui.home.HomeScreen
 
 
 enum class AppScreen {
@@ -137,16 +58,24 @@ enum class AppScreen {
     Profile
 }
 
+enum class AppWindowSize {
+    Compact,
+    Medium,
+    Extended
+}
+
 @Composable
 @Preview
 fun App() {
     var selectedTab by remember {mutableStateOf(AppScreen.Home)}
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSize = getWindowSize(windowSizeClass)
 
     MainScaffold(
         selectedTab = selectedTab,
         onTabSelected = { selectedTab = it }
     ) {
-        AppContent(selectedTab)
+        AppContent(selectedTab, windowSize)
     }
 }
 
@@ -224,34 +153,14 @@ fun NavigationSuiteScope.AppNavigationItems(
 
 @Composable
 fun AppContent (
-    selectedTab: AppScreen
+    selectedTab: AppScreen,
+    windowSize: AppWindowSize
 ) {
     when (selectedTab) {
-        AppScreen.Home -> HomeScreen()
+        AppScreen.Home -> HomeScreen(windowSize)
         AppScreen.Training -> TrainingScreen()
         AppScreen.Scanner -> ScannerScreen()
         AppScreen.Profile -> ProfileScreen()
-    }
-}
-
-@Composable
-fun HomeScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primaryContainer),
-        contentAlignment = Alignment.Center
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painterResource(Res.drawable.placeholder),
-                null
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text( "Home screen" )
-        }
     }
 }
 
@@ -316,4 +225,42 @@ fun ProfileScreen() {
             Text( "Profile screen" )
         }
     }
+}
+
+fun getWindowSize(
+    windowSizeClass: WindowSizeClass
+): AppWindowSize {
+    return when {
+        windowSizeClass.isWidthAtLeastBreakpoint(
+            WIDTH_DP_EXPANDED_LOWER_BOUND
+        ) -> AppWindowSize.Extended
+        windowSizeClass.isWidthAtLeastBreakpoint(
+            WIDTH_DP_MEDIUM_LOWER_BOUND
+        ) -> AppWindowSize.Medium
+        else -> AppWindowSize.Compact
+    }
+}
+
+@Composable
+fun AppLogo(
+    modifier: Modifier = Modifier
+) {
+    Image (
+        painter = painterResource(Res.drawable.logo),
+        contentDescription = "App logo",
+        modifier = modifier,
+        contentScale = ContentScale.Fit
+    )
+}
+
+@Composable
+fun AppName(
+    modifier: Modifier = Modifier
+) {
+    Text (
+        text = "RepIt-DoIt",
+        style = MaterialTheme.typography.titleLargeEmphasized,
+        color = Color.Black,
+        modifier = modifier
+    )
 }
