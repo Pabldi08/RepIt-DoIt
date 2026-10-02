@@ -1,4 +1,4 @@
-package ui.home
+package com.pad.multiplatformapp.features.home.presentation
 
 import androidx.compose.runtime.Composable
 import com.example.myapp.AppWindowSize

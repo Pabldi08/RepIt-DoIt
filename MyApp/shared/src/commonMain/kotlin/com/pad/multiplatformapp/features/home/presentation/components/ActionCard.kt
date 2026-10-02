@@ -1,4 +1,4 @@
-package ui.home.components
+package com.pad.multiplatformapp.features.home.presentation.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
