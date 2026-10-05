@@ -1,57 +1,60 @@
 package com.pad.multiplatformapp.features.profile.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.pad.multiplatformapp.features.home.presentation.components.FriendsSection
-import com.pad.multiplatformapp.features.home.presentation.components.ProgressCard
-import com.pad.multiplatformapp.features.home.presentation.components.RecomendationSection
-import com.pad.multiplatformapp.features.home.presentation.components.TodayWorkoutSection
+import androidx.compose.ui.unit.sp
+import com.pad.multiplatformapp.features.profile.presentation.components.ChallengesSection
+import com.pad.multiplatformapp.features.profile.presentation.components.ProfileColors
+import com.pad.multiplatformapp.features.profile.presentation.components.ProfileOverviewCard
 import com.pad.multiplatformapp.ui.common.Header
 
 @Composable
-fun     ProfileCompactLayout() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 40.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+fun ProfileCompactLayout(maxContentWidth: Dp = 480.dp) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(ProfileColors.Background),
+        contentAlignment = Alignment.TopCenter
     ) {
-        //Borrar luego
-        var durationMinutes by remember { mutableStateOf(60) }
-
-        Header(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .height(40.dp)
-        )
-        LazyColumn (
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentPadding = PaddingValues(
-                start = 20.dp,
-                end = 20.dp,
-                bottom = 20.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        LazyColumn(
+            modifier = Modifier.widthIn(max = maxContentWidth).fillMaxSize(),
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 28.dp, bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            item { ProgressCard() }
-
-            item { RecomendationSection() }
+            item {
+                Header(modifier = Modifier.fillMaxWidth().height(40.dp))
+            }
+            item {
+                Text(
+                    text = "Mi progreso",
+                    color = ProfileColors.Heading,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            item {
+                ProfileOverviewCard(
+                    name = "Alex Rivera",
+                    rank = "Nivel 3 · Explorador",
+                    streakDays = 7,
+                    level = 3,
+                    currentXp = 1280,
+                    nextLevelXp = 2000
+                )
+            }
+            item { ChallengesSection() }
         }
     }
 }
