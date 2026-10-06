@@ -1,72 +1,65 @@
 package com.pad.multiplatformapp.features.profile.presentation.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-internal data class ProfileChallenge(
-    val number: String,
-    val rewardXp: Int,
-    val title: String,
-    val description: String,
-    val progress: String
-)
 
 @Composable
-internal fun ChallengeCard(challenge: ProfileChallenge, modifier: Modifier = Modifier) {
-    Surface(
+fun ChallengeCard(
+    number: String,
+    rewardXp: Int,
+    title: String,
+    description: String,
+    progress: String,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
         modifier = modifier.fillMaxWidth(),
-        color = Color.White,
-        shape = RoundedCornerShape(18.dp),
-        border = BorderStroke(1.dp, ProfileColors.Border)
+        shape = RoundedCornerShape(18.dp)
     ) {
         Column(
-            modifier = Modifier.heightIn(min = 150.dp).padding(14.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(color = ProfileColors.NumberBackground, shape = RoundedCornerShape(8.dp)) {
+                Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(8.dp)) {
                     Text(
-                        challenge.number,
+                        number,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
-                        color = ProfileColors.Accent,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
-                Surface(color = ProfileColors.RewardBackground, shape = RoundedCornerShape(50)) {
+                Surface(color = Color(0xFFE7F4E9), shape = RoundedCornerShape(50)) {
                     Text(
-                        "+${challenge.rewardXp} XP",
+                        "+$rewardXp XP",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                        color = ProfileColors.RewardText,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+                        color = Color(0xFF4C855B),
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(challenge.title, color = ProfileColors.Heading, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text(challenge.description, color = ProfileColors.Muted, fontSize = 12.sp)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
-            Text(challenge.progress, color = ProfileColors.Accent, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+            Text(progress, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelSmall)
         }
     }
 }

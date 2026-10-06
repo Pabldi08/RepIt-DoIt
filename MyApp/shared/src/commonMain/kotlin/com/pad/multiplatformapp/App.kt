@@ -33,7 +33,7 @@ import myapp.shared.generated.resources.iconScanner
 import myapp.shared.generated.resources.logo
 import myapp.shared.generated.resources.placeholder
 import com.pad.multiplatformapp.features.home.presentation.HomeScreen
-import com.pad.multiplatformapp.features.profile.presentation.components.ProfileScreen
+import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
 
 
 enum class AppScreen {
