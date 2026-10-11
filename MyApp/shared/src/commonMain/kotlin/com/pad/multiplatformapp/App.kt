@@ -24,7 +24,7 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import org.jetbrains.compose.resources.painterResource
-
+import com.pad.multiplatformapp.features.home.presentation.training.presentation.TrainingScreen
 import myapp.shared.generated.resources.Res
 import myapp.shared.generated.resources.iconDumbbell
 import myapp.shared.generated.resources.iconHouse
@@ -51,7 +51,7 @@ enum class AppWindowSize {
 @Composable
 @Preview
 fun App() {
-    var selectedTab by remember {mutableStateOf(AppScreen.Home)}
+    var selectedTab by remember { mutableStateOf(AppScreen.Home) }
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
 
@@ -142,30 +142,9 @@ fun AppContent (
 ) {
     when (selectedTab) {
         AppScreen.Home -> HomeScreen(windowSize)
-        AppScreen.Training -> TrainingScreen()
+        AppScreen.Training -> TrainingScreen(windowSize)
         AppScreen.Scanner -> ScannerScreen()
         AppScreen.Profile -> ProfileScreen()
-    }
-}
-
-@Composable
-fun TrainingScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.inversePrimary),
-        contentAlignment = Alignment.Center
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painterResource(Res.drawable.placeholder),
-                null
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text( "Training screen" )
-        }
     }
 }
 
