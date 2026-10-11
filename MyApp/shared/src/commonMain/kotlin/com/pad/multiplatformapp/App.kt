@@ -33,6 +33,7 @@ import myapp.shared.generated.resources.iconScanner
 import myapp.shared.generated.resources.logo
 import myapp.shared.generated.resources.placeholder
 import com.pad.multiplatformapp.features.home.presentation.HomeScreen
+import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
 
 
 enum class AppScreen {
@@ -144,7 +145,7 @@ fun AppContent (
         AppScreen.Home -> HomeScreen(windowSize)
         AppScreen.Training -> TrainingScreen(windowSize)
         AppScreen.Scanner -> ScannerScreen()
-        AppScreen.Profile -> ProfileScreen()
+        AppScreen.Profile -> ProfileScreen(windowSize)
     }
 }
 
@@ -169,26 +170,6 @@ fun ScannerScreen() {
     }
 }
 
-@Composable
-fun ProfileScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.secondaryContainer),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painterResource(Res.drawable.placeholder),
-                null
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text( "Profile screen" )
-        }
-    }
-}
 
 fun getWindowSize(
     windowSizeClass: WindowSizeClass
