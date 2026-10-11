@@ -225,26 +225,5 @@ fun getWindowSize(
     }
 }
 
-@Composable
-fun AppLogo(
-    modifier: Modifier = Modifier
-) {
-    Image (
-        painter = painterResource(Res.drawable.logo),
-        contentDescription = "App logo",
-        modifier = modifier,
-        contentScale = ContentScale.Fit
-    )
-}
 
-@Composable
-fun AppName(
-    modifier: Modifier = Modifier
-) {
-    Text (
-        text = "RepIt-DoIt",
-        style = MaterialTheme.typography.titleLargeEmphasized,
-        color = Color.Black,
-        modifier = modifier
-    )
-}
+
