@@ -1,4 +1,4 @@
-package com.example.myapp
+package com.example.repitdoit
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport

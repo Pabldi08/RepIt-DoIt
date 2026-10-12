@@ -4,8 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import myapp.shared.generated.resources.Res
-import myapp.shared.generated.resources.logo
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.logo
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.myapp
+package com.example.repitdoit
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,8 +16,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
@@ -25,13 +23,13 @@ import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_L
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import org.jetbrains.compose.resources.painterResource
 import com.pad.multiplatformapp.features.home.presentation.training.presentation.TrainingScreen
-import myapp.shared.generated.resources.Res
-import myapp.shared.generated.resources.iconDumbbell
-import myapp.shared.generated.resources.iconHouse
-import myapp.shared.generated.resources.iconProfile
-import myapp.shared.generated.resources.iconScanner
-import myapp.shared.generated.resources.logo
-import myapp.shared.generated.resources.placeholder
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.iconDumbbell
+import repitdoit.shared.generated.resources.iconHouse
+import repitdoit.shared.generated.resources.iconProfile
+import repitdoit.shared.generated.resources.iconScanner
+import repitdoit.shared.generated.resources.logo
+import repitdoit.shared.generated.resources.placeholder
 import com.pad.multiplatformapp.features.home.presentation.HomeScreen
 import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
 
@@ -88,7 +86,7 @@ fun NavigationSuiteScope.AppNavigationItems(
 ) {
     item (
         selected = selectedTab == AppScreen.Home,
-        onClick = { onTabSelected(AppScreen.Home) },
+        onClick = { onTabSelected(AppScreen.Home ) },
         icon = {
             Image (
                 painter = painterResource(Res.drawable.iconHouse),

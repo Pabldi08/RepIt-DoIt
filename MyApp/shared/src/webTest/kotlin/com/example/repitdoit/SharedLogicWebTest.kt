@@ -1,9 +1,9 @@
-package com.example.myapp
+package com.example.repitdoit
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class SharedCommonTest {
+class SharedLogicWebTest {
 
     @Test
     fun example() {

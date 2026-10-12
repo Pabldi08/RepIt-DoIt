@@ -22,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import myapp.shared.generated.resources.Res
-import myapp.shared.generated.resources.placeholder
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.placeholder
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

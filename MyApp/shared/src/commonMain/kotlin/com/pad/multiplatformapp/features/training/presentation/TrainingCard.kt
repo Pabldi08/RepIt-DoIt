@@ -26,9 +26,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import myapp.shared.generated.resources.Res
-import myapp.shared.generated.resources.icon_edit
-import myapp.shared.generated.resources.icon_play
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.icon_edit
+import repitdoit.shared.generated.resources.icon_play
 
 data class ExerciseItem(
     val name: String,

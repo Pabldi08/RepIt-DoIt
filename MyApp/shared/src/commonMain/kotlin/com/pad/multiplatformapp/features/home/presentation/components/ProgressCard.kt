@@ -21,8 +21,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import myapp.shared.generated.resources.Res
-import myapp.shared.generated.resources.placeholder
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.placeholder
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

@@ -20,11 +20,11 @@ dependencies {
 }
 
 android {
-    namespace = "com.example.myapp"
+    namespace = "com.example.repitdoit"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.example.myapp"
+        applicationId = "com.example.repitdoit"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

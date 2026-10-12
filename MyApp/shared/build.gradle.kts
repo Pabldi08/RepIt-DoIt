@@ -23,7 +23,7 @@ kotlin {
     }
     
     android {
-       namespace = "com.example.myapp.shared"
+       namespace = "com.example.repitdoit.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     
@@ -71,4 +71,7 @@ kotlin {
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 
+}
+compose.resources {
+    packageOfResClass = "repitdoit.shared.generated.resources"
 }

@@ -23,14 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapp.AppWindowSize
+import com.example.repitdoit.AppWindowSize
 import com.pad.multiplatformapp.features.home.presentation.HomeExtendedLayout
 import com.pad.multiplatformapp.features.home.presentation.HomeMediumLayout
 import com.pad.multiplatformapp.ui.common.Header
-import myapp.shared.generated.resources.Res
-import myapp.shared.generated.resources.placeholder
-import myapp.shared.generated.resources.training_muscles
-import myapp.shared.generated.resources.training_legs
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.placeholder
+import repitdoit.shared.generated.resources.training_muscles
+import repitdoit.shared.generated.resources.training_legs
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

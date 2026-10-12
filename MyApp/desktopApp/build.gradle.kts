@@ -17,11 +17,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.example.myapp.MainKt"
+        mainClass = "com.example.repitdoit.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.example.myapp"
+            packageName = "com.example.repitdoit"
             packageVersion = "1.0.0"
         }
     }

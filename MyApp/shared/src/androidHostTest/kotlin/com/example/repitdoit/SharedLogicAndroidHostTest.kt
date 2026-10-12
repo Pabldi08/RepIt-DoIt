@@ -1,4 +1,4 @@
-package com.example.myapp
+package com.example.repitdoit
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
