@@ -1,7 +1,7 @@
 package com.pad.multiplatformapp.features.profile.presentation
 
 import androidx.compose.runtime.Composable
-import com.example.repitdoit.AppWindowSize
+import com.pad.multiplatformapp.AppWindowSize
 
 @Composable
 fun ProfileScreen(windowSize: AppWindowSize) {

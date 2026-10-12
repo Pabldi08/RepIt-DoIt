@@ -22,16 +22,15 @@ import com.pad.multiplatformapp.features.home.presentation.components.TodayWorko
 import com.pad.multiplatformapp.ui.common.Header
 
 @Composable
-fun HomeCompactLayout() {
+fun HomeCompactLayout(
+    onWorkoutPreview: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 40.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        //Borrar luego
-        var durationMinutes by remember { mutableStateOf(60) }
-
         Header(
             modifier = Modifier
                 .fillMaxWidth()
@@ -53,8 +52,8 @@ fun HomeCompactLayout() {
             item { TodayWorkoutSection(
                 title = "Tren Superior",
                 exerciseCount = 10,
-                durationMinutes = durationMinutes,
-                onClick = { durationMinutes += 1 }
+                durationMinutes = 60,
+                onClick = onWorkoutPreview
             ) }
             item { FriendsSection(
                 friendName = "Pedro",

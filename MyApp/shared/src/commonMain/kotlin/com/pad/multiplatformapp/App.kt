@@ -1,4 +1,4 @@
-package com.example.repitdoit
+package com.pad.multiplatformapp
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,28 +18,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import org.jetbrains.compose.resources.painterResource
-import com.pad.multiplatformapp.features.home.presentation.training.presentation.TrainingScreen
 import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.iconDumbbell
-import repitdoit.shared.generated.resources.iconHouse
-import repitdoit.shared.generated.resources.iconProfile
-import repitdoit.shared.generated.resources.iconScanner
-import repitdoit.shared.generated.resources.logo
-import repitdoit.shared.generated.resources.placeholder
+import repitdoit.shared.generated.resources.*
 import com.pad.multiplatformapp.features.home.presentation.HomeScreen
+import com.pad.multiplatformapp.features.training.presentation.TrainingScreen
 import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
+import com.pad.multiplatformapp.navigation.Route
 
-
-enum class AppScreen {
-    Home,
-    Training,
-    Scanner,
-    Profile
-}
 
 enum class AppWindowSize {
     Compact,
@@ -50,29 +45,53 @@ enum class AppWindowSize {
 @Composable
 @Preview
 fun App() {
-    var selectedTab by remember { mutableStateOf(AppScreen.Home) }
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
+    val navController = rememberNavController()
+
+    val backStackEntry by navController.currentBackStackEntryAsState()
 
     MainScaffold(
-        selectedTab = selectedTab,
-        onTabSelected = { selectedTab = it }
+        currentDestination = backStackEntry?.destination,
+        onNavigate = { route -> navController.navigate(route)}
     ) {
-        AppContent(selectedTab, windowSize)
+        NavHost(
+            navController = navController,
+            startDestination = Route.Home
+        ) {
+            composable<Route.Home>{
+                HomeScreen(
+                    windowSize = windowSize,
+                    onWorkoutPreview = { navController.navigate(Route.Training) }
+                )
+            }
+
+            composable<Route.Training> {
+                TrainingScreen(windowSize)
+            }
+
+            composable<Route.Scanner> {
+                ScannerScreen()
+            }
+
+            composable<Route.Profile> {
+                ProfileScreen(windowSize)
+            }
+        }
     }
 }
 
 @Composable
 fun MainScaffold (
-    selectedTab: AppScreen,
-    onTabSelected: (AppScreen) -> Unit,
+    currentDestination: NavDestination?,
+    onNavigate: (Route) -> Unit,
     content: @Composable () -> Unit
 ) {
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             AppNavigationItems(
-                selectedTab = selectedTab,
-                onTabSelected = onTabSelected
+                currentDestination = currentDestination,
+                onNavigate = onNavigate
             )
         }
     ) {
@@ -81,12 +100,12 @@ fun MainScaffold (
 }
 
 fun NavigationSuiteScope.AppNavigationItems(
-    selectedTab: AppScreen,
-    onTabSelected: (AppScreen) -> Unit
+    currentDestination: NavDestination?,
+    onNavigate: (Route) -> Unit
 ) {
     item (
-        selected = selectedTab == AppScreen.Home,
-        onClick = { onTabSelected(AppScreen.Home ) },
+        selected = currentDestination?.hasRoute<Route.Home>() == true,
+        onClick = { onNavigate(Route.Home) },
         icon = {
             Image (
                 painter = painterResource(Res.drawable.iconHouse),
@@ -97,8 +116,8 @@ fun NavigationSuiteScope.AppNavigationItems(
         label = { Text ("Home") }
     )
     item (
-        selected = selectedTab == AppScreen.Training,
-        onClick = { onTabSelected(AppScreen.Training) },
+        selected = currentDestination?.hasRoute<Route.Training>() == true,
+        onClick = { onNavigate(Route.Training) },
         icon = {
             Image (
                 painter = painterResource(Res.drawable.iconDumbbell),
@@ -109,8 +128,8 @@ fun NavigationSuiteScope.AppNavigationItems(
         label = { Text ("Training") }
     )
     item (
-        selected = selectedTab == AppScreen.Scanner,
-        onClick = { onTabSelected(AppScreen.Scanner) },
+        selected = currentDestination?.hasRoute<Route.Scanner>() == true,
+        onClick = { onNavigate(Route.Scanner) },
         icon = {
             Image (
                 painter = painterResource(Res.drawable.iconScanner),
@@ -121,8 +140,8 @@ fun NavigationSuiteScope.AppNavigationItems(
         label = { Text ("Scanner") }
     )
     item (
-        selected = selectedTab == AppScreen.Profile,
-        onClick = { onTabSelected(AppScreen.Profile) },
+        selected = currentDestination?.hasRoute<Route.Profile>() == true,
+        onClick = { onNavigate(Route.Profile) },
         icon = {
             Image (
                 painter = painterResource(Res.drawable.iconProfile),
@@ -132,19 +151,6 @@ fun NavigationSuiteScope.AppNavigationItems(
         },
         label = { Text ("Profile") }
     )
-}
-
-@Composable
-fun AppContent (
-    selectedTab: AppScreen,
-    windowSize: AppWindowSize
-) {
-    when (selectedTab) {
-        AppScreen.Home -> HomeScreen(windowSize)
-        AppScreen.Training -> TrainingScreen(windowSize)
-        AppScreen.Scanner -> ScannerScreen()
-        AppScreen.Profile -> ProfileScreen(windowSize)
-    }
 }
 
 @Composable
