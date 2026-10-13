@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -32,8 +31,8 @@ fun FriendsSection(
             leadingContent = {
                 WorkoutPlayIcon(
                     isChallenge = true,
-                    containerColor = Color(0xFFE7F4E9),
-                    contentColor = Color(0xFF4C855B)
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         )

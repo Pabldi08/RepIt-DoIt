@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -46,11 +45,11 @@ fun ChallengeCard(
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
-                Surface(color = Color(0xFFE7F4E9), shape = RoundedCornerShape(50)) {
+                Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(50)) {
                     Text(
                         "+$rewardXp XP",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                        color = Color(0xFF4C855B),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }

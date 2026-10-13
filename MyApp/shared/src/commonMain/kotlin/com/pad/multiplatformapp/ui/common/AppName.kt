@@ -13,7 +13,7 @@ fun AppName(
     Text (
         text = "RepIt-DoIt",
         style = MaterialTheme.typography.titleLargeEmphasized,
-        color = Color.Black,
+        color = MaterialTheme.colorScheme.primary,
         modifier = modifier
     )
 }

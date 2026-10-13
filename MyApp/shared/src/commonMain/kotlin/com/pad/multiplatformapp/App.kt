@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -34,6 +35,7 @@ import com.pad.multiplatformapp.features.home.presentation.HomeScreen
 import com.pad.multiplatformapp.features.training.presentation.TrainingScreen
 import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
 import com.pad.multiplatformapp.navigation.Route
+import com.pad.multiplatformapp.ui.theme.AppTheme
 
 
 enum class AppWindowSize {
@@ -45,6 +47,13 @@ enum class AppWindowSize {
 @Composable
 @Preview
 fun App() {
+    AppTheme {
+        AppContent()
+    }
+}
+
+@Composable
+private fun AppContent() {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
     val navController = rememberNavController()
@@ -88,6 +97,8 @@ fun MainScaffold (
     content: @Composable () -> Unit
 ) {
     NavigationSuiteScaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         navigationSuiteItems = {
             AppNavigationItems(
                 currentDestination = currentDestination,
@@ -107,7 +118,7 @@ fun NavigationSuiteScope.AppNavigationItems(
         selected = currentDestination?.hasRoute<Route.Home>() == true,
         onClick = { onNavigate(Route.Home) },
         icon = {
-            Image (
+            Icon (
                 painter = painterResource(Res.drawable.iconHouse),
                 contentDescription = "Home",
                 modifier = Modifier.size(24.dp)
@@ -119,7 +130,7 @@ fun NavigationSuiteScope.AppNavigationItems(
         selected = currentDestination?.hasRoute<Route.Training>() == true,
         onClick = { onNavigate(Route.Training) },
         icon = {
-            Image (
+            Icon (
                 painter = painterResource(Res.drawable.iconDumbbell),
                 contentDescription = "Training",
                 modifier = Modifier.size(24.dp)
@@ -131,7 +142,7 @@ fun NavigationSuiteScope.AppNavigationItems(
         selected = currentDestination?.hasRoute<Route.Scanner>() == true,
         onClick = { onNavigate(Route.Scanner) },
         icon = {
-            Image (
+            Icon (
                 painter = painterResource(Res.drawable.iconScanner),
                 contentDescription = "Scanner",
                 modifier = Modifier.size(24.dp)
@@ -143,7 +154,7 @@ fun NavigationSuiteScope.AppNavigationItems(
         selected = currentDestination?.hasRoute<Route.Profile>() == true,
         onClick = { onNavigate(Route.Profile) },
         icon = {
-            Image (
+            Icon (
                 painter = painterResource(Res.drawable.iconProfile),
                 contentDescription = "Profile",
                 modifier = Modifier.size(24.dp)
@@ -158,7 +169,7 @@ fun ScannerScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.error),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column (
@@ -188,6 +199,5 @@ fun getWindowSize(
         else -> AppWindowSize.Compact
     }
 }
-
 
 
