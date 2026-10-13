@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
@@ -27,10 +28,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import com.pad.multiplatformapp.di.DefaultAppContainer
+import com.pad.multiplatformapp.features.home.presentation.HomeViewModel
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.*
-import com.pad.multiplatformapp.features.home.presentation.HomeScreen
+import com.pad.multiplatformapp.features.home.presentation.screen.HomeScreenRoot
 import com.pad.multiplatformapp.features.training.presentation.TrainingScreen
 import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
 import com.pad.multiplatformapp.navigation.Route
@@ -45,6 +48,7 @@ enum class AppWindowSize {
 @Composable
 @Preview
 fun App() {
+    val appContainer = remember {DefaultAppContainer()}
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
     val navController = rememberNavController()
@@ -60,8 +64,9 @@ fun App() {
             startDestination = Route.Home
         ) {
             composable<Route.Home>{
-                HomeScreen(
+                HomeScreenRoot(
                     windowSize = windowSize,
+                    viewModel = appContainer.homeViewModel,
                     onWorkoutPreview = { navController.navigate(Route.Training) }
                 )
             }

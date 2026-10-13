@@ -20,8 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.multiplatformapp.AppWindowSize
-import com.pad.multiplatformapp.features.home.presentation.training.presentation.ExerciseItem
-import com.pad.multiplatformapp.features.home.presentation.training.presentation.TrainingCard
 import com.pad.multiplatformapp.ui.common.Header
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles
