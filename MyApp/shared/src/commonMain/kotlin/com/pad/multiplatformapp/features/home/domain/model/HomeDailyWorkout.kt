@@ -1,8 +1,8 @@
 package com.pad.multiplatformapp.features.home.domain.model
 
-data class HomeDailyRoutine(
+data class HomeDailyWorkout(
     val id: Long,
     val name: String,
     val exerciseCount: Int,
-    val estimatedMinutes: Int
+    val estimatedTime: Int
 )

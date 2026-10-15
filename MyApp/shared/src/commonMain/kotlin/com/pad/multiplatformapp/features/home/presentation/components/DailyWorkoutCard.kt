@@ -7,11 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pad.multiplatformapp.features.home.domain.model.HomeDailyRoutine
+import com.pad.multiplatformapp.features.home.domain.model.HomeDailyWorkout
 
 @Composable
 fun DailyRoutineCard(
-    routine: HomeDailyRoutine,
+    routine: HomeDailyWorkout,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -25,7 +25,7 @@ fun DailyRoutineCard(
         )
         ActionCard(
             title = routine.name,
-            subtitle = "${routine.exerciseCount} ejercicios · ${routine.estimatedMinutes} min",
+            subtitle = "${routine.exerciseCount} ejercicios · ${routine.estimatedTime} min",
             onClick = onClick
         )
     }

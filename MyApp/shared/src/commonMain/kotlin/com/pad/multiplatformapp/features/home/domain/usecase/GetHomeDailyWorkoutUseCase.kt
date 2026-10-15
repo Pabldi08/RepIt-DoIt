@@ -1,12 +1,12 @@
 package com.pad.multiplatformapp.features.home.domain.usecase
 
-import com.pad.multiplatformapp.features.home.domain.model.HomeDailyRoutine
+import com.pad.multiplatformapp.features.home.domain.model.HomeDailyWorkout
 import com.pad.multiplatformapp.features.home.domain.repository.HomeRepository
 
-class GetHomeDailyRoutineUseCase (
+class GetHomeDailyWorkoutUseCase (
     private val repository: HomeRepository
 ) {
-    suspend operator fun invoke(): HomeDailyRoutine? {
+    suspend operator fun invoke(): HomeDailyWorkout? {
         return repository.getDailyRoutine()
     }
 }

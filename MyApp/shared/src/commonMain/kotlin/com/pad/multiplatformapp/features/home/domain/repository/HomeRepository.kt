@@ -1,7 +1,7 @@
 package com.pad.multiplatformapp.features.home.domain.repository
 
-import com.pad.multiplatformapp.features.home.domain.model.HomeDailyRoutine
+import com.pad.multiplatformapp.features.home.domain.model.HomeDailyWorkout
 
 interface HomeRepository {
-    suspend fun getDailyRoutine(): HomeDailyRoutine
+    suspend fun getDailyRoutine(): HomeDailyWorkout?
 }
