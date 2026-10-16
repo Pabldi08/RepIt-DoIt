@@ -7,14 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pad.multiplatformapp.features.home.domain.model.HomeDailyWorkout
 
 @Composable
-fun TodayWorkoutSection(
-    title: String,
-    exerciseCount: Int,
-    durationMinutes: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+fun DailyRoutineCard(
+    routine: HomeDailyWorkout,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -25,8 +24,8 @@ fun TodayWorkoutSection(
             style = MaterialTheme.typography.titleMediumEmphasized
         )
         ActionCard(
-            title = title,
-            subtitle = "$exerciseCount ejercicios · $durationMinutes min",
+            title = routine.name,
+            subtitle = "${routine.exerciseCount} ejercicios · ${routine.estimatedTime} min",
             onClick = onClick
         )
     }

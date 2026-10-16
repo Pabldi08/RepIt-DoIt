@@ -1,4 +1,4 @@
-package com.pad.multiplatformapp.features.home.presentation
+package com.pad.multiplatformapp.features.home.presentation.layout
 
 import androidx.compose.runtime.Composable
 

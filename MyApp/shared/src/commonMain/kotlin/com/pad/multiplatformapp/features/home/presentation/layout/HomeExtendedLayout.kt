@@ -1,4 +1,4 @@
-package com.pad.multiplatformapp.features.home.presentation
+package com.pad.multiplatformapp.features.home.presentation.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,23 +8,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SearchBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pad.multiplatformapp.features.home.presentation.HomeUIState
+import com.pad.multiplatformapp.features.home.presentation.components.DailyRoutineCard
 import com.pad.multiplatformapp.features.home.presentation.components.FriendsSection
 import com.pad.multiplatformapp.features.home.presentation.components.ProgressCard
 import com.pad.multiplatformapp.features.home.presentation.components.RecomendationSection
-import com.pad.multiplatformapp.features.home.presentation.components.TodayWorkoutSection
 import com.pad.multiplatformapp.ui.common.Greetings
 import com.pad.multiplatformapp.ui.common.Header
 
 @Composable
-fun HomeExtendedLayout() {
+fun HomeExtendedLayout(
+    uiState: HomeUIState,
+    onWorkoutPreview: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -59,14 +58,13 @@ fun HomeExtendedLayout() {
                 modifier = Modifier.weight(2f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                var durationMinutes by remember { mutableStateOf(60)}
                 Greetings(name = "Jaime")
-                TodayWorkoutSection(
-                    title = "Tren Superior",
-                    exerciseCount = 10,
-                    durationMinutes = durationMinutes,
-                    onClick = { durationMinutes += 1 }
-                )
+                uiState.dailyRoutine?.let { routine ->
+                    DailyRoutineCard(
+                        routine = routine,
+                        onClick = onWorkoutPreview
+                    )
+                }
                 FriendsSection(
                     friendName = "Juan",
                     onClick = { }

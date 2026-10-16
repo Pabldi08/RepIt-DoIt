@@ -25,15 +25,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import com.pad.multiplatformapp.di.DefaultAppContainer
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.*
-import com.pad.multiplatformapp.features.home.presentation.HomeScreen
+import com.pad.multiplatformapp.features.home.presentation.screen.HomeScreenRoot
 import com.pad.multiplatformapp.features.training.presentation.TrainingScreen
 import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
+import com.pad.multiplatformapp.features.workout.presentation.screen.WorkoutScreenRoot
 import com.pad.multiplatformapp.navigation.Route
 import com.pad.multiplatformapp.ui.theme.AppTheme
 
@@ -54,6 +57,7 @@ fun App() {
 
 @Composable
 private fun AppContent() {
+    val appContainer = remember {DefaultAppContainer()}
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
     val navController = rememberNavController()
@@ -69,9 +73,10 @@ private fun AppContent() {
             startDestination = Route.Home
         ) {
             composable<Route.Home>{
-                HomeScreen(
+                HomeScreenRoot(
                     windowSize = windowSize,
-                    onWorkoutPreview = { navController.navigate(Route.Training) }
+                    viewModel = appContainer.homeViewModel,
+                    onWorkoutPreview = { navController.navigate(Route.Workout(1)) }
                 )
             }
 
@@ -86,6 +91,19 @@ private fun AppContent() {
             composable<Route.Profile> {
                 ProfileScreen(windowSize)
             }
+
+            composable<Route.Workout>{ backStackEntry ->
+                val route = backStackEntry.toRoute<Route.Workout>()
+                WorkoutScreenRoot(
+                    windowSize = windowSize,
+                    viewModel = appContainer.workoutViewModel,
+                    workoutId = route.workoutId,
+                    onExercisePreview = {},
+                    onExit = { navController.popBackStack() }
+                )
+            }
+
+
         }
     }
 }
@@ -199,5 +217,6 @@ fun getWindowSize(
         else -> AppWindowSize.Compact
     }
 }
+
 
 

@@ -1,4 +1,4 @@
-package com.pad.multiplatformapp.features.home.presentation.training.presentation
+package com.pad.multiplatformapp.features.training.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
