@@ -1,0 +1,80 @@
+
+CREATE TABLE WorkoutExercise (
+    id TEXT NOT NULL PRIMARY KEY,
+    workout_id TEXT NOT NULL,
+    exercise_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    target_sets INTEGER,
+    target_reps INTEGER,
+    rest_seconds INTEGER,
+    notes TEXT,
+
+    FOREIGN KEY (workout_id)
+        REFERENCES Workout(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (exercise_id)
+        REFERENCES Exercise(id)
+        ON DELETE RESTRICT,
+
+    UNIQUE (workout_id, position),
+
+    CHECK (position >= 0),
+    CHECK (target_sets IS NULL OR target_sets > 0),
+    CHECK (target_reps IS NULL OR target_reps > 0),
+    CHECK (rest_seconds IS NULL OR rest_seconds >= 0)
+);
+
+selectExercisesByWorkout:
+SELECT
+    WorkoutExercise.id,
+    WorkoutExercise.workout_id,
+    WorkoutExercise.exercise_id,
+    WorkoutExercise.position,
+    WorkoutExercise.target_sets,
+    WorkoutExercise.target_reps,
+    WorkoutExercise.rest_seconds,
+    WorkoutExercise.notes,
+    Exercise.name,
+    Exercise.description,
+    Exercise.image_url,
+    Exercise.video_url
+FROM WorkoutExercise
+INNER JOIN Exercise
+    ON WorkoutExercise.exercise_id = Exercise.id
+WHERE WorkoutExercise.workout_id = ?
+ORDER BY WorkoutExercise.position ASC;
+
+selectWorkoutExerciseById:
+SELECT *
+FROM WorkoutExercise
+WHERE id = ?;
+
+insertWorkoutExercise:
+INSERT INTO WorkoutExercise (
+    id,
+    workout_id,
+    exercise_id,
+    position,
+    target_sets,
+    target_reps,
+    rest_seconds,
+    notes
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateWorkoutExercise:
+UPDATE WorkoutExercise
+SET
+    target_sets = ?,
+    target_reps = ?,
+    rest_seconds = ?,
+    notes = ?
+WHERE id = ?;
+
+deleteWorkoutExercise:
+DELETE FROM WorkoutExercise
+WHERE id = ?;
+
+CREATE INDEX idx_workout_exercise_catalog
+ON WorkoutExercise(exercise_id);

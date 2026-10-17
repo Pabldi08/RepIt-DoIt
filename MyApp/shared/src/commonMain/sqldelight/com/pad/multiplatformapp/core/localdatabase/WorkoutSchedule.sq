@@ -1,0 +1,95 @@
+
+CREATE TABLE WorkoutSchedule (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    training_plan_id TEXT NOT NULL,
+    workout_id TEXT NOT NULL,
+    weekday INTEGER NOT NULL,
+    position INTEGER NOT NULL,
+
+    FOREIGN KEY (training_plan_id, user_id)
+        REFERENCES TrainingPlan(id, user_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (workout_id, user_id)
+        REFERENCES Workout(id, user_id)
+        ON DELETE CASCADE,
+
+    UNIQUE (training_plan_id, weekday, position),
+
+    CHECK (weekday BETWEEN 1 AND 7),
+    CHECK (position >= 0)
+);
+
+selectScheduleByPlan:
+SELECT
+    WorkoutSchedule.*,
+    Workout.name AS workout_name,
+    Workout.description AS workout_description
+FROM WorkoutSchedule
+INNER JOIN Workout
+    ON Workout.id = WorkoutSchedule.workout_id
+WHERE WorkoutSchedule.training_plan_id = ?
+  AND WorkoutSchedule.user_id = ?
+ORDER BY weekday ASC, position ASC;
+
+selectScheduleByDay:
+SELECT
+    WorkoutSchedule.*,
+    Workout.name AS workout_name,
+    Workout.description AS workout_description
+FROM WorkoutSchedule
+INNER JOIN Workout
+    ON Workout.id = WorkoutSchedule.workout_id
+WHERE WorkoutSchedule.training_plan_id = ?
+  AND WorkoutSchedule.user_id = ?
+  AND WorkoutSchedule.weekday = ?
+ORDER BY WorkoutSchedule.position ASC;
+
+selectDailyWorkouts:
+SELECT
+    Workout.*,
+    WorkoutSchedule.position AS schedule_position
+FROM WorkoutSchedule
+INNER JOIN TrainingPlan
+    ON TrainingPlan.id = WorkoutSchedule.training_plan_id
+    AND TrainingPlan.user_id = WorkoutSchedule.user_id
+INNER JOIN Workout
+    ON Workout.id = WorkoutSchedule.workout_id
+    AND Workout.user_id = WorkoutSchedule.user_id
+WHERE TrainingPlan.user_id = ?
+  AND TrainingPlan.is_active = 1
+  AND WorkoutSchedule.weekday = ?
+ORDER BY WorkoutSchedule.position ASC;
+
+insertWorkoutSchedule:
+INSERT INTO WorkoutSchedule (
+    id,
+    user_id,
+    training_plan_id,
+    workout_id,
+    weekday,
+    position
+)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateWorkoutSchedule:
+UPDATE WorkoutSchedule
+SET
+    weekday = ?,
+    position = ?
+WHERE id = ?
+  AND user_id = ?;
+
+deleteWorkoutSchedule:
+DELETE FROM WorkoutSchedule
+WHERE id = ?
+  AND user_id = ?;
+
+deleteScheduleByPlan:
+DELETE FROM WorkoutSchedule
+WHERE training_plan_id = ?
+  AND user_id = ?;
+
+CREATE INDEX idx_workout_schedule_workout
+ON WorkoutSchedule(workout_id, user_id);
