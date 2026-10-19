@@ -39,6 +39,17 @@ import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
 import com.pad.multiplatformapp.features.workout.presentation.screen.WorkoutScreenRoot
 import com.pad.multiplatformapp.navigation.Route
 import com.pad.multiplatformapp.ui.theme.AppTheme
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.CircleShape
+import org.jetbrains.compose.resources.DrawableResource
 
 
 enum class AppWindowSize {
@@ -49,14 +60,14 @@ enum class AppWindowSize {
 
 @Composable
 @Preview
-fun App() {
+fun App(showScanOptions: Boolean = false) {
     AppTheme {
-        AppContent()
+        AppContent(showScanOptions = showScanOptions)
     }
 }
 
 @Composable
-private fun AppContent() {
+private fun AppContent(showScanOptions: Boolean) {
     val appContainer = remember {DefaultAppContainer()}
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
@@ -65,6 +76,7 @@ private fun AppContent() {
     val backStackEntry by navController.currentBackStackEntryAsState()
 
     MainScaffold(
+        showScanOptions = showScanOptions,
         currentDestination = backStackEntry?.destination,
         onNavigate = { route -> navController.navigate(route)}
     ) {
@@ -102,35 +114,67 @@ private fun AppContent() {
                     onExit = { navController.popBackStack() }
                 )
             }
-
-
         }
     }
 }
 
 @Composable
-fun MainScaffold (
+fun MainScaffold(
     currentDestination: NavDestination?,
     onNavigate: (Route) -> Unit,
+    showScanOptions: Boolean,
     content: @Composable () -> Unit
 ) {
+    var addMenuExpanded by remember { mutableStateOf(false) }
+
     NavigationSuiteScaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
         navigationSuiteItems = {
             AppNavigationItems(
+                showScanOptions = showScanOptions,
                 currentDestination = currentDestination,
-                onNavigate = onNavigate
+                onNavigate = { route ->
+                    addMenuExpanded = false
+                    onNavigate(route)
+                },
+                addMenuExpanded = addMenuExpanded,
+                onAddClick = {
+                    addMenuExpanded = !addMenuExpanded
+                }
             )
         }
     ) {
-        content()
+        Box(Modifier.fillMaxSize()) {
+            content()
+
+            AddExerciseMenu(
+                showScanOptions = showScanOptions,
+                expanded = addMenuExpanded,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onNfcClick = {
+                    addMenuExpanded = false
+                    // Abrir lectura NFC.
+                },
+                onQrClick = {
+                    addMenuExpanded = false
+                    onNavigate(Route.Scanner)
+                },
+                onManualClick = {
+                    addMenuExpanded = false
+                    // Abrir formulario manual.
+                }
+            )
+        }
     }
 }
 
 fun NavigationSuiteScope.AppNavigationItems(
     currentDestination: NavDestination?,
-    onNavigate: (Route) -> Unit
+    onNavigate: (Route) -> Unit,
+    addMenuExpanded: Boolean,
+    showScanOptions: Boolean,
+    onAddClick: () -> Unit
 ) {
     item (
         selected = currentDestination?.hasRoute<Route.Home>() == true,
@@ -156,18 +200,48 @@ fun NavigationSuiteScope.AppNavigationItems(
         },
         label = { Text ("Training") }
     )
-    item (
-        selected = currentDestination?.hasRoute<Route.Scanner>() == true,
-        onClick = { onNavigate(Route.Scanner) },
+    item(
+        selected = false,
+        onClick = onAddClick,
         icon = {
-            Icon (
-                painter = painterResource(Res.drawable.iconScanner),
-                contentDescription = "Scanner",
-                modifier = Modifier.size(24.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    )
+                    .semantics {
+                        contentDescription =
+                            if (addMenuExpanded) "Cerrar menú"
+                            else "Añadir ejercicio"
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "+",
+                    fontSize = 32.sp,
+                    lineHeight = 32.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         },
-        label = { Text ("Scanner") }
+        label = { Text("Añadir") }
     )
+    if (showScanOptions) {
+        item (
+            selected = currentDestination?.hasRoute<Route.Scanner>() == true,
+            onClick = { onNavigate(Route.Scanner) },
+            icon = {
+                Icon (
+                    painter = painterResource(Res.drawable.iconScanner),
+                    contentDescription = "Scanner",
+                    modifier = Modifier.size(24.dp)
+                )
+            },
+            label = { Text ("Scanner") }
+        )
+    }
     item (
         selected = currentDestination?.hasRoute<Route.Profile>() == true,
         onClick = { onNavigate(Route.Profile) },
@@ -215,6 +289,101 @@ fun getWindowSize(
             WIDTH_DP_MEDIUM_LOWER_BOUND
         ) -> AppWindowSize.Medium
         else -> AppWindowSize.Compact
+    }
+}
+
+@Composable
+private fun AddExerciseMenu(
+    expanded: Boolean,
+    showScanOptions: Boolean,
+    onNfcClick: () -> Unit,
+    onQrClick: () -> Unit,
+    onManualClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val progress by animateFloatAsState(
+        targetValue = if (expanded) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 250,
+            easing = FastOutSlowInEasing
+        ),
+        label = "Add menu expansion"
+    )
+    if (progress > 0f) {
+        Box(
+            modifier = modifier.size(
+                width = 260.dp,
+                height = 150.dp
+            ),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            if (showScanOptions) {
+                AddMenuAction(
+                    text = "NFC",
+                    icon = Res.drawable.addNFC,
+                    x = -80f,
+                    y = -20f,
+                    progress = progress,
+                    enabled = expanded,
+                    onClick = onNfcClick
+                )
+
+                AddMenuAction(
+                    text = "QR",
+                    icon = Res.drawable.addQR,
+                    x = 0f,
+                    y = -78f,
+                    progress = progress,
+                    enabled = expanded,
+                    onClick = onQrClick
+                )
+            }
+
+            AddMenuAction(
+                text = "Manual",
+                icon = Res.drawable.addManually,
+                x = if (showScanOptions) 80f else 0f,
+                y = if (showScanOptions) -20f else -78f,
+                progress = progress,
+                enabled = expanded,
+                onClick = onManualClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun AddMenuAction(
+    text: String,
+    icon: DrawableResource,
+    x: Float,
+    y: Float,
+    progress: Float,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    SmallFloatingActionButton(
+        onClick = {
+            if (enabled) onClick()
+        },
+        modifier = Modifier
+            .offset(
+                x = (x * progress).dp,
+                y = (y * progress).dp
+            )
+            .graphicsLayer {
+                alpha = progress
+                scaleX = progress
+                scaleY = progress
+            },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = text,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
 
