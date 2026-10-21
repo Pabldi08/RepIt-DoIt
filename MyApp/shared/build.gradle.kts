@@ -64,6 +64,7 @@ kotlin {
             implementation(libs.androidxNavigationCompose)
             implementation(libs.kotlinxSerializationJson)
             implementation(libs.sqldelight.runtime)
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -80,7 +81,7 @@ kotlin {
 sqldelight {
     databases {
         create("RepItDoItDatabase") {
-            packageName.set("com.pad.multiplatformapp.core.localdatabase")
+            packageName.set("com.pad.repitdoit.core.localdatabase")
         }
     }
 }
