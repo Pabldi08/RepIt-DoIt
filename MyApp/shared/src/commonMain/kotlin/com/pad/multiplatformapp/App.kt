@@ -255,8 +255,8 @@ fun NavigationSuiteScope.AppNavigationItems(
                     )
                     .semantics {
                         contentDescription =
-                            if (addMenuExpanded) "Cerrar menú"
-                            else "Añadir ejercicio"
+                            if (addMenuExpanded) "Close Menu"
+                            else "Add exercise"
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -267,8 +267,8 @@ fun NavigationSuiteScope.AppNavigationItems(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
-        },
-        label = { Text("Añadir") }
+        }
+
     )
     if (showScanOptions) {
         item (
@@ -405,7 +405,7 @@ private fun AddExerciseMenu(
                     )
                 }
                 AddMenuAction(
-                    text = "Manual",
+                    text = "Add manually",
                     icon = Res.drawable.addManually,
                     enabled = expanded,
                     onClick = onManualClick
