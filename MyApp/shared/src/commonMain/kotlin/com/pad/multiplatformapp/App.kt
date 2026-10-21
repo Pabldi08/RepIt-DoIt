@@ -30,6 +30,8 @@ import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.pad.multiplatformapp.di.DefaultAppContainer
+import com.pad.multiplatformapp.core.platform.supportsScanOptions
+import com.pad.multiplatformapp.ui.common.OnBackHandler
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.*
@@ -60,9 +62,9 @@ enum class AppWindowSize {
 
 @Composable
 @Preview
-fun App(showScanOptions: Boolean = false) {
+fun App() {
     AppTheme {
-        AppContent(showScanOptions = showScanOptions)
+        AppContent(showScanOptions = supportsScanOptions())
     }
 }
 
@@ -147,6 +149,10 @@ fun MainScaffold(
     ) {
         Box(Modifier.fillMaxSize()) {
             content()
+
+            OnBackHandler(enabled = addMenuExpanded) {
+                addMenuExpanded = false
+            }
 
             AddExerciseMenu(
                 showScanOptions = showScanOptions,

@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App(showScanOptions = true)
+            App()
         }
     }
 }
@@ -22,5 +22,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App(showScanOptions = true)
+    App()
 }
