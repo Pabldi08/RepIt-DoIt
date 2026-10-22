@@ -20,7 +20,7 @@ dependencies {
 }
 
 android {
-    namespace = "com.example.repitdoit"
+    namespace = "com.pad.repitdoit"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
