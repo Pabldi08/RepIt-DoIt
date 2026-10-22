@@ -41,7 +41,7 @@ import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.*
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.training.presentation.TrainingScreen
-import com.pad.repitdoit.features.profile.presentation.ProfileScreen
+import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreen
 import com.pad.repitdoit.features.workout.presentation.screen.WorkoutScreenRoot
 import com.pad.repitdoit.navigation.Route
 import com.pad.repitdoit.core.ui.theme.AppTheme
