@@ -42,7 +42,7 @@ import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.*
 import com.pad.multiplatformapp.features.home.presentation.screen.HomeScreenRoot
 import com.pad.multiplatformapp.features.training.presentation.TrainingScreen
-import com.pad.multiplatformapp.features.profile.presentation.ProfileScreen
+import com.pad.multiplatformapp.features.profile.presentation.screen.ProfileScreen
 import com.pad.multiplatformapp.features.workout.presentation.screen.WorkoutScreenRoot
 import com.pad.multiplatformapp.navigation.Route
 import com.pad.multiplatformapp.ui.theme.AppTheme
