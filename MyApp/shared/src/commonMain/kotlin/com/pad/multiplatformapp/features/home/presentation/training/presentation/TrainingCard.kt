@@ -26,9 +26,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+<<<<<<< Updated upstream:MyApp/shared/src/commonMain/kotlin/com/pad/multiplatformapp/features/home/presentation/training/presentation/TrainingCard.kt
 import myapp.shared.generated.resources.Res
 import myapp.shared.generated.resources.icon_edit
 import myapp.shared.generated.resources.icon_play
+=======
+import repitdoit.shared.generated.resources.Res
+import repitdoit.shared.generated.resources.icon_details
+import repitdoit.shared.generated.resources.icon_play
+>>>>>>> Stashed changes:MyApp/shared/src/commonMain/kotlin/com/pad/repitdoit/features/training/presentation/TrainingCard.kt
 
 data class ExerciseItem(
     val name: String,
@@ -42,9 +48,12 @@ fun TrainingCard(
     image: DrawableResource,
     exercises: List<ExerciseItem>,
     xp: Int,
+    onDetails: () -> Unit,
+    onStart: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
+        onClick = onDetails,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -114,19 +123,19 @@ fun TrainingCard(
                 color = MaterialTheme.colorScheme.primary
             )
             OutlinedButton(
-                onClick = {},
+                onClick = onDetails,
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.icon_edit),
+                    painter = painterResource(Res.drawable.icon_details),
                     contentDescription = null,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Editar")
+                Text("Detalles")
             }
             Button(
-                onClick = {},
+                onClick = onStart,
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Icon(

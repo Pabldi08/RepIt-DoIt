@@ -35,17 +35,20 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun TrainingScreen(
-    windowSize: AppWindowSize
+    windowSize: AppWindowSize,
+    onWorkoutDetails: (String) -> Unit
 ) {
     when (windowSize) {
-        AppWindowSize.Compact -> TrainingCompactLayout()
-        AppWindowSize.Medium -> TrainingCompactLayout()
-        AppWindowSize.Extended -> TrainingExtendedLayout()
+        AppWindowSize.Compact -> TrainingCompactLayout(onWorkoutDetails)
+        AppWindowSize.Medium -> TrainingCompactLayout(onWorkoutDetails)
+        AppWindowSize.Extended -> TrainingExtendedLayout(onWorkoutDetails)
     }
 }
 
 @Composable
-fun TrainingCompactLayout() {
+fun TrainingCompactLayout(
+    onWorkoutDetails: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,8 +87,10 @@ fun TrainingCompactLayout() {
                         ExerciseItem("Press de banca", "3x10 repeticiones · 40 kg"),
                         ExerciseItem("Remo con mancuerna", "3x12 repeticiones · 16 kg"),
                         ExerciseItem(name = "Jalón al pecho", "4x10 repeticiones · 50 kg"),
-                        ExerciseItem("Curl de bíceps", "4x10 repeticiones · 20 kg")
-                    )
+                        ExerciseItem("Curl de bíceps", "4x10 repeticiones · 20 kg"),
+                    ),
+                    onDetails = { onWorkoutDetails("id-real-de-la-rutina") },
+                    onStart = { /* Acción de iniciar entrenamiento */ }
                 )
             }
             item {
@@ -98,7 +103,9 @@ fun TrainingCompactLayout() {
                         ExerciseItem("Press de piernas", "3x10 repeticiones · 150 kg"),
                         ExerciseItem("Abductores", "3x12 repeticiones · 40 kg"),
                         ExerciseItem("Extensión de cuádriceps", "4x10 repeticiones · 80 kg")
-                    )
+                    ),
+                    onDetails = { onWorkoutDetails("id-real-de-la-rutina") },
+                    onStart = { /* Acción de iniciar entrenamiento */ }
                 )
             }
             item {
@@ -131,7 +138,9 @@ fun TrainingCompactLayout() {
 }
 
 @Composable
-fun TrainingExtendedLayout() {
+fun TrainingExtendedLayout(
+    onWorkoutDetails: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -175,7 +184,9 @@ fun TrainingExtendedLayout() {
                         ExerciseItem("Remo con mancuerna", "3x12 repeticiones · 16 kg"),
                         ExerciseItem(name = "Jalón al pecho", "4x10 repeticiones · 50 kg"),
                         ExerciseItem("Curl de bíceps", "4x10 repeticiones · 20 kg")
-                    )
+                    ),
+                    onDetails = { onWorkoutDetails("id-real-de-la-rutina") },
+                    onStart = { /* Acción de iniciar entrenamiento */ }
                 )
             }
             item {
@@ -188,7 +199,9 @@ fun TrainingExtendedLayout() {
                         ExerciseItem("Press de piernas", "3x10 repeticiones · 150 kg"),
                         ExerciseItem("Abductores", "3x12 repeticiones · 40 kg"),
                         ExerciseItem("Extensión de cuádriceps", "4x10 repeticiones · 80 kg")
-                    )
+                    ),
+                    onDetails = { onWorkoutDetails("id-real-de-la-rutina") },
+                    onStart = { /* Acción de iniciar entrenamiento */ }
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
