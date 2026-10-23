@@ -1,0 +1,84 @@
+
+CREATE TABLE TrainingPlan (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    is_active INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+
+    FOREIGN KEY (user_id)
+        REFERENCES User(id)
+        ON DELETE CASCADE,
+
+    UNIQUE (id, user_id),
+
+    CHECK (length(trim(name)) > 0),
+    CHECK (is_active IN (0, 1)),
+    CHECK (updated_at >= created_at)
+);
+
+CREATE UNIQUE INDEX idx_training_plan_active
+ON TrainingPlan(user_id)
+WHERE is_active = 1;
+
+selectPlansByUser:
+SELECT *
+FROM TrainingPlan
+WHERE user_id = ?
+ORDER BY updated_at DESC;
+
+selectPlanById:
+SELECT *
+FROM TrainingPlan
+WHERE id = ?
+  AND user_id = ?;
+
+selectActivePlan:
+SELECT *
+FROM TrainingPlan
+WHERE user_id = ?
+  AND is_active = 1;
+
+insertTrainingPlan:
+INSERT INTO TrainingPlan (
+    id,
+    user_id,
+    name,
+    is_active,
+    created_at,
+    updated_at
+)
+VALUES (?, ?, ?, 0, ?, ?);
+
+updateTrainingPlan:
+UPDATE TrainingPlan
+SET
+    name = ?,
+    updated_at = ?
+WHERE id = ?
+  AND user_id = ?;
+
+deactivateUserPlans:
+UPDATE TrainingPlan
+SET
+    is_active = 0,
+    updated_at = ?
+WHERE user_id = ?
+  AND is_active = 1;
+
+activateTrainingPlan:
+UPDATE TrainingPlan
+SET
+    is_active = 1,
+    updated_at = ?
+WHERE id = ?
+  AND user_id = ?;
+
+deleteTrainingPlan:
+DELETE FROM TrainingPlan
+WHERE id = ?
+  AND user_id = ?;
+
+CREATE INDEX idx_training_plan_user
+ON TrainingPlan(user_id);

@@ -1,0 +1,39 @@
+
+CREATE TABLE ExerciseEquipment (
+    exercise_id TEXT NOT NULL,
+    equipment_id TEXT NOT NULL,
+
+    PRIMARY KEY (exercise_id, equipment_id),
+
+    FOREIGN KEY (exercise_id)
+        REFERENCES Exercise(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (equipment_id)
+        REFERENCES Equipment(id)
+        ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_exercise_equipment_equipment
+ON ExerciseEquipment(equipment_id);
+
+selectEquipmentByExercise:
+SELECT Equipment.*
+FROM Equipment
+INNER JOIN ExerciseEquipment
+    ON Equipment.id = ExerciseEquipment.equipment_id
+WHERE ExerciseEquipment.exercise_id = ?;
+
+selectExercisesByEquipment:
+SELECT Exercise.*
+FROM Exercise
+INNER JOIN ExerciseEquipment
+    ON Exercise.id = ExerciseEquipment.exercise_id
+WHERE ExerciseEquipment.equipment_id = ?;
+
+insertExerciseEquipment:
+INSERT INTO ExerciseEquipment (
+    exercise_id,
+    equipment_id
+)
+VALUES (?, ?);

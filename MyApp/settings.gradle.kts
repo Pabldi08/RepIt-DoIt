@@ -1,4 +1,4 @@
-rootProject.name = "MyApp"
+rootProject.name = "RepIt-DoIt"
 
 pluginManagement {
     repositories {
