@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pad.repitdoit.AppWindowSize
+import com.pad.repitdoit.core.ui.adaptive.AppWindowSize
 import com.pad.repitdoit.core.ui.common.Header
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles

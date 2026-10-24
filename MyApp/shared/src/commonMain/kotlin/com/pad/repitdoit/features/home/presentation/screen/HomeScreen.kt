@@ -1,7 +1,7 @@
 package com.pad.repitdoit.features.home.presentation.screen
 
 import androidx.compose.runtime.Composable
-import com.pad.repitdoit.AppWindowSize
+import com.pad.repitdoit.core.ui.adaptive.AppWindowSize
 import com.pad.repitdoit.features.home.presentation.HomeUIState
 import com.pad.repitdoit.features.home.presentation.layout.HomeCompactLayout
 import com.pad.repitdoit.features.home.presentation.layout.HomeExtendedLayout

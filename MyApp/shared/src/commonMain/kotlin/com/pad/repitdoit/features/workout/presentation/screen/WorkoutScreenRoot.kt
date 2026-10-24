@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.pad.repitdoit.AppWindowSize
+import com.pad.repitdoit.core.ui.adaptive.AppWindowSize
 import com.pad.repitdoit.features.workout.presentation.WorkoutViewModel
 
 @Composable
