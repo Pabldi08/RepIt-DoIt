@@ -13,7 +13,6 @@
         android:name="android.hardware.camera.any"
         android:required="false" />
 
-
     <application
         android:name="com.pad.repitdoit.RepItDoItApplication"
         android:allowBackup="true"
