@@ -21,9 +21,13 @@ class JvmDatabaseDriverFactory : DatabaseDriverFactory {
             "repitdoit.db"
         )
 
+        val properties = Properties().apply {
+            setProperty("foreign_keys", "true")
+        }
+
         return JdbcSqliteDriver (
             "jdbc:sqlite:${dbFile.absolutePath}",
-            Properties(),
+            properties,
             RepItDoItDatabase.Schema
         )
     }

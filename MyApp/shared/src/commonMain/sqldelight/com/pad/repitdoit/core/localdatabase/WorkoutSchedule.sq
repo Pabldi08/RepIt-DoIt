@@ -21,6 +21,9 @@ CREATE TABLE WorkoutSchedule (
     CHECK (position >= 0)
 );
 
+CREATE INDEX idx_workout_schedule_workout
+ON WorkoutSchedule(workout_id, user_id);
+
 selectScheduleByPlan:
     SELECT
         WorkoutSchedule.*,
@@ -110,5 +113,5 @@ deleteScheduleByPlan:
     WHERE training_plan_id = ?
       AND user_id = ?;
 
-CREATE INDEX idx_workout_schedule_workout
-ON WorkoutSchedule(workout_id, user_id);
+selectWorkoutScheduleById:
+SELECT * FROM WorkoutSchedule WHERE id = :id AND user_id = :user_id;

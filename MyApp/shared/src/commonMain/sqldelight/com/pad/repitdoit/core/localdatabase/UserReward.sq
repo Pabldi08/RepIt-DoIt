@@ -1,0 +1,33 @@
+-- obtained_at is Unix milliseconds and starts the progress window for KEY rewards.
+-- Initial KEY_LEVEL_0 grants and achievement reward grants belong to business logic.
+CREATE TABLE UserReward (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    reward_id TEXT NOT NULL,
+    obtained_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE RESTRICT,
+    FOREIGN KEY (reward_id) REFERENCES Reward(id) ON DELETE RESTRICT,
+    UNIQUE (user_id, reward_id)
+);
+
+CREATE INDEX idx_user_reward_reward ON UserReward(reward_id);
+
+-- Raw ownership queries include KEY rewards; visual inventory must filter them.
+selectUserRewardById:
+SELECT * FROM UserReward WHERE id = :id AND user_id = :user_id;
+
+selectRewardsByUser:
+SELECT * FROM UserReward WHERE user_id = :user_id ORDER BY obtained_at DESC, id;
+
+insertUserReward:
+INSERT INTO UserReward (id, user_id, reward_id, obtained_at)
+VALUES (:id, :user_id, :reward_id, :obtained_at);
+
+-- Explicit correction only: this changes the progress window of KEY rewards.
+-- Normal grants must preserve obtained_at and handle already-owned rewards.
+updateUserReward:
+UPDATE UserReward SET obtained_at = :obtained_at
+WHERE id = :id AND user_id = :user_id;
+
+deleteUserReward:
+DELETE FROM UserReward WHERE id = :id AND user_id = :user_id;

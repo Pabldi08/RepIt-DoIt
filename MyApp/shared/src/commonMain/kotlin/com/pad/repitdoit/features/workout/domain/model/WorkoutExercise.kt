@@ -6,4 +6,5 @@ data class WorkoutExercise (
     val weight: Double,
     val numReps: Int,
     val numSets: Int,
+    val restSec: Int
 )

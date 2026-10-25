@@ -1,0 +1,30 @@
+CREATE TABLE MuscleExercise (
+    muscle_id TEXT NOT NULL,
+    exercise_id TEXT NOT NULL,
+    PRIMARY KEY (muscle_id, exercise_id),
+    FOREIGN KEY (muscle_id) REFERENCES Muscle(id) ON DELETE RESTRICT,
+    FOREIGN KEY (exercise_id) REFERENCES Exercise(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_muscle_exercise_exercise ON MuscleExercise(exercise_id);
+
+selectMuscleExercise:
+SELECT * FROM MuscleExercise
+WHERE muscle_id = :muscle_id AND exercise_id = :exercise_id;
+
+selectMuscleExercisesByMuscle:
+SELECT * FROM MuscleExercise WHERE muscle_id = :muscle_id ORDER BY exercise_id;
+
+selectMuscleExercisesByExercise:
+SELECT * FROM MuscleExercise WHERE exercise_id = :exercise_id ORDER BY muscle_id;
+
+insertMuscleExercise:
+INSERT INTO MuscleExercise (muscle_id, exercise_id)
+VALUES (:muscle_id, :exercise_id);
+
+deleteMuscleExercise:
+DELETE FROM MuscleExercise
+WHERE muscle_id = :muscle_id AND exercise_id = :exercise_id;
+
+-- No non-key attributes: replace an association with DELETE + INSERT
+-- in a transaction.

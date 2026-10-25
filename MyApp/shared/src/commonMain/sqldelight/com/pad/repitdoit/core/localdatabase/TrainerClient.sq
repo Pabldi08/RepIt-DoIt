@@ -1,0 +1,33 @@
+-- Business rule: trainer_id must identify a User with is_trainer = 1.
+CREATE TABLE TrainerClient (
+    trainer_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    PRIMARY KEY (trainer_id, client_id),
+    FOREIGN KEY (trainer_id) REFERENCES User(id) ON DELETE RESTRICT,
+    FOREIGN KEY (client_id) REFERENCES User(id) ON DELETE RESTRICT,
+    CHECK (trainer_id != client_id)
+);
+
+CREATE INDEX idx_trainer_client_client ON TrainerClient(client_id);
+
+selectTrainerClient:
+SELECT * FROM TrainerClient
+WHERE trainer_id = :trainer_id AND client_id = :client_id;
+
+selectClientsByTrainer:
+SELECT * FROM TrainerClient WHERE trainer_id = :trainer_id ORDER BY client_id;
+
+selectTrainersByClient:
+SELECT * FROM TrainerClient WHERE client_id = :client_id ORDER BY trainer_id;
+
+-- Caller must validate trainer eligibility and authorization.
+insertTrainerClient:
+INSERT INTO TrainerClient (trainer_id, client_id)
+VALUES (:trainer_id, :client_id);
+
+deleteTrainerClient:
+DELETE FROM TrainerClient
+WHERE trainer_id = :trainer_id AND client_id = :client_id;
+
+-- No non-key attributes: replace an association with DELETE + INSERT
+-- in a transaction.
