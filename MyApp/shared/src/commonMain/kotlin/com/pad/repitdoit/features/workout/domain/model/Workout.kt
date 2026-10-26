@@ -2,10 +2,13 @@ package com.pad.repitdoit.features.workout.domain.model
 
 import org.jetbrains.compose.resources.DrawableResource
 
-data class Workout (
+data class Workout(
     val id: String,
+    val userId: String,
     val name: String,
-    val workoutExercises: List<WorkoutExercise> = emptyList(),
-    val estimatedTime: Int,
-    val image: DrawableResource
+    val description: String? = null,
+    val estimatedTime: Int? = null,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val archivedAt: Long? = null
 )
