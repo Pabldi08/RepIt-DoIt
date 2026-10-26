@@ -49,7 +49,7 @@ fun AppNavigation(
             val route = backStackEntry.toRoute<Route.Workout>()
             WorkoutScreenRoot(
                 windowSize = windowSize,
-                viewModel = appContainer.workoutViewModel,
+                appContainer = appContainer,
                 workoutId = route.workoutId,
                 onExercisePreview = {},
                 onExit = { navController.popBackStack() }
