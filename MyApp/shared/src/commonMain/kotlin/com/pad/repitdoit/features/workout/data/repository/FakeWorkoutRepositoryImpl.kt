@@ -19,28 +19,32 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
                     exerciseId = "10",
                     weight = 40.0,
                     numReps = 10,
-                    numSets = 3
+                    numSets = 3,
+                    restSec = 30
                 ),
                 WorkoutExercise(
                     id = "2",
                     exerciseId = "20",
                     weight = 16.0,
                     numReps = 12,
-                    numSets = 3
+                    numSets = 3,
+                    restSec = 30
                 ),
                 WorkoutExercise(
                     id = "3",
                     exerciseId = "30",
                     weight = 50.0,
                     numReps = 10,
-                    numSets = 4
+                    numSets = 4,
+                    restSec = 30
                 ),
                 WorkoutExercise(
                     id = "4",
                     exerciseId = "40",
                     weight = 20.0,
                     numReps = 10,
-                    numSets = 4
+                    numSets = 4,
+                    restSec = 30
                 ),
             )
         )

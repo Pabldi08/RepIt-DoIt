@@ -52,7 +52,7 @@ class WorkoutRepositoryImpl (
     override suspend fun createWorkout(
         name: String
     ): Workout = withContext(dispatcher){
-        //Validar nombre
+        // Validar nombre
         // Generar id unico y obtener timestamp
 
         val id = "Workout 1"
@@ -63,7 +63,7 @@ class WorkoutRepositoryImpl (
             user_id = "test-user-001",
             name = name,
             description = "",
-            estimated_time = 0,
+            estimated_time = null,
             created_at = timestamp,
             updated_at = timestamp,
         )
@@ -76,8 +76,19 @@ class WorkoutRepositoryImpl (
         )
     }
 
-    override suspend fun renameWorkout(workoutId: String, name: String) {
-        TODO("Not yet implemented")
+    override suspend fun renameWorkout(
+        workoutId: String,
+        name: String
+    ) = withContext(dispatcher){
+        //Validar nombre
+        // Coger timestamp actual
+        val timestamp = 261026171100
+        val workout = db.workoutQueries.renameWorkout(
+            id = workoutId,
+            user_id = "test-user-001",
+            name = name,
+            updated_at = timestamp
+        )
     }
 
     override suspend fun removeWorkout(workoutId: String) {

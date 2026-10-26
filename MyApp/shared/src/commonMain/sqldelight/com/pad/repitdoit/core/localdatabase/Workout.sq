@@ -86,3 +86,10 @@ SELECT *
 FROM Workout
 WHERE user_id = ?
 ORDER BY updated_at DESC;
+
+renameWorkout:
+UPDATE Workout
+SET name = ?, updated_at = ?
+WHERE id = ?
+  AND user_id = ?
+  AND archived_at IS NULL;
