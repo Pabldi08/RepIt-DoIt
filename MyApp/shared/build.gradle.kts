@@ -62,6 +62,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.compose.material3.adaptive.navigation.suite)
+            implementation("org.jetbrains.compose.material3.adaptive:adaptive-navigation:1.2.0")
             implementation(libs.androidxNavigationCompose)
             implementation(libs.kotlinxSerializationJson)
             implementation(libs.sqldelight.runtime)
