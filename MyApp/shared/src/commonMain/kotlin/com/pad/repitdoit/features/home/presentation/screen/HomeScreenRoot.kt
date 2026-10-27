@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.home.presentation.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.home.presentation.HomeViewModel
@@ -13,9 +14,11 @@ fun HomeScreenRoot(
     appContainer: AppContainer,
     onWorkoutPreview: (String) -> Unit
 ) {
-    val viewModel = HomeViewModel(
-        getHomeDailyWorkoutsUseCase = appContainer.getHomeDailyWorkoutsUseCase
-    )
+    val viewModel: HomeViewModel = viewModel {
+        HomeViewModel (
+            getHomeDailyWorkoutsUseCase = appContainer.getHomeDailyWorkoutsUseCase
+        )
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(

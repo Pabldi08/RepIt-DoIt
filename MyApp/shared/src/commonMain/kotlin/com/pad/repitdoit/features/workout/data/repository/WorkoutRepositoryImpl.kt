@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.placeholder
+import kotlin.uuid.Uuid
 
 
 class WorkoutRepositoryImpl (
@@ -33,6 +34,7 @@ class WorkoutRepositoryImpl (
             WorkoutExercise (
                 id = exercise.id,
                 exerciseId = exercise.exercise_id,
+                name = exercise.name,
                 weight = exercise.target_weight ?:0.0,
                 numReps = exercise.target_reps?.toInt() ?:0,
                 numSets = exercise.target_sets?.toInt() ?:0,
@@ -55,7 +57,7 @@ class WorkoutRepositoryImpl (
         // Validar nombre
         // Generar id unico y obtener timestamp
 
-        val id = "Workout 1"
+        val id = Uuid.random().toString()
         val timestamp = 261025171100
 
         db.workoutQueries.insertWorkout(
@@ -116,6 +118,44 @@ class WorkoutRepositoryImpl (
         workoutExerciseId: String
     ) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getAllWorkouts(): List<Workout> =
+        withContext(dispatcher) {
+            db.transactionWithResult {
+                val workouts = db.workoutQueries
+                    .selectAllWorkoutsByUser("test-user-001")
+                    .executeAsList()
+
+                val exercisesByWorkout = db.workoutExerciseQueries
+                    .selectExercisesByUser("test-user-001")
+                    .executeAsList()
+                    .groupBy { it.workout_id }
+
+                workouts.map { workout ->
+                    val exercises = exercisesByWorkout[workout.id]
+                        .orEmpty()
+                        .map { exercise ->
+                            WorkoutExercise (
+                                id = exercise.id,
+                                exerciseId = exercise.exercise_id,
+                                name = exercise.name,
+                                weight = exercise.target_weight?: 0.0,
+                                numReps = exercise.target_reps?.toInt() ?: 0,
+                                numSets = exercise.target_sets?.toInt() ?: 0,
+                                restSec = exercise.rest_seconds?.toInt() ?:0
+                            )
+                        }
+
+                    Workout (
+                        id = workout.id,
+                        name = workout.name,
+                        workoutExercises = exercises,
+                        estimatedTime = workout.estimated_time?.toInt() ?: 0,
+                        image = Res.drawable.placeholder
+                    )
+                }
+        }
     }
 
 }

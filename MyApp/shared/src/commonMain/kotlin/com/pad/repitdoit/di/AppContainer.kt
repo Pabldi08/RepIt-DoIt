@@ -10,6 +10,7 @@ import com.pad.repitdoit.features.workout.data.repository.FakeWorkoutRepositoryI
 import com.pad.repitdoit.features.workout.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.workout.domain.repository.WorkoutRepository
 import com.pad.repitdoit.features.workout.domain.usecase.CreateWorkoutUseCase
+import com.pad.repitdoit.features.workout.domain.usecase.GetUsersWorkoutsUseCase
 import com.pad.repitdoit.features.workout.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.workout.presentation.WorkoutViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,6 +21,7 @@ interface AppContainer {
 
     //Feature Workout
     val getWorkoutUseCase: GetWorkoutUseCase
+    val getUsersWorkoutsUseCase: GetUsersWorkoutsUseCase
     val createWorkoutUseCase: CreateWorkoutUseCase
 }
 
@@ -50,6 +52,7 @@ class DefaultAppContainer(
      */
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
+    override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)
     override val createWorkoutUseCase = CreateWorkoutUseCase(workoutRepository)
 
 }

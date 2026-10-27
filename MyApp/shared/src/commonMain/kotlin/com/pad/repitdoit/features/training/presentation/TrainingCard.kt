@@ -24,24 +24,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.features.workout.domain.model.WorkoutExercise
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.icon_edit
 import repitdoit.shared.generated.resources.icon_play
 
-data class ExerciseItem(
-    val name: String,
-    val details: String
-)
-
 @Composable
 fun TrainingCard(
     title: String,
     day: String,
     image: DrawableResource,
-    exercises: List<ExerciseItem>,
+    exercises: List<WorkoutExercise>,
     xp: Int,
+    duration: Int,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
@@ -98,7 +95,7 @@ fun TrainingCard(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 exercises.forEach { exercise ->
-                    ExerciseItemView(exercise)
+                    WorkoutExerciseView(exercise)
                 }
             }
         }
@@ -142,7 +139,7 @@ fun TrainingCard(
 }
 
 @Composable
-private fun ExerciseItemView(exercise: ExerciseItem) {
+private fun WorkoutExerciseView(exercise: WorkoutExercise) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -151,7 +148,7 @@ private fun ExerciseItemView(exercise: ExerciseItem) {
             style = MaterialTheme.typography.titleSmall
         )
         Text(
-            text = exercise.details,
+            text = "${exercise.numSets}x${exercise.numReps} repeticiones · ${exercise.weight}kg",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

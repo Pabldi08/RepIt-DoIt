@@ -26,7 +26,7 @@ fun AppNavigation(
         composable<Route.Home>{
             HomeScreenRoot(
                 windowSize = windowSize,
-                viewModel = appContainer.homeViewModel,
+                appContainer = appContainer,
                 onWorkoutPreview = { workoutId ->
                     navController.navigate(Route.Workout(workoutId))
                 }
@@ -34,7 +34,10 @@ fun AppNavigation(
         }
 
         composable<Route.Training> {
-            TrainingScreen(windowSize)
+            TrainingScreen(
+                windowSize,
+                appContainer
+            )
         }
 
         composable<Route.Scanner> {
@@ -55,5 +58,6 @@ fun AppNavigation(
                 onExit = { navController.popBackStack() }
             )
         }
+
     }
 }

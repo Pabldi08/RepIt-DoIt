@@ -51,9 +51,11 @@ WHERE WorkoutExercise.workout_id = ?
 ORDER BY WorkoutExercise.position ASC;
 
 selectWorkoutExerciseById:
-SELECT *
+SELECT WorkoutExercise.*, Exercise.name
 FROM WorkoutExercise
-WHERE id = ?;
+INNER JOIN Exercise
+    ON WorkoutExercise.exercise_id = Exercise.id
+WHERE WorkoutExercise.id = ?;
 
 insertWorkoutExercise:
 INSERT INTO WorkoutExercise (
@@ -95,3 +97,13 @@ WHERE id = :id AND workout_id = :workout_id
       WHERE Workout.id = WorkoutExercise.workout_id
         AND Workout.user_id = :user_id
   );
+
+selectExercisesByUser:
+SELECT WorkoutExercise.*, Exercise.name
+FROM WorkoutExercise
+INNER JOIN Workout
+    ON WorkoutExercise.workout_id = Workout.id
+INNER JOIN Exercise
+    ON WorkoutExercise.exercise_id = Exercise.id
+WHERE Workout.user_id = ?
+ORDER BY WorkoutExercise.workout_id, WorkoutExercise.position ASC;

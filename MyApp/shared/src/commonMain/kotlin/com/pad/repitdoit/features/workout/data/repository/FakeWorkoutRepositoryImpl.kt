@@ -17,6 +17,7 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
                 WorkoutExercise(
                     id = "1",
                     exerciseId = "10",
+                    name = "Press de banca",
                     weight = 40.0,
                     numReps = 10,
                     numSets = 3,
@@ -25,6 +26,7 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
                 WorkoutExercise(
                     id = "2",
                     exerciseId = "20",
+                    name = "Remo con mancuerna",
                     weight = 16.0,
                     numReps = 12,
                     numSets = 3,
@@ -33,6 +35,7 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
                 WorkoutExercise(
                     id = "3",
                     exerciseId = "30",
+                    name = "Jalón al pecho",
                     weight = 50.0,
                     numReps = 10,
                     numSets = 4,
@@ -41,6 +44,7 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
                 WorkoutExercise(
                     id = "4",
                     exerciseId = "40",
+                    name = "Curl de bíceps",
                     weight = 20.0,
                     numReps = 10,
                     numSets = 4,
@@ -76,6 +80,10 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
     }
 
     override suspend fun removeWorkoutExercise(workoutId: String, workoutExerciseId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAllWorkouts(): List<Workout> {
         TODO("Not yet implemented")
     }
 }
