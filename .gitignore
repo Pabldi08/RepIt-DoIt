@@ -100,3 +100,6 @@ Desktop.ini
 # =========================
 *.class
 *.hprof
+
+# Local Training implementation notes
+/MyApp/shared/src/commonMain/kotlin/com/pad/repitdoit/features/training/README.md

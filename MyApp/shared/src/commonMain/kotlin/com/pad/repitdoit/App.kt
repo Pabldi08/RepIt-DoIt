@@ -114,7 +114,12 @@ private fun AppContent(
             }
 
             composable<Route.Training> {
-                TrainingScreen(windowSize)
+                TrainingScreen(
+                    windowSize = windowSize,
+                    onWorkoutDetails = { workoutId ->
+                        navController.navigate(Route.Workout(workoutId))
+                    }
+                )
             }
 
             composable<Route.Scanner> {
