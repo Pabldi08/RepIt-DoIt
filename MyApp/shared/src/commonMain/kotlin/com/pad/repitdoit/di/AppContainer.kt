@@ -7,14 +7,22 @@ import com.pad.repitdoit.features.home.domain.repository.HomeRepository
 import com.pad.repitdoit.features.home.domain.usecase.GetHomeDailyWorkoutsUseCase
 import com.pad.repitdoit.features.home.presentation.HomeViewModel
 import com.pad.repitdoit.features.workout.data.repository.FakeWorkoutRepositoryImpl
+import com.pad.repitdoit.features.workout.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.workout.domain.repository.WorkoutRepository
+import com.pad.repitdoit.features.workout.domain.usecase.CreateWorkoutUseCase
+import com.pad.repitdoit.features.workout.domain.usecase.GetUsersWorkoutsUseCase
 import com.pad.repitdoit.features.workout.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.workout.presentation.WorkoutViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 
 interface AppContainer {
-    val homeViewModel: HomeViewModel
-    val workoutViewModel: WorkoutViewModel
+    //Feature Home
+    val getHomeDailyWorkoutsUseCase: GetHomeDailyWorkoutsUseCase
+
+    //Feature Workout
+    val getWorkoutUseCase: GetWorkoutUseCase
+    val getUsersWorkoutsUseCase: GetUsersWorkoutsUseCase
+    val createWorkoutUseCase: CreateWorkoutUseCase
 }
 
 class DefaultAppContainer(
@@ -31,25 +39,20 @@ class DefaultAppContainer(
         } else {
             HomeRepositoryImpl(db, dispatcher)
         }
-    private val workoutRepository: WorkoutRepository = FakeWorkoutRepositoryImpl()
-//        if (db == null || dispatcher == null) {
-//            FakeWorkoutRepositoryImpl()
-//        } else {
-//            WorkoutRepositoryImpl(db, dispatcher)
-//        }
+    private val workoutRepository: WorkoutRepository =
+        if (db == null || dispatcher == null) {
+            FakeWorkoutRepositoryImpl()
+        } else {
+            WorkoutRepositoryImpl(db, dispatcher)
+        }
 
 
     /*
         USE CASES
      */
-    private val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
-    private val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
-
-
-    /*
-        ViewModels
-     */
-    override val homeViewModel = HomeViewModel(getHomeDailyWorkoutsUseCase)
-    override val workoutViewModel = WorkoutViewModel(getWorkoutUseCase)
+    override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
+    override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
+    override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)
+    override val createWorkoutUseCase = CreateWorkoutUseCase(workoutRepository)
 
 }

@@ -1,0 +1,68 @@
+-- completed_at is Unix milliseconds; duration_seconds is a duration in seconds.
+CREATE TABLE SessionSet (
+    id TEXT NOT NULL PRIMARY KEY,
+    session_exercise_id TEXT NOT NULL,
+    set_number INTEGER NOT NULL CHECK (set_number > 0),
+    weight_kg REAL CHECK (weight_kg IS NULL OR weight_kg >= 0),
+    reps INTEGER CHECK (reps IS NULL OR reps >= 0),
+    duration_seconds INTEGER CHECK (duration_seconds IS NULL OR duration_seconds >= 0),
+    completed_at INTEGER,
+    FOREIGN KEY (session_exercise_id) REFERENCES SessionExercise(id) ON DELETE CASCADE,
+    UNIQUE (session_exercise_id, set_number)
+);
+
+selectSessionSetById:
+SELECT * FROM SessionSet
+WHERE id = :id
+  AND EXISTS (
+      SELECT 1 FROM SessionExercise
+      INNER JOIN WorkoutSession ON WorkoutSession.id = SessionExercise.session_id
+      WHERE SessionExercise.id = SessionSet.session_exercise_id
+        AND WorkoutSession.user_id = :user_id
+  );
+
+selectSetsBySessionExercise:
+SELECT * FROM SessionSet
+WHERE session_exercise_id = :session_exercise_id
+  AND EXISTS (
+      SELECT 1 FROM SessionExercise
+      INNER JOIN WorkoutSession ON WorkoutSession.id = SessionExercise.session_id
+      WHERE SessionExercise.id = SessionSet.session_exercise_id
+        AND WorkoutSession.user_id = :user_id
+  )
+ORDER BY set_number ASC;
+
+-- No row is inserted for an absent or differently owned parent.
+insertSessionSet:
+INSERT INTO SessionSet (
+    id, session_exercise_id, set_number, weight_kg, reps, duration_seconds, completed_at
+)
+SELECT :id, SessionExercise.id, :set_number, :weight_kg, :reps, :duration_seconds, :completed_at
+FROM SessionExercise
+INNER JOIN WorkoutSession ON WorkoutSession.id = SessionExercise.session_id
+WHERE SessionExercise.id = :session_exercise_id AND WorkoutSession.user_id = :user_id;
+
+updateSessionSet:
+UPDATE SessionSet
+SET set_number = :set_number,
+    weight_kg = :weight_kg,
+    reps = :reps,
+    duration_seconds = :duration_seconds,
+    completed_at = :completed_at
+WHERE id = :id
+  AND EXISTS (
+      SELECT 1 FROM SessionExercise
+      INNER JOIN WorkoutSession ON WorkoutSession.id = SessionExercise.session_id
+      WHERE SessionExercise.id = SessionSet.session_exercise_id
+        AND WorkoutSession.user_id = :user_id
+  );
+
+deleteSessionSet:
+DELETE FROM SessionSet
+WHERE id = :id
+  AND EXISTS (
+      SELECT 1 FROM SessionExercise
+      INNER JOIN WorkoutSession ON WorkoutSession.id = SessionExercise.session_id
+      WHERE SessionExercise.id = SessionSet.session_exercise_id
+        AND WorkoutSession.user_id = :user_id
+  );

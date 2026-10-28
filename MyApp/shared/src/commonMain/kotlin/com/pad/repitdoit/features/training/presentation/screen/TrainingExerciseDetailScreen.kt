@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.training.presentation
+package com.pad.repitdoit.features.training.presentation.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +15,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.features.training.presentation.TrainingExercisePreview
+import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
+import com.pad.repitdoit.features.training.presentation.TrainingSetPreview
+import com.pad.repitdoit.features.training.presentation.TrainingWorkoutPreview
 
 @Composable
 fun TrainingExerciseDetailScreen(
@@ -29,8 +33,10 @@ fun TrainingExerciseDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                TrainingDetailHeader(exercise.name,
-                    "${TrainingPreviewData.plan.name} · ${workout.title}", onBack)
+                TrainingDetailHeader(
+                    exercise.name,
+                    "${TrainingPreviewData.plan.name} · ${workout.title}", onBack
+                )
             }
             item {
                 Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.secondaryContainer) {

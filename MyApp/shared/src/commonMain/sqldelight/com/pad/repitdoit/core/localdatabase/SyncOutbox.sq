@@ -1,0 +1,33 @@
+-- Local outbox, not a declaration of the future PostgreSQL schema.
+-- entity_id is polymorphic and deliberately has no foreign key.
+-- Entity, operation and sync status catalogs await the synchronization protocol.
+-- created_at is application-provided Unix milliseconds.
+CREATE TABLE SyncOutbox (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    entity_type TEXT NOT NULL CHECK (length(trim(entity_type)) > 0),
+    entity_id TEXT NOT NULL,
+    operation TEXT NOT NULL CHECK (length(trim(operation)) > 0),
+    created_at INTEGER NOT NULL,
+    sync_status TEXT NOT NULL CHECK (length(trim(sync_status)) > 0),
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_sync_outbox_user_status_created ON SyncOutbox(user_id, sync_status, created_at);
+
+selectSyncOutboxById:
+SELECT * FROM SyncOutbox WHERE id = :id AND user_id = :user_id;
+
+selectSyncOutboxByUser:
+SELECT * FROM SyncOutbox WHERE user_id = :user_id ORDER BY created_at ASC, id;
+
+insertSyncOutbox:
+INSERT INTO SyncOutbox (id, user_id, entity_type, entity_id, operation, created_at, sync_status)
+VALUES (:id, :user_id, :entity_type, :entity_id, :operation, :created_at, :sync_status);
+
+-- Only delivery state changes; the recorded operation keeps its identity and date.
+updateSyncOutboxStatus:
+UPDATE SyncOutbox SET sync_status = :sync_status WHERE id = :id AND user_id = :user_id;
+
+deleteSyncOutbox:
+DELETE FROM SyncOutbox WHERE id = :id AND user_id = :user_id;

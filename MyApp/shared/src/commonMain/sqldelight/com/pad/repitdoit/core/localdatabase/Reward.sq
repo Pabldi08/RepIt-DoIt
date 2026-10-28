@@ -1,0 +1,34 @@
+-- KEY rewards are hidden by presentation logic, not by a visibility column.
+-- code identifies rewards such as KEY_LEVEL_0; UUIDs remain the primary keys.
+CREATE TABLE Reward (
+    id TEXT NOT NULL PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE CHECK (length(trim(code)) > 0),
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+    reward_type TEXT NOT NULL CHECK (reward_type IN ('KEY', 'BADGE', 'COSMETIC', 'COLLECTIBLE')),
+    asset_url TEXT,
+    description TEXT
+);
+
+selectAllRewards:
+SELECT * FROM Reward ORDER BY name ASC, id;
+
+selectRewardById:
+SELECT * FROM Reward WHERE id = :id;
+
+selectRewardByCode:
+SELECT * FROM Reward WHERE code = :code;
+
+insertReward:
+INSERT INTO Reward (id, code, name, reward_type, asset_url, description)
+VALUES (:id, :code, :name, :reward_type, :asset_url, :description);
+
+-- Validate dependent achievements before changing a required KEY's type.
+updateReward:
+UPDATE Reward
+SET code = :code, name = :name, reward_type = :reward_type,
+    asset_url = :asset_url, description = :description
+WHERE id = :id;
+
+-- Required or granted rewards are protected by RESTRICT foreign keys.
+deleteReward:
+DELETE FROM Reward WHERE id = :id;

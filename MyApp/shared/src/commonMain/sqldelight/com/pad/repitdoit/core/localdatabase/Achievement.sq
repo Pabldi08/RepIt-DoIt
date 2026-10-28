@@ -1,0 +1,41 @@
+-- Business rules: required_reward_id must reference a KEY; at least one
+-- AchievementCondition is required before this achievement can be used.
+CREATE TABLE Achievement (
+    id TEXT NOT NULL PRIMARY KEY,
+    required_reward_id TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE CHECK (length(trim(code)) > 0),
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+    description TEXT,
+    condition_logic TEXT NOT NULL CHECK (condition_logic IN ('ALL', 'ANY')),
+    icon_url TEXT,
+    FOREIGN KEY (required_reward_id) REFERENCES Reward(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_achievement_required_reward ON Achievement(required_reward_id);
+
+-- Raw catalog CRUD, not the list of achievements visible/unlocked for a user.
+-- Eligibility, required KEY type and conditions are business validations.
+selectAllAchievements:
+SELECT * FROM Achievement ORDER BY name ASC, id;
+
+selectAchievementById:
+SELECT * FROM Achievement WHERE id = :id;
+
+selectAchievementByCode:
+SELECT * FROM Achievement WHERE code = :code;
+
+insertAchievement:
+INSERT INTO Achievement (id, required_reward_id, code, name, description, condition_logic, icon_url)
+VALUES (:id, :required_reward_id, :code, :name, :description, :condition_logic, :icon_url);
+
+updateAchievement:
+UPDATE Achievement
+SET required_reward_id = :required_reward_id,
+    code = :code, name = :name, description = :description,
+    condition_logic = :condition_logic, icon_url = :icon_url
+WHERE id = :id;
+
+-- Obtained achievements are protected by UserAchievement's RESTRICT FK.
+-- Otherwise dependent conditions and reward associations are removed.
+deleteAchievement:
+DELETE FROM Achievement WHERE id = :id;

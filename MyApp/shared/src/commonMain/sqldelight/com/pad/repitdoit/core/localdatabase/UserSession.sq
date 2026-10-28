@@ -1,0 +1,33 @@
+-- Authentication metadata only: no passwords or tokens.
+-- Device identifier semantics/requiredness depend on the future authentication
+-- provider. It is nullable until that policy is defined.
+-- Timestamps are Unix milliseconds.
+CREATE TABLE UserSession (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    device_id TEXT,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE RESTRICT,
+    CHECK (expires_at IS NULL OR expires_at > created_at)
+);
+
+CREATE INDEX idx_user_session_user ON UserSession(user_id);
+
+selectUserSessionById:
+SELECT * FROM UserSession WHERE id = :id AND user_id = :user_id;
+
+selectUserSessionsByUser:
+SELECT * FROM UserSession WHERE user_id = :user_id ORDER BY created_at DESC, id;
+
+insertUserSession:
+INSERT INTO UserSession (id, user_id, device_id, created_at, expires_at)
+VALUES (:id, :user_id, :device_id, :created_at, :expires_at);
+
+updateUserSession:
+UPDATE UserSession SET device_id = :device_id, expires_at = :expires_at
+WHERE id = :id AND user_id = :user_id;
+
+-- Removes local metadata only; this does not revoke a remote authentication token.
+deleteUserSession:
+DELETE FROM UserSession WHERE id = :id AND user_id = :user_id;

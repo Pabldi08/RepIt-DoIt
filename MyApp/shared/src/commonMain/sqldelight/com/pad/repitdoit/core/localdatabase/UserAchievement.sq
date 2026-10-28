@@ -1,0 +1,31 @@
+-- unlocked_at is Unix milliseconds. Award with rewards in one transaction.
+CREATE TABLE UserAchievement (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    achievement_id TEXT NOT NULL,
+    unlocked_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE RESTRICT,
+    FOREIGN KEY (achievement_id) REFERENCES Achievement(id) ON DELETE RESTRICT,
+    UNIQUE (user_id, achievement_id)
+);
+
+CREATE INDEX idx_user_achievement_achievement ON UserAchievement(achievement_id);
+
+selectUserAchievementById:
+SELECT * FROM UserAchievement WHERE id = :id AND user_id = :user_id;
+
+selectAchievementsByUser:
+SELECT * FROM UserAchievement WHERE user_id = :user_id ORDER BY unlocked_at DESC, id;
+
+insertUserAchievement:
+INSERT INTO UserAchievement (id, user_id, achievement_id, unlocked_at)
+VALUES (:id, :user_id, :achievement_id, :unlocked_at);
+
+-- Explicit correction only; normal grants must not reset the original date.
+updateUserAchievement:
+UPDATE UserAchievement SET unlocked_at = :unlocked_at
+WHERE id = :id AND user_id = :user_id;
+
+-- Does not revoke rewards automatically; any such policy belongs to business logic.
+deleteUserAchievement:
+DELETE FROM UserAchievement WHERE id = :id AND user_id = :user_id;

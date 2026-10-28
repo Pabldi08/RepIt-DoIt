@@ -37,3 +37,14 @@ INSERT INTO ExerciseEquipment (
     equipment_id
 )
 VALUES (?, ?);
+
+selectExerciseEquipment:
+SELECT * FROM ExerciseEquipment
+WHERE exercise_id = :exercise_id AND equipment_id = :equipment_id;
+
+deleteExerciseEquipment:
+DELETE FROM ExerciseEquipment
+WHERE exercise_id = :exercise_id AND equipment_id = :equipment_id;
+
+-- This table has no non-key attributes. Change an association with DELETE
+-- and INSERT in one transaction, rather than updating its composite identity.

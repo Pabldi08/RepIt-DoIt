@@ -9,7 +9,7 @@ CREATE TABLE TrainingPlan (
 
     FOREIGN KEY (user_id)
         REFERENCES User(id)
-        ON DELETE CASCADE,
+        ON DELETE RESTRICT,
 
     UNIQUE (id, user_id),
 
@@ -21,6 +21,9 @@ CREATE TABLE TrainingPlan (
 CREATE UNIQUE INDEX idx_training_plan_active
 ON TrainingPlan(user_id)
 WHERE is_active = 1;
+
+CREATE INDEX idx_training_plan_user
+ON TrainingPlan(user_id);
 
 selectPlansByUser:
 SELECT *
@@ -79,6 +82,3 @@ deleteTrainingPlan:
 DELETE FROM TrainingPlan
 WHERE id = ?
   AND user_id = ?;
-
-CREATE INDEX idx_training_plan_user
-ON TrainingPlan(user_id);

@@ -1,0 +1,71 @@
+-- Historical exercise records do not depend on mutable WorkoutExercise rows.
+-- Copy the catalog name/description when adding this exercise to the session,
+-- in the same transaction. Historical reads use these snapshots, not the catalog.
+-- Business logic must not refresh them when the catalog changes.
+CREATE TABLE SessionExercise (
+    id TEXT NOT NULL PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    exercise_id TEXT NOT NULL,
+    exercise_name_snapshot TEXT NOT NULL CHECK (length(trim(exercise_name_snapshot)) > 0),
+    exercise_description_snapshot TEXT,
+    position INTEGER NOT NULL CHECK (position >= 0),
+    notes TEXT,
+    FOREIGN KEY (session_id) REFERENCES WorkoutSession(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES Exercise(id) ON DELETE RESTRICT,
+    UNIQUE (session_id, position)
+);
+
+CREATE INDEX idx_session_exercise_catalog ON SessionExercise(exercise_id);
+
+selectSessionExerciseById:
+SELECT * FROM SessionExercise
+WHERE id = :id
+  AND EXISTS (
+      SELECT 1 FROM WorkoutSession
+      WHERE WorkoutSession.id = SessionExercise.session_id
+        AND WorkoutSession.user_id = :user_id
+  );
+
+selectExercisesBySession:
+SELECT * FROM SessionExercise
+WHERE session_id = :session_id
+  AND EXISTS (
+      SELECT 1 FROM WorkoutSession
+      WHERE WorkoutSession.id = SessionExercise.session_id
+        AND WorkoutSession.user_id = :user_id
+  )
+ORDER BY position ASC;
+
+-- Caller supplies historical catalog values. No row is inserted if the
+-- session does not belong to user_id. The repository must validate parent
+-- ownership and handle missing parents instead of assuming insertion succeeded.
+insertSessionExercise:
+INSERT INTO SessionExercise (
+    id, session_id, exercise_id, exercise_name_snapshot,
+    exercise_description_snapshot, position, notes
+)
+SELECT :id, WorkoutSession.id, :exercise_id, :exercise_name_snapshot,
+       :exercise_description_snapshot, :position, :notes
+FROM WorkoutSession
+WHERE WorkoutSession.id = :session_id AND WorkoutSession.user_id = :user_id;
+
+-- Catalog identity and historical snapshots remain unchanged.
+updateSessionExercise:
+UPDATE SessionExercise
+SET position = :position, notes = :notes
+WHERE id = :id
+  AND EXISTS (
+      SELECT 1 FROM WorkoutSession
+      WHERE WorkoutSession.id = SessionExercise.session_id
+        AND WorkoutSession.user_id = :user_id
+  );
+
+-- Explicit removal also deletes the sets belonging to this session exercise.
+deleteSessionExercise:
+DELETE FROM SessionExercise
+WHERE id = :id
+  AND EXISTS (
+      SELECT 1 FROM WorkoutSession
+      WHERE WorkoutSession.id = SessionExercise.session_id
+        AND WorkoutSession.user_id = :user_id
+  );

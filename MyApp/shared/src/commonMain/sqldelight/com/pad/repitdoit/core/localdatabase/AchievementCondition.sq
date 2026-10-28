@@ -1,0 +1,41 @@
+-- The specification corrects the PDF spellings achivement_id and comparisson_operator.
+-- Allowed condition types/operators and period_days semantics are pending.
+-- Do not constrain their catalog or numeric ranges until business rules exist.
+CREATE TABLE AchievementCondition (
+    id TEXT NOT NULL PRIMARY KEY,
+    achievement_id TEXT NOT NULL,
+    condition_type TEXT NOT NULL CHECK (length(trim(condition_type)) > 0),
+    comparison_operator TEXT NOT NULL CHECK (length(trim(comparison_operator)) > 0),
+    target_value REAL NOT NULL,
+    exercise_id TEXT,
+    period_days INTEGER,
+    FOREIGN KEY (achievement_id) REFERENCES Achievement(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES Exercise(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_achievement_condition_achievement ON AchievementCondition(achievement_id);
+CREATE INDEX idx_achievement_condition_exercise ON AchievementCondition(exercise_id);
+
+selectAchievementConditionById:
+SELECT * FROM AchievementCondition WHERE id = :id;
+
+selectConditionsByAchievement:
+SELECT * FROM AchievementCondition WHERE achievement_id = :achievement_id ORDER BY id;
+
+insertAchievementCondition:
+INSERT INTO AchievementCondition (
+    id, achievement_id, condition_type, comparison_operator, target_value, exercise_id, period_days
+)
+VALUES (
+    :id, :achievement_id, :condition_type, :comparison_operator, :target_value, :exercise_id, :period_days
+);
+
+updateAchievementCondition:
+UPDATE AchievementCondition
+SET condition_type = :condition_type, comparison_operator = :comparison_operator,
+    target_value = :target_value, exercise_id = :exercise_id, period_days = :period_days
+WHERE id = :id AND achievement_id = :achievement_id;
+
+-- Business logic must prevent using achievements without any conditions.
+deleteAchievementCondition:
+DELETE FROM AchievementCondition WHERE id = :id AND achievement_id = :achievement_id;

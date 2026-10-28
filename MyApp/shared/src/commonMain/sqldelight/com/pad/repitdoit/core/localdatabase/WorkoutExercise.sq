@@ -4,6 +4,7 @@ CREATE TABLE WorkoutExercise (
     workout_id TEXT NOT NULL,
     exercise_id TEXT NOT NULL,
     position INTEGER NOT NULL,
+    target_weight REAL,
     target_sets INTEGER,
     target_reps INTEGER,
     rest_seconds INTEGER,
@@ -25,12 +26,16 @@ CREATE TABLE WorkoutExercise (
     CHECK (rest_seconds IS NULL OR rest_seconds >= 0)
 );
 
+CREATE INDEX idx_workout_exercise_catalog
+ON WorkoutExercise(exercise_id);
+
 selectExercisesByWorkout:
 SELECT
     WorkoutExercise.id,
     WorkoutExercise.workout_id,
     WorkoutExercise.exercise_id,
     WorkoutExercise.position,
+    WorkoutExercise.target_weight,
     WorkoutExercise.target_sets,
     WorkoutExercise.target_reps,
     WorkoutExercise.rest_seconds,
@@ -46,9 +51,11 @@ WHERE WorkoutExercise.workout_id = ?
 ORDER BY WorkoutExercise.position ASC;
 
 selectWorkoutExerciseById:
-SELECT *
+SELECT WorkoutExercise.*, Exercise.name
 FROM WorkoutExercise
-WHERE id = ?;
+INNER JOIN Exercise
+    ON WorkoutExercise.exercise_id = Exercise.id
+WHERE WorkoutExercise.id = ?;
 
 insertWorkoutExercise:
 INSERT INTO WorkoutExercise (
@@ -56,16 +63,18 @@ INSERT INTO WorkoutExercise (
     workout_id,
     exercise_id,
     position,
+    target_weight,
     target_sets,
     target_reps,
     rest_seconds,
     notes
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateWorkoutExercise:
 UPDATE WorkoutExercise
 SET
+    target_weight = ?,
     target_sets = ?,
     target_reps = ?,
     rest_seconds = ?,
@@ -76,5 +85,25 @@ deleteWorkoutExercise:
 DELETE FROM WorkoutExercise
 WHERE id = ?;
 
-CREATE INDEX idx_workout_exercise_catalog
-ON WorkoutExercise(exercise_id);
+-- The repository must validate the
+-- parent workout's ownership before invoking queries without a user_id.
+-- Reordering must respect UNIQUE(workout_id, position) at every statement.
+updateWorkoutExercisePosition:
+UPDATE WorkoutExercise
+SET position = :position
+WHERE id = :id AND workout_id = :workout_id
+  AND EXISTS (
+      SELECT 1 FROM Workout
+      WHERE Workout.id = WorkoutExercise.workout_id
+        AND Workout.user_id = :user_id
+  );
+
+selectExercisesByUser:
+SELECT WorkoutExercise.*, Exercise.name
+FROM WorkoutExercise
+INNER JOIN Workout
+    ON WorkoutExercise.workout_id = Workout.id
+INNER JOIN Exercise
+    ON WorkoutExercise.exercise_id = Exercise.id
+WHERE Workout.user_id = ?
+ORDER BY WorkoutExercise.workout_id, WorkoutExercise.position ASC;

@@ -11,7 +11,7 @@ CREATE TABLE Workout (
 
     FOREIGN KEY (user_id)
         REFERENCES User(id)
-        ON DELETE CASCADE,
+        ON DELETE RESTRICT,
 
     UNIQUE (id, user_id),
 
@@ -22,6 +22,9 @@ CREATE TABLE Workout (
     ),
     CHECK (updated_at >= created_at)
 );
+
+CREATE INDEX idx_workout_user
+ON Workout(user_id);
 
 selectWorkoutsByUser:
     SELECT *
@@ -84,5 +87,9 @@ FROM Workout
 WHERE user_id = ?
 ORDER BY updated_at DESC;
 
-CREATE INDEX idx_workout_user
-ON Workout(user_id);
+renameWorkout:
+UPDATE Workout
+SET name = ?, updated_at = ?
+WHERE id = ?
+  AND user_id = ?
+  AND archived_at IS NULL;

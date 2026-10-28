@@ -4,17 +4,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pad.repitdoit.AppWindowSize
+import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.workout.presentation.WorkoutViewModel
 
 @Composable
 fun WorkoutScreenRoot(
     windowSize: AppWindowSize,
-    viewModel: WorkoutViewModel,
+    appContainer: AppContainer,
     workoutId: String,
     onExercisePreview: () -> Unit,
     onExit: () -> Unit
 ) {
+    val viewModel : WorkoutViewModel = viewModel {
+        WorkoutViewModel(
+            getWorkoutUseCase = appContainer.getWorkoutUseCase,
+            createWorkoutUseCase = appContainer.createWorkoutUseCase
+        )
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(workoutId, viewModel) {
         viewModel.loadWorkout(workoutId)

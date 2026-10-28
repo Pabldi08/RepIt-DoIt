@@ -1,0 +1,57 @@
+-- All timestamps are application-provided Unix milliseconds.
+-- Archive referenced workouts instead of deleting them.
+-- State transitions and pause accounting belong to business logic.
+-- Copy the workout name/description when starting the session, in the same
+-- transaction as session creation. Historical reads use these snapshots.
+-- Business logic must not refresh them when the source workout changes.
+CREATE TABLE WorkoutSession (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    workout_id TEXT NOT NULL,
+    workout_name_snapshot TEXT NOT NULL CHECK (length(trim(workout_name_snapshot)) > 0),
+    workout_description_snapshot TEXT,
+    started_at INTEGER NOT NULL,
+    finished_at INTEGER,
+    status TEXT NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE', 'PAUSED', 'ABORTED', 'COMPLETED')),
+    notes TEXT,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE RESTRICT,
+    FOREIGN KEY (workout_id, user_id)
+        REFERENCES Workout(id, user_id) ON DELETE RESTRICT,
+    CHECK (finished_at IS NULL OR finished_at >= started_at),
+    CHECK (
+        (status IN ('ACTIVE', 'PAUSED') AND finished_at IS NULL)
+        OR (status IN ('ABORTED', 'COMPLETED') AND finished_at IS NOT NULL)
+    )
+);
+
+CREATE INDEX idx_workout_session_user_started ON WorkoutSession(user_id, started_at);
+CREATE INDEX idx_workout_session_workout ON WorkoutSession(workout_id, user_id);
+
+selectWorkoutSessionById:
+SELECT * FROM WorkoutSession WHERE id = :id AND user_id = :user_id;
+
+selectWorkoutSessionsByUser:
+SELECT * FROM WorkoutSession WHERE user_id = :user_id ORDER BY started_at DESC, id;
+
+-- Caller supplies snapshots captured when the session starts.
+insertWorkoutSession:
+INSERT INTO WorkoutSession (
+    id, user_id, workout_id, workout_name_snapshot, workout_description_snapshot,
+    started_at, finished_at, status, notes
+)
+VALUES (
+    :id, :user_id, :workout_id, :workout_name_snapshot, :workout_description_snapshot,
+    :started_at, :finished_at, :status, :notes
+);
+
+-- State and finish time change together to satisfy the status CHECK.
+-- Original identity, start time and snapshots are preserved.
+updateWorkoutSession:
+UPDATE WorkoutSession
+SET finished_at = :finished_at, status = :status, notes = :notes
+WHERE id = :id AND user_id = :user_id;
+
+-- Explicit removal of this session also removes its exercises and sets.
+deleteWorkoutSession:
+DELETE FROM WorkoutSession WHERE id = :id AND user_id = :user_id;

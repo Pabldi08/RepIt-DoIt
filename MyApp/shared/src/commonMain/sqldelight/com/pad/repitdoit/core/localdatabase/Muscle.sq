@@ -1,0 +1,26 @@
+-- Optional image/group metadata: the model does not require either field.
+CREATE TABLE Muscle (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+    image_url TEXT,
+    muscle_group TEXT
+);
+
+selectAllMuscles:
+SELECT * FROM Muscle ORDER BY name ASC;
+
+selectMuscleById:
+SELECT * FROM Muscle WHERE id = :id;
+
+insertMuscle:
+INSERT INTO Muscle (id, name, image_url, muscle_group)
+VALUES (:id, :name, :image_url, :muscle_group);
+
+updateMuscle:
+UPDATE Muscle
+SET name = :name, image_url = :image_url, muscle_group = :muscle_group
+WHERE id = :id;
+
+-- Linked muscles are protected by MuscleExercise's RESTRICT foreign key.
+deleteMuscle:
+DELETE FROM Muscle WHERE id = :id;

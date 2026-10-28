@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.training.presentation
+package com.pad.repitdoit.features.training.presentation.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.core.ui.common.OnBackHandler
+import com.pad.repitdoit.features.training.presentation.screen.TrainingExerciseDetailScreen
+import com.pad.repitdoit.features.training.presentation.screen.TrainingOverviewScreen
+import com.pad.repitdoit.features.training.presentation.screen.TrainingWorkoutDetailScreen
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -41,7 +44,7 @@ private data class TrainingDetailDestination(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun TrainingScreen(windowSize: AppWindowSize, onWorkoutDetails: (String) -> Unit) {
-    val plan = TrainingPreviewData.plan
+    val plan = _root_ide_package_.com.pad.repitdoit.features.training.presentation.TrainingPreviewData.plan
     // Los tamaños de la app deciden cuándo mostrar ambos paneles, incluido Medium.
     val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()).copy(
         maxHorizontalPartitions = if (windowSize == AppWindowSize.Compact) 1 else 2,
@@ -76,10 +79,15 @@ fun TrainingScreen(windowSize: AppWindowSize, onWorkoutDetails: (String) -> Unit
                     singleColumn = true,
                     selectedWorkoutId = workout?.id,
                     onWorkoutDetails = { id ->
-                        if (TrainingPreviewData.workout(id) != null) {
+                        if (_root_ide_package_.com.pad.repitdoit.features.training.presentation.TrainingPreviewData.workout(id) != null) {
                             val key = Json.encodeToString(TrainingDetailDestination(plan.id, id))
                             if (navigator.currentDestination?.contentKey != key) {
-                                scope.launch { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, key) }
+                                scope.launch {
+                                    navigator.navigateTo(
+                                        ListDetailPaneScaffoldRole.Detail,
+                                        key
+                                    )
+                                }
                             }
                         } else onWorkoutDetails(id)
                     },
@@ -97,8 +105,14 @@ fun TrainingScreen(windowSize: AppWindowSize, onWorkoutDetails: (String) -> Unit
                         onExercise = { exerciseId ->
                             scope.launch {
                                 navigator.navigateTo(
-                                    ListDetailPaneScaffoldRole.Detail,
-                                    Json.encodeToString(TrainingDetailDestination(plan.id, workout.id, exerciseId))
+                                    pane = ListDetailPaneScaffoldRole.Detail,
+                                    contentKey = Json.encodeToString(
+                                        value = TrainingDetailDestination(
+                                            planId = plan.id,
+                                            workoutId = workout.id,
+                                            exerciseId
+                                        )
+                                    )
                                 )
                             }
                         },

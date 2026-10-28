@@ -1,0 +1,27 @@
+CREATE TABLE AchievementReward (
+    achievement_id TEXT NOT NULL,
+    reward_id TEXT NOT NULL,
+    PRIMARY KEY (achievement_id, reward_id),
+    FOREIGN KEY (achievement_id) REFERENCES Achievement(id) ON DELETE CASCADE,
+    FOREIGN KEY (reward_id) REFERENCES Reward(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_achievement_reward_reward ON AchievementReward(reward_id);
+
+selectAchievementReward:
+SELECT * FROM AchievementReward
+WHERE achievement_id = :achievement_id AND reward_id = :reward_id;
+
+selectRewardsByAchievement:
+SELECT * FROM AchievementReward WHERE achievement_id = :achievement_id ORDER BY reward_id;
+
+insertAchievementReward:
+INSERT INTO AchievementReward (achievement_id, reward_id)
+VALUES (:achievement_id, :reward_id);
+
+deleteAchievementReward:
+DELETE FROM AchievementReward
+WHERE achievement_id = :achievement_id AND reward_id = :reward_id;
+
+-- No non-key attributes: replace an association with DELETE + INSERT
+-- in a transaction.

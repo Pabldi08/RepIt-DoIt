@@ -1,0 +1,39 @@
+-- QR and NFC refer to equipment types, not individual physical machines.
+-- Neither exclusivity nor mandatory presence of either identifier is specified.
+CREATE TABLE ScanTarget (
+    id TEXT NOT NULL PRIMARY KEY,
+    equipment_id TEXT NOT NULL,
+    qr_payload TEXT UNIQUE,
+    nfc_identifier TEXT UNIQUE,
+    is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+    FOREIGN KEY (equipment_id) REFERENCES Equipment(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_scan_target_equipment ON ScanTarget(equipment_id);
+
+selectScanTargetById:
+SELECT * FROM ScanTarget WHERE id = :id;
+
+selectScanTargetsByEquipment:
+SELECT * FROM ScanTarget WHERE equipment_id = :equipment_id ORDER BY id;
+
+selectScanTargetByQrPayload:
+SELECT * FROM ScanTarget WHERE qr_payload = :qr_payload AND is_active = 1;
+
+selectScanTargetByNfcIdentifier:
+SELECT * FROM ScanTarget WHERE nfc_identifier = :nfc_identifier AND is_active = 1;
+
+insertScanTarget:
+INSERT INTO ScanTarget (id, equipment_id, qr_payload, nfc_identifier, is_active)
+VALUES (:id, :equipment_id, :qr_payload, :nfc_identifier, :is_active);
+
+updateScanTarget:
+UPDATE ScanTarget
+SET equipment_id = :equipment_id,
+    qr_payload = :qr_payload,
+    nfc_identifier = :nfc_identifier,
+    is_active = :is_active
+WHERE id = :id;
+
+deactivateScanTarget:
+UPDATE ScanTarget SET is_active = 0 WHERE id = :id;

@@ -1,7 +1,7 @@
 
 CREATE TABLE Exercise (
     id TEXT NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
     description TEXT,
     image_url TEXT,
     video_url TEXT,
@@ -43,3 +43,7 @@ updateExercise:
         is_active = ?,
         updated_at = ?
     WHERE id = ?;
+
+-- Ordinary removal is logical; routine and historical references are retained.
+deactivateExercise:
+UPDATE Exercise SET is_active = 0, updated_at = :updated_at WHERE id = :id;

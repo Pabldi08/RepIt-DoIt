@@ -39,10 +39,6 @@ import com.pad.repitdoit.core.ui.common.OnBackHandler
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.*
-import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
-import com.pad.repitdoit.features.training.presentation.TrainingScreen
-import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreen
-import com.pad.repitdoit.features.workout.presentation.screen.WorkoutScreenRoot
 import com.pad.repitdoit.navigation.Route
 import com.pad.repitdoit.core.ui.theme.AppTheme
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -65,6 +61,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import com.pad.repitdoit.navigation.AppNavigation
 import org.jetbrains.compose.resources.DrawableResource
 import kotlin.math.roundToInt
 
@@ -99,48 +96,11 @@ private fun AppContent(
         currentDestination = backStackEntry?.destination,
         onNavigate = { route -> navController.navigate(route)}
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = Route.Home
-        ) {
-            composable<Route.Home>{
-                HomeScreenRoot(
-                    windowSize = windowSize,
-                    viewModel = appContainer.homeViewModel,
-                    onWorkoutPreview = { workoutId ->
-                        navController.navigate(Route.Workout(workoutId))
-                    }
-                )
-            }
-
-            composable<Route.Training> {
-                TrainingScreen(
-                    windowSize = windowSize,
-                    onWorkoutDetails = { workoutId ->
-                        navController.navigate(Route.Workout(workoutId))
-                    }
-                )
-            }
-
-            composable<Route.Scanner> {
-                ScannerScreen()
-            }
-
-            composable<Route.Profile> {
-                ProfileScreen(windowSize)
-            }
-
-            composable<Route.Workout>{ backStackEntry ->
-                val route = backStackEntry.toRoute<Route.Workout>()
-                WorkoutScreenRoot(
-                    windowSize = windowSize,
-                    viewModel = appContainer.workoutViewModel,
-                    workoutId = route.workoutId,
-                    onExercisePreview = {},
-                    onExit = { navController.popBackStack() }
-                )
-            }
-        }
+        AppNavigation(
+            navController,
+            windowSize,
+            appContainer
+        )
     }
 }
 

@@ -28,5 +28,6 @@ interface WorkoutRepository {
         workoutExerciseId: String
     )
 
+    suspend fun getAllWorkouts(): List<Workout>
 
 }

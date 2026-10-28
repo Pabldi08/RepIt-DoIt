@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.training.presentation
+package com.pad.repitdoit.features.training.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke

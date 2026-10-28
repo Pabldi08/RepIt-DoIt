@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.training.presentation
+package com.pad.repitdoit.features.training.presentation.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -11,6 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.core.ui.common.Header
+import com.pad.repitdoit.features.training.presentation.components.ExerciseItem
+import com.pad.repitdoit.features.training.presentation.components.TrainingCard
+import com.pad.repitdoit.features.training.presentation.TrainingPlanPreview
+import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
 
 @Composable
 internal fun TrainingOverviewScreen(
@@ -69,7 +73,12 @@ internal fun TrainingOverviewScreen(
             TrainingCard(
                 title = workout.title, day = workout.day, image = workout.image, xp = workout.xp,
                 isSelected = workout.id == selectedWorkoutId,
-                exercises = workout.exercises.map { ExerciseItem(it.name, "${it.sets.size} × ${it.sets.first().reps} repeticiones · ${it.sets.first().weightKg} kg") },
+                exercises = workout.exercises.map {
+                    ExerciseItem(
+                        it.name,
+                        "${it.sets.size} × ${it.sets.first().reps} repeticiones · ${it.sets.first().weightKg} kg"
+                    )
+                },
                 onDetails = { onWorkoutDetails(workout.id) },
                 onStart = { /* Pendiente de conectar */ }
             )
