@@ -9,7 +9,6 @@ import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.ScannerScreen
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
-import com.pad.repitdoit.features.profile.presentation.ProfileScreen
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreen
 import com.pad.repitdoit.features.training.presentation.layout.TrainingScreen
 import com.pad.repitdoit.features.workout.presentation.screen.WorkoutScreenRoot
@@ -36,8 +35,10 @@ fun AppNavigation(
 
         composable<Route.Training> {
             TrainingScreen(
-                windowSize,
-                appContainer
+                windowSize = windowSize,
+                onWorkoutDetails = { workoutId ->
+                    navController.navigate(Route.Workout(workoutId))
+                }
             )
         }
 
