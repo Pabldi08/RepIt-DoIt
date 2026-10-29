@@ -14,7 +14,8 @@ import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoo
 fun AppNavigation(
     navController: NavHostController,
     windowSize: AppWindowSize,
-    appContainer: AppContainer
+    appContainer: AppContainer,
+    qrCameraScreen: @Composable (() -> Unit) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -39,6 +40,12 @@ fun AppNavigation(
 
         composable<Route.Scanner> {
             ScannerScreen()
+        }
+
+        composable<Route.QrCamera> {
+            qrCameraScreen {
+                navController.popBackStack()
+            }
         }
 
         composable<Route.Profile> {

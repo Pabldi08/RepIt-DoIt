@@ -71,6 +71,7 @@ fun MainScaffold(
     currentDestination: NavDestination?,
     onNavigate: (Route) -> Unit,
     showScanOptions: Boolean,
+    onQrClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     var addMenuExpanded by remember { mutableStateOf(false) }
@@ -131,7 +132,7 @@ fun MainScaffold(
                 },
                 onQrClick = {
                     addMenuExpanded = false
-                    TODO()
+                    onQrClick()
                 },
                 onManualClick = {
                     addMenuExpanded = false

@@ -15,6 +15,9 @@ sealed interface Route {
     data object Scanner: Route
 
     @Serializable
+    data object QrCamera: Route
+
+    @Serializable
     data object Training: Route
 
     @Serializable

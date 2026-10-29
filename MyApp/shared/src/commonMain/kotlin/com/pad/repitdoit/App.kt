@@ -13,6 +13,8 @@ import com.pad.repitdoit.core.platform.supportsScanOptions
 import com.pad.repitdoit.core.ui.theme.AppTheme
 import com.pad.repitdoit.navigation.AppNavigation
 import com.pad.repitdoit.navigation.MainScaffold
+import com.pad.repitdoit.navigation.Route
+import com.pad.repitdoit.navigation.ScannerScreen
 
 enum class AppWindowSize {
     Compact,
@@ -22,16 +24,18 @@ enum class AppWindowSize {
 
 @Composable
 fun App(
-    appContainer: AppContainer
+    appContainer: AppContainer,
+    qrCameraScreen: @Composable (() -> Unit) -> Unit = { ScannerScreen() }
 ) {
     AppTheme {
-        AppContent(appContainer)
+        AppContent(appContainer, qrCameraScreen)
     }
 }
 
 @Composable
 private fun AppContent(
-    appContainer: AppContainer
+    appContainer: AppContainer,
+    qrCameraScreen: @Composable (() -> Unit) -> Unit
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
@@ -42,12 +46,18 @@ private fun AppContent(
     MainScaffold(
         showScanOptions = supportsScanOptions(),
         currentDestination = backStackEntry?.destination,
-        onNavigate = { route -> navController.navigate(route)}
+        onNavigate = { route -> navController.navigate(route)},
+        onQrClick = {
+            navController.navigate(Route.QrCamera) {
+                launchSingleTop = true
+            }
+        }
     ) {
         AppNavigation(
-            navController,
-            windowSize,
-            appContainer
+            navController = navController,
+            windowSize = windowSize,
+            appContainer = appContainer,
+            qrCameraScreen = qrCameraScreen
         )
     }
 }
