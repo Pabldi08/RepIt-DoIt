@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.pad.repitdoit.core.ui.common.NfcInfoPanel
 import com.pad.repitdoit.core.ui.common.OnBackHandler
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -72,6 +75,7 @@ fun MainScaffold(
 ) {
     var addMenuExpanded by remember { mutableStateOf(false) }
     var addButtonCenter by remember { mutableStateOf<Offset?>(null) }
+    var nfcPanelVisible by remember { mutableStateOf(false) }
     var scaffoldOrigin by remember { mutableStateOf(Offset.Zero) }
     val navigationLayout = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
         currentWindowAdaptiveInfo()
@@ -107,8 +111,12 @@ fun MainScaffold(
             content()
         }
 
-        OnBackHandler(enabled = addMenuExpanded) {
-            addMenuExpanded = false
+        OnBackHandler(enabled = addMenuExpanded || nfcPanelVisible) {
+            if (nfcPanelVisible) {
+                nfcPanelVisible = false
+            } else {
+                addMenuExpanded = false
+            }
         }
 
         addButtonCenter?.let { center ->
@@ -119,7 +127,7 @@ fun MainScaffold(
                 isNavigationBar = isNavigationBar,
                 onNfcClick = {
                     addMenuExpanded = false
-                    TODO()
+                    nfcPanelVisible = true
                 },
                 onQrClick = {
                     addMenuExpanded = false
@@ -131,6 +139,14 @@ fun MainScaffold(
                 }
             )
         }
+        NfcInfoPanel(
+            visible = showScanOptions && nfcPanelVisible,
+            onDismiss = { nfcPanelVisible = false },
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        )
     }
 }
 
