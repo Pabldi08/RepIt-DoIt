@@ -1,6 +1,6 @@
-package com.pad.repitdoit.features.workout.domain.usecase
+package com.pad.repitdoit.features.training.domain.usecase
 
-import com.pad.repitdoit.features.workout.domain.repository.WorkoutRepository
+import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
 class RenameWorkoutUseCase (
     private val repository: WorkoutRepository

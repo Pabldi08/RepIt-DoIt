@@ -20,13 +20,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
@@ -41,9 +41,8 @@ data class ExerciseItem(
 @Composable
 fun TrainingCard(
     title: String,
-    day: String,
+    exercises: List<WorkoutExercise> = emptyList(),
     image: DrawableResource,
-    exercises: List<ExerciseItem>,
     xp: Int,
     onDetails: () -> Unit,
     onStart: () -> Unit,
@@ -52,7 +51,11 @@ fun TrainingCard(
 ) {
     OutlinedCard(
         onClick = onDetails,
-        border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else CardDefaults.outlinedCardBorder(),
+        border =
+            if (isSelected) BorderStroke(
+                width =2.dp,
+                color = MaterialTheme.colorScheme.primary
+            ) else CardDefaults.outlinedCardBorder(),
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -71,20 +74,20 @@ fun TrainingCard(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                ) {
-                    Text(
-                        text = day,
-                        modifier = Modifier.padding(
-                            horizontal = 12.dp,
-                            vertical = 4.dp
-                        ),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                }
+//                Surface(
+//                    shape = RoundedCornerShape(50),
+//                    color = MaterialTheme.colorScheme.secondaryContainer,
+//                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+//                ) {
+//                    Text(
+//                        text = day,
+//                        modifier = Modifier.padding(
+//                            horizontal = 12.dp,
+//                            vertical = 4.dp
+//                        ),
+//                        style = MaterialTheme.typography.labelSmall
+//                    )
+//                }
             }
         }
         Row(
@@ -106,7 +109,7 @@ fun TrainingCard(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 exercises.forEach { exercise ->
-                    ExerciseItemView(exercise)
+                    ExerciseView(exercise)
                 }
             }
         }
@@ -150,7 +153,7 @@ fun TrainingCard(
 }
 
 @Composable
-private fun ExerciseItemView(exercise: ExerciseItem) {
+private fun ExerciseView(exercise: WorkoutExercise) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -159,7 +162,7 @@ private fun ExerciseItemView(exercise: ExerciseItem) {
             style = MaterialTheme.typography.titleSmall
         )
         Text(
-            text = exercise.details,
+            text = "${exercise.numSets} x ${exercise.numReps} repeticiones · ${exercise.weight} kg",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

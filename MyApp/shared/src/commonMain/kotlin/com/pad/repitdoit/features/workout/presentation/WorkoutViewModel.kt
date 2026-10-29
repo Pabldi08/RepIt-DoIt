@@ -2,8 +2,8 @@ package com.pad.repitdoit.features.workout.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pad.repitdoit.features.workout.domain.usecase.CreateWorkoutUseCase
-import com.pad.repitdoit.features.workout.domain.usecase.GetWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -6,13 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.pad.repitdoit.AppWindowSize
-import com.pad.repitdoit.ScannerScreen
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreen
-import com.pad.repitdoit.features.training.presentation.layout.TrainingScreen
-import com.pad.repitdoit.features.workout.presentation.screen.WorkoutScreenRoot
-
+import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
 @Composable
 fun AppNavigation(
     navController: NavHostController,
@@ -34,11 +31,9 @@ fun AppNavigation(
         }
 
         composable<Route.Training> {
-            TrainingScreen(
+            TrainingScreenRoot(
                 windowSize = windowSize,
-                onWorkoutDetails = { workoutId ->
-                    navController.navigate(Route.Workout(workoutId))
-                }
+                appContainer = appContainer
             )
         }
 
@@ -52,12 +47,10 @@ fun AppNavigation(
 
         composable<Route.Workout>{ backStackEntry ->
             val route = backStackEntry.toRoute<Route.Workout>()
-            WorkoutScreenRoot(
+            TrainingScreenRoot(
                 windowSize = windowSize,
                 appContainer = appContainer,
-                workoutId = route.workoutId,
-                onExercisePreview = {},
-                onExit = { navController.popBackStack() }
+                initialWorkoutId = route.workoutId
             )
         }
 

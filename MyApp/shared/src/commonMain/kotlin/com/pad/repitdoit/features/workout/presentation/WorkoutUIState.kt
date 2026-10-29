@@ -1,6 +1,6 @@
 package com.pad.repitdoit.features.workout.presentation
 
-import com.pad.repitdoit.features.workout.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.Workout
 
 data class WorkoutUIState (
     val workout: Workout? = null,

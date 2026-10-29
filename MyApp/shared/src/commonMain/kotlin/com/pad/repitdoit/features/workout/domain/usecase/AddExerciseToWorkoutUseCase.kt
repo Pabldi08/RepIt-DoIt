@@ -1,4 +1,0 @@
-package com.pad.repitdoit.features.workout.domain.usecase
-
-class AddExerciseToWorkoutUseCase {
-}

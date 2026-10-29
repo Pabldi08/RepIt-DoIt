@@ -5,14 +5,12 @@ import com.pad.repitdoit.features.home.data.repository.FakeHomeRepositoryImpl
 import com.pad.repitdoit.features.home.data.repository.HomeRepositoryImpl
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
 import com.pad.repitdoit.features.home.domain.usecase.GetHomeDailyWorkoutsUseCase
-import com.pad.repitdoit.features.home.presentation.HomeViewModel
-import com.pad.repitdoit.features.workout.data.repository.FakeWorkoutRepositoryImpl
-import com.pad.repitdoit.features.workout.data.repository.WorkoutRepositoryImpl
-import com.pad.repitdoit.features.workout.domain.repository.WorkoutRepository
-import com.pad.repitdoit.features.workout.domain.usecase.CreateWorkoutUseCase
-import com.pad.repitdoit.features.workout.domain.usecase.GetUsersWorkoutsUseCase
-import com.pad.repitdoit.features.workout.domain.usecase.GetWorkoutUseCase
-import com.pad.repitdoit.features.workout.presentation.WorkoutViewModel
+import com.pad.repitdoit.features.training.data.repository.FakeWorkoutRepositoryImpl
+import com.pad.repitdoit.features.training.data.repository.WorkoutRepositoryImpl
+import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
+import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCase
+import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
 interface AppContainer {

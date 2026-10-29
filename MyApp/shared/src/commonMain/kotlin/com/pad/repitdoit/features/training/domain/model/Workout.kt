@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.workout.domain.model
+package com.pad.repitdoit.features.training.domain.model
 
 import org.jetbrains.compose.resources.DrawableResource
 

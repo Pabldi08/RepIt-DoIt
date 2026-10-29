@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.workout.domain.model
+package com.pad.repitdoit.features.training.domain.model
 
 data class WorkoutExercise (
     val id: String,

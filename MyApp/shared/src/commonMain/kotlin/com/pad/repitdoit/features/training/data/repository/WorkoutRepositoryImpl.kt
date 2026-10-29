@@ -1,14 +1,15 @@
-package com.pad.repitdoit.features.workout.data.repository
+package com.pad.repitdoit.features.training.data.repository
 
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
-import com.pad.repitdoit.features.workout.domain.model.Workout
-import com.pad.repitdoit.features.workout.domain.model.WorkoutExercise
-import com.pad.repitdoit.features.workout.domain.repository.WorkoutRepository
+import com.pad.repitdoit.core.utility.generateId
+import com.pad.repitdoit.core.utility.loadImage
+import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
+import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.placeholder
-import kotlin.uuid.Uuid
 
 
 class WorkoutRepositoryImpl (
@@ -47,7 +48,7 @@ class WorkoutRepositoryImpl (
             name = workout.name,
             workoutExercises = exercises,
             estimatedTime = workout.estimated_time?.toInt() ?:0,
-            image = Res.drawable.placeholder
+            image = loadImage(workout.image_url)
         )
     }
 
@@ -57,7 +58,7 @@ class WorkoutRepositoryImpl (
         // Validar nombre
         // Generar id unico y obtener timestamp
 
-        val id = Uuid.random().toString()
+        val id = generateId()
         val timestamp = 261025171100
 
         db.workoutQueries.insertWorkout(
@@ -65,6 +66,7 @@ class WorkoutRepositoryImpl (
             user_id = "test-user-001",
             name = name,
             description = "",
+            image_url = null,
             estimated_time = null,
             created_at = timestamp,
             updated_at = timestamp,
@@ -152,7 +154,7 @@ class WorkoutRepositoryImpl (
                         name = workout.name,
                         workoutExercises = exercises,
                         estimatedTime = workout.estimated_time?.toInt() ?: 0,
-                        image = Res.drawable.placeholder
+                        image = loadImage(workout.image_url)
                     )
                 }
         }

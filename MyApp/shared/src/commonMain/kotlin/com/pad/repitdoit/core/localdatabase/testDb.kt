@@ -56,6 +56,7 @@ class testDb(
                 user_id = userId,
                 name = "Push Day",
                 description = "Entrenamiento de empuje",
+                image_url = "training_muscles",
                 estimated_time = 60L,
                 created_at = 1000L,
                 updated_at = 1000L
@@ -66,6 +67,7 @@ class testDb(
                 user_id = userId,
                 name = "Cardio",
                 description = "Entrenamiento cardiovascular",
+                image_url = null,
                 estimated_time = 30L,
                 created_at = 1000L,
                 updated_at = 1000L

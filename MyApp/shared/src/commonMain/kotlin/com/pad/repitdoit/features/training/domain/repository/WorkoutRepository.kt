@@ -1,7 +1,7 @@
-package com.pad.repitdoit.features.workout.domain.repository
+package com.pad.repitdoit.features.training.domain.repository
 
-import com.pad.repitdoit.features.workout.domain.model.Workout
-import com.pad.repitdoit.features.workout.domain.model.WorkoutExercise
+import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 
 interface WorkoutRepository {
     suspend fun getWorkout(workoutId: String): Workout?

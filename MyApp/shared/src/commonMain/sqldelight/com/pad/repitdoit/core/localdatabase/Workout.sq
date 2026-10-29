@@ -4,6 +4,7 @@ CREATE TABLE Workout (
     user_id TEXT NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
+    image_url TEXT,
     estimated_time INTEGER,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL,
@@ -45,18 +46,20 @@ insertWorkout:
         user_id,
         name,
         description,
+        image_url,
         estimated_time,
         created_at,
         updated_at,
         archived_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, NULL);
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL);
 
 updateWorkout:
     UPDATE Workout
     SET
         name = ?,
         description = ?,
+        image_url = ?,
         estimated_time = ?,
         updated_at = ?
     WHERE id = ?

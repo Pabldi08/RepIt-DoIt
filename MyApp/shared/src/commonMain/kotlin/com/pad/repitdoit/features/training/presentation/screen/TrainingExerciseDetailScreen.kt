@@ -16,58 +16,123 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.training.presentation.TrainingExercisePreview
-import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
 import com.pad.repitdoit.features.training.presentation.TrainingSetPreview
-import com.pad.repitdoit.features.training.presentation.TrainingWorkoutPreview
+import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 
 @Composable
 fun TrainingExerciseDetailScreen(
-    workout: TrainingWorkoutPreview,
-    exercise: TrainingExercisePreview,
+    workout: Workout,
+    exercise: WorkoutExercise,
+    hardcodedExercise: TrainingExercisePreview,
     onBack: () -> Unit
 ) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    Box(
+        Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
         LazyColumn(
-            modifier = Modifier.widthIn(max = 840.dp).fillMaxSize(),
-            contentPadding = PaddingValues(20.dp, 24.dp),
+            modifier = Modifier
+                .widthIn(max = 840.dp)
+                .fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
                 TrainingDetailHeader(
-                    exercise.name,
-                    "${TrainingPreviewData.plan.name} · ${workout.title}", onBack
+                    title = exercise.name,
+                    //subtitle = "${TrainingPreviewData.plan.name} · ${workout.title}",
+                    onBack = onBack
                 )
             }
             item {
-                Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.secondaryContainer) {
-                    Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("${exercise.sets.size} series × ${exercise.sets.first().reps} repeticiones", style = MaterialTheme.typography.headlineSmall)
-                        Text("${exercise.sets.first().weightKg} kg · Descanso de ${exercise.rest} entre series")
+                Surface(
+                    shape = RoundedCornerShape(size = 20.dp),
+                    color = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(all = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "${exercise.numSets} series × ${exercise.numReps} repeticiones",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Text(
+                            text = "${exercise.weight} kg · Descanso de ${exercise.restSec} s entre series"
+                        )
                     }
                 }
             }
             item {
-                Text("Series programadas", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = "Series programadas\n(sigue hardcodeado",
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
-            item { TrainingTableRow("Serie", "Repeticiones", "Peso", heading = true) }
-            itemsIndexed(exercise.sets) { index, set ->
-                TrainingSetRow(exercise.id, index, set)
+            item {
+                TrainingTableRow(
+                    first = "Serie",
+                    second ="Repeticiones",
+                    third = "Peso",
+                    heading = true
+                )
+            }
+            itemsIndexed(hardcodedExercise.sets) {
+                index,
+                set ->
+                    TrainingSetRow(
+                        exerciseId = exercise.id,
+                        index = index,
+                        set = set
+                    )
             }
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Historial en esta rutina", style = MaterialTheme.typography.titleLarge)
-            }
-            item { TrainingTableRow("Fecha", "Series × reps", "Peso", heading = true) }
-            itemsIndexed(exercise.history) { _, session ->
-                TrainingTableRow(session.date, session.sets, session.weight)
+                Text(
+                    text = "Historial en esta rutina\n(sigue hardcodeado)",
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
             item {
-                OutlinedCard(shape = RoundedCornerShape(20.dp)) {
-                    Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Evolución", style = MaterialTheme.typography.titleMedium)
-                        Text("Próximamente", color = MaterialTheme.colorScheme.primary)
-                        Text("Aquí irá la gráfica con la evolución de los pesos.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                TrainingTableRow(
+                    first = "Fecha",
+                    second = "Series × reps",
+                    third ="Peso",
+                    heading = true
+                )
+            }
+            itemsIndexed(hardcodedExercise.history) {
+                _, session ->
+                    TrainingTableRow(
+                        first = session.date,
+                        second= session.sets,
+                        third = session.weight
+                    )
+            }
+            item {
+                OutlinedCard(
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Evolución",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = "Próximamente",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Aquí irá la gráfica con la evolución de los pesos.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

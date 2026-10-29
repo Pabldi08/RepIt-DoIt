@@ -1,8 +1,8 @@
-package com.pad.repitdoit.features.workout.data.repository
+package com.pad.repitdoit.features.training.data.repository
 
-import com.pad.repitdoit.features.workout.domain.model.Workout
-import com.pad.repitdoit.features.workout.domain.model.WorkoutExercise
-import com.pad.repitdoit.features.workout.domain.repository.WorkoutRepository
+import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
+import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles
 
