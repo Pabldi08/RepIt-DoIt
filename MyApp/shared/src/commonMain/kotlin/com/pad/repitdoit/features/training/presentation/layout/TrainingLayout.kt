@@ -59,11 +59,6 @@ fun TrainingLayout(
 ) {
     val plan = TrainingPreviewData.plan
     // Los tamaños de la app deciden cuándo mostrar ambos paneles, incluido Medium.
-    val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()).copy(
-        maxHorizontalPartitions = if (windowSize == AppWindowSize.Compact) 1 else 2,
-        horizontalPartitionSpacerSize = 0.dp,
-        maxVerticalPartitions = 1
-    )
 
     val initialHistory = remember(initialWorkoutId) {
         buildList<ThreePaneScaffoldDestinationItem<String>> {
@@ -89,7 +84,6 @@ fun TrainingLayout(
         }
     }
     val navigator = rememberListDetailPaneScaffoldNavigator<String>(
-        scaffoldDirective = directive,
         initialDestinationHistory = initialHistory
     )
 
@@ -128,10 +122,8 @@ fun TrainingLayout(
         listPane = {
             AnimatedPane {
                 TrainingOverviewScreen(
-                    windowSize = windowSize,
                     plan = plan,
                     state = state,
-                    singleColumn = true,
                     selectedWorkoutId = destination?.workoutId,
                     onCreateWorkout = onCreateWorkout,
 //                    onWorkoutDetails = { id ->
@@ -197,7 +189,7 @@ fun TrainingLayout(
 //                    }
 //                }
                 val selectedDestination =
-                    if (windowSize == AppWindowSize.Compact) {
+                    if (navigator.scaffoldDirective.maxHorizontalPartitions == 1) {
                         destination ?: lastDetailDestination
                     } else {
                         destination

@@ -24,10 +24,8 @@ import com.pad.repitdoit.features.training.presentation.TrainingUIState
 
 @Composable
 internal fun TrainingOverviewScreen(
-    windowSize: AppWindowSize,
     plan: TrainingPlanPreview = TrainingPreviewData.plan,
     state: TrainingUIState,
-    singleColumn: Boolean = false,
     selectedWorkoutId: String? = null,
     onCreateWorkout: (String) -> Unit,
     onWorkoutDetails: (String) -> Unit
@@ -44,7 +42,7 @@ internal fun TrainingOverviewScreen(
     }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(if (!singleColumn && windowSize == AppWindowSize.Extended) 2 else 1),
+        columns = GridCells.Fixed(1),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 40.dp, bottom = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
