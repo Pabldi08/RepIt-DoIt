@@ -9,6 +9,10 @@ class CreateWorkoutUseCase (
     suspend operator fun invoke (
         name: String
     ) : Workout {
-      return repository.createWorkout(name)
+        val trimName = name.trim()
+        require(trimName.isNotEmpty()) {
+            "El nombre del entrenamiento no puede estar vacio"
+        }
+        return repository.createWorkout(trimName)
     }
 }

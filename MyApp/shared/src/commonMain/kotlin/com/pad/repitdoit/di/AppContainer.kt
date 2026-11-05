@@ -9,6 +9,12 @@ import com.pad.repitdoit.features.training.data.repository.FakeWorkoutRepository
 import com.pad.repitdoit.features.training.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.GetExercisesUseCase
+import com.pad.repitdoit.features.training.domain.usecase.AddExerciseToWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.UpdateWorkoutExerciseUseCase
+import com.pad.repitdoit.features.training.domain.usecase.RemoveExerciseFromWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.RemoveWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.RenameWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +27,12 @@ interface AppContainer {
     val getWorkoutUseCase: GetWorkoutUseCase
     val getUsersWorkoutsUseCase: GetUsersWorkoutsUseCase
     val createWorkoutUseCase: CreateWorkoutUseCase
+    val getExercisesUseCase: GetExercisesUseCase
+    val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase
+    val updateWorkoutExerciseUseCase: UpdateWorkoutExerciseUseCase
+    val removeExerciseFromWorkoutUseCase: RemoveExerciseFromWorkoutUseCase
+    val removeWorkoutUseCase: RemoveWorkoutUseCase
+    val renameWorkoutUseCase: RenameWorkoutUseCase
 }
 
 class DefaultAppContainer(
@@ -52,5 +64,11 @@ class DefaultAppContainer(
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
     override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)
     override val createWorkoutUseCase = CreateWorkoutUseCase(workoutRepository)
+    override val getExercisesUseCase = GetExercisesUseCase(workoutRepository)
+    override val addExerciseToWorkoutUseCase = AddExerciseToWorkoutUseCase(workoutRepository)
+    override val updateWorkoutExerciseUseCase = UpdateWorkoutExerciseUseCase(workoutRepository)
+    override val removeExerciseFromWorkoutUseCase = RemoveExerciseFromWorkoutUseCase(workoutRepository)
+    override val removeWorkoutUseCase = RemoveWorkoutUseCase(workoutRepository)
+    override val renameWorkoutUseCase = RenameWorkoutUseCase(workoutRepository)
 
 }

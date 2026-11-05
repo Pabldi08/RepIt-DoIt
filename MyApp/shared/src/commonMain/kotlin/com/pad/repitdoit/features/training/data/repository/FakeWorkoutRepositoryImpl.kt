@@ -1,5 +1,7 @@
 package com.pad.repitdoit.features.training.data.repository
 
+import com.pad.repitdoit.core.utility.generateId
+import com.pad.repitdoit.features.training.domain.model.Exercise
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
@@ -7,9 +9,9 @@ import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles
 
 class FakeWorkoutRepositoryImpl: WorkoutRepository {
-    override suspend fun getWorkout(workoutId: String): Workout? {
-        return Workout(
-            id = workoutId,
+    private val workouts = mutableMapOf(
+        "001" to Workout(
+            id = "001",
             name = "Tren Superior",
             estimatedTime = 0,
             image = Res.drawable.training_muscles,
@@ -52,38 +54,79 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
                 ),
             )
         )
+    )
+    private val archivedWorkoutIds = mutableSetOf<String>()
+    private val exercises = workouts.values.flatMap { it.workoutExercises }
+        .map { Exercise(it.exerciseId, it.name, null) }.distinctBy { it.id }.sortedBy { it.name }
+
+    override suspend fun getExercises(): List<Exercise> {
+        return exercises
+    }
+
+    override suspend fun getWorkout(workoutId: String): Workout? {
+        return workouts[workoutId]
     }
 
     override suspend fun createWorkout(name: String): Workout {
-        TODO("Not yet implemented")
+        val workout = Workout(generateId(), name, estimatedTime = 0, image = Res.drawable.training_muscles)
+        workouts[workout.id] = workout
+        return workout
     }
 
     override suspend fun renameWorkout(workoutId: String, name: String) {
-        TODO("Not yet implemented")
+        val workout = requireActiveWorkout(workoutId)
+        workouts[workoutId] = workout.copy(name = name)
     }
 
     override suspend fun removeWorkout(workoutId: String) {
-        TODO("Not yet implemented")
+        requireActiveWorkout(workoutId)
+        archivedWorkoutIds.add(workoutId)
     }
 
     override suspend fun addWorkoutExercise(
         workoutId: String,
         exerciseId: String,
         numReps: Int,
-        numSeries: Int
+        numSeries: Int,
+        weight: Double,
+        restSec: Int
     ): WorkoutExercise {
-        TODO("Not yet implemented")
+        val workout = requireActiveWorkout(workoutId)
+        val exercise = requireNotNull(exercises.find { it.id == exerciseId }) { "El ejercicio no existe o no esta activo" }
+        val workoutExercise = WorkoutExercise(generateId(), exerciseId, exercise.name, weight, numReps, numSeries, restSec)
+        workouts[workoutId] = workout.copy(workoutExercises = workout.workoutExercises + workoutExercise)
+        return workoutExercise
     }
 
     override suspend fun updateWorkoutExercise(workoutId: String, workoutExercise: WorkoutExercise) {
-        TODO("Not yet implemented")
+        val workout = requireActiveWorkout(workoutId)
+        val existing = requireNotNull(workout.workoutExercises.find { it.id == workoutExercise.id }) {
+            "El ejercicio no pertenece a la rutina"
+        }
+        require(existing.exerciseId == workoutExercise.exerciseId) { "No se puede cambiar el ejercicio del catalogo" }
+        workouts[workoutId] = workout.copy(workoutExercises = workout.workoutExercises.map {
+            if (it.id == existing.id) existing.copy(
+                weight = workoutExercise.weight,
+                numReps = workoutExercise.numReps,
+                numSets = workoutExercise.numSets,
+                restSec = workoutExercise.restSec
+            ) else it
+        })
     }
 
     override suspend fun removeWorkoutExercise(workoutId: String, workoutExerciseId: String) {
-        TODO("Not yet implemented")
+        val workout = requireActiveWorkout(workoutId)
+        require(workout.workoutExercises.any { it.id == workoutExerciseId }) { "El ejercicio no pertenece a la rutina" }
+        workouts[workoutId] = workout.copy(workoutExercises = workout.workoutExercises.filterNot { it.id == workoutExerciseId })
     }
 
     override suspend fun getAllWorkouts(): List<Workout> {
-        TODO("Not yet implemented")
+        return workouts.values.filterNot { it.id in archivedWorkoutIds }
+    }
+
+    private fun requireActiveWorkout(workoutId: String): Workout {
+        val workout = requireNotNull(workouts[workoutId]) { "La rutina no existe o no pertenece al usuario" }
+        require(workoutId !in archivedWorkoutIds) { "La rutina esta archivada" }
+        return workout
     }
 }
