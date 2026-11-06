@@ -32,7 +32,6 @@ fun AppNavigation(
 
         composable<Route.Training> {
             TrainingScreenRoot(
-                windowSize = windowSize,
                 appContainer = appContainer
             )
         }
@@ -48,7 +47,6 @@ fun AppNavigation(
         composable<Route.Workout>{ backStackEntry ->
             val route = backStackEntry.toRoute<Route.Workout>()
             TrainingScreenRoot(
-                windowSize = windowSize,
                 appContainer = appContainer,
                 initialWorkoutId = route.workoutId
             )

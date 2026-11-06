@@ -51,8 +51,8 @@ private data class TrainingDetailDestination(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
+
 fun TrainingLayout(
-    windowSize: AppWindowSize,
     state: TrainingUIState,
     initialWorkoutId: String? = null,
     onCreateWorkout: (String) -> Unit
