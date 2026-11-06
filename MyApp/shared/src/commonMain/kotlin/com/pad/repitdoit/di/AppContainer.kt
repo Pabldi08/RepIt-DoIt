@@ -19,10 +19,7 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCas
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
-interface AppContainer : TrainingUseCasesAC{
-    //Feature Home
-    val getHomeDailyWorkoutsUseCase: GetHomeDailyWorkoutsUseCase
-}
+interface AppContainer : TrainingUseCasesAC, HomeUseCasesAC { }
 
 class DefaultAppContainer(
     val db: RepItDoItDatabase? = null,
