@@ -19,20 +19,9 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCas
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
-interface AppContainer {
+interface AppContainer : TrainingUseCasesAC{
     //Feature Home
     val getHomeDailyWorkoutsUseCase: GetHomeDailyWorkoutsUseCase
-
-    //Feature Workout
-    val getWorkoutUseCase: GetWorkoutUseCase
-    val getUsersWorkoutsUseCase: GetUsersWorkoutsUseCase
-    val createWorkoutUseCase: CreateWorkoutUseCase
-    val getExercisesUseCase: GetExercisesUseCase
-    val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase
-    val updateWorkoutExerciseUseCase: UpdateWorkoutExerciseUseCase
-    val removeExerciseFromWorkoutUseCase: RemoveExerciseFromWorkoutUseCase
-    val removeWorkoutUseCase: RemoveWorkoutUseCase
-    val renameWorkoutUseCase: RenameWorkoutUseCase
 }
 
 class DefaultAppContainer(

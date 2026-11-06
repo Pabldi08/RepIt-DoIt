@@ -17,8 +17,7 @@ fun TrainingScreenRoot(
 ) {
     val viewModel: TrainingViewModel = viewModel {
         TrainingViewModel(
-            createWorkoutUseCase = appContainer.createWorkoutUseCase,
-            getUsersWorkoutsUseCase = appContainer.getUsersWorkoutsUseCase
+            appContainer = appContainer
         )
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
