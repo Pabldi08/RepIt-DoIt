@@ -1,9 +1,11 @@
 package com.pad.repitdoit.features.training.domain.repository
 
+import com.pad.repitdoit.features.training.domain.model.Exercise
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 
 interface WorkoutRepository {
+    suspend fun getExercises(): List<Exercise>
     suspend fun getWorkout(workoutId: String): Workout?
 
     suspend fun createWorkout(name: String): Workout
@@ -17,7 +19,9 @@ interface WorkoutRepository {
         workoutId: String,
         exerciseId: String,
         numReps: Int,
-        numSeries: Int
+        numSeries: Int,
+        weight: Double = 0.0,
+        restSec: Int = 0
     ) : WorkoutExercise
     suspend fun updateWorkoutExercise(
         workoutId: String,
