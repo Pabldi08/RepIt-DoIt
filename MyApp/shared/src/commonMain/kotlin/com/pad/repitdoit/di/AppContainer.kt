@@ -1,9 +1,9 @@
 package com.pad.repitdoit.di
 
+import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.features.achievement.data.repository.AchievementsRepositoryImpl
 import com.pad.repitdoit.features.achievement.data.repository.FakeAchievementsRepositoryImpl
-import com.pad.repitdoit.features.achievement.domain.model.Achievement
 import com.pad.repitdoit.features.achievement.domain.repository.AchievementRepository
 import com.pad.repitdoit.features.achievement.domain.usecase.GetAllowedAchievementsUseCase
 import com.pad.repitdoit.features.home.data.repository.FakeHomeRepositoryImpl
@@ -51,7 +51,7 @@ class DefaultAppContainer(
         if (db == null || dispatcher == null) {
             FakeAchievementsRepositoryImpl()
         } else {
-            AchievementsRepositoryImpl(db, dispatcher)
+            AchievementsRepositoryImpl(db, dispatcher, LOCAL_TEST_USER_ID)
         }
 
 
