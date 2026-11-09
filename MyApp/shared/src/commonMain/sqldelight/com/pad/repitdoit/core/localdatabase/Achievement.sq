@@ -24,6 +24,15 @@ SELECT * FROM Achievement WHERE id = :id;
 selectAchievementByCode:
 SELECT * FROM Achievement WHERE code = :code;
 
+getAllowedAchievementsByUser:
+SELECT
+    a.*,
+    ur.obtained_at AS available_from
+FROM Achievement a
+INNER JOIN UserReward ur
+    ON a.required_reward_id = ur.reward_id
+WHERE ur.user_id = :userId;
+
 insertAchievement:
 INSERT INTO Achievement (id, required_reward_id, code, name, description, condition_logic, icon_url)
 VALUES (:id, :required_reward_id, :code, :name, :description, :condition_logic, :icon_url);

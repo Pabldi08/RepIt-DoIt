@@ -28,6 +28,17 @@ CREATE TABLE WorkoutSession (
 CREATE INDEX idx_workout_session_user_started ON WorkoutSession(user_id, started_at);
 CREATE INDEX idx_workout_session_workout ON WorkoutSession(workout_id, user_id);
 
+getCompletedWorkoutCount:
+SELECT COUNT(*) AS current_value
+FROM WorkoutSession ws
+WHERE ws.user_id = :userId
+  AND ws.status = 'COMPLETED'
+  AND ws.finished_at >= :fromTimestamp
+  AND (
+      :workoutId IS NULL
+      OR ws.workout_id = :workoutId
+  );
+
 selectWorkoutSessionById:
 SELECT * FROM WorkoutSession WHERE id = :id AND user_id = :user_id;
 

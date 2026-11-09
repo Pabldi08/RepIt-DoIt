@@ -11,6 +11,46 @@ CREATE TABLE SessionSet (
     UNIQUE (session_exercise_id, set_number)
 );
 
+getCompletedExerciseSetsCount:
+SELECT COUNT(*) AS current_value
+FROM SessionSet ss
+INNER JOIN SessionExercise se
+    ON ss.session_exercise_id = se.id
+INNER JOIN WorkoutSession ws
+    ON se.session_id = ws.id
+WHERE ws.user_id = :userId
+  AND ws.status = 'COMPLETED'
+  AND ss.completed_at IS NOT NULL
+  AND ss.completed_at >= :fromTimestamp
+  AND (
+      :exerciseId IS NULL
+      OR se.exercise_id = :exerciseId
+  )
+  AND (
+      :workoutId IS NULL
+      OR ws.workout_id = :workoutId
+  );
+
+getCompletedExerciseReps:
+SELECT COALESCE(SUM(ss.reps), 0) AS current_value
+FROM SessionSet ss
+INNER JOIN SessionExercise se
+    ON ss.session_exercise_id = se.id
+INNER JOIN WorkoutSession ws
+    ON se.session_id = ws.id
+WHERE ws.user_id = :userId
+  AND ws.status = 'COMPLETED'
+  AND ss.completed_at IS NOT NULL
+  AND ss.completed_at >= :fromTimestamp
+  AND (
+      :exerciseId IS NULL
+      OR se.exercise_id = :exerciseId
+  )
+  AND (
+      :workoutId IS NULL
+      OR ws.workout_id = :workoutId
+  );
+
 selectSessionSetById:
 SELECT * FROM SessionSet
 WHERE id = :id

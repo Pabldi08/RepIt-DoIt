@@ -1,6 +1,11 @@
 package com.pad.repitdoit.di
 
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
+import com.pad.repitdoit.features.achievement.data.repository.AchievementsRepositoryImpl
+import com.pad.repitdoit.features.achievement.data.repository.FakeAchievementsRepositoryImpl
+import com.pad.repitdoit.features.achievement.domain.model.Achievement
+import com.pad.repitdoit.features.achievement.domain.repository.AchievementRepository
+import com.pad.repitdoit.features.achievement.domain.usecase.GetAllowedAchievementsUseCase
 import com.pad.repitdoit.features.home.data.repository.FakeHomeRepositoryImpl
 import com.pad.repitdoit.features.home.data.repository.HomeRepositoryImpl
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
@@ -19,7 +24,7 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCas
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
-interface AppContainer : TrainingUseCasesAC, HomeUseCasesAC { }
+interface AppContainer : AchievementUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC { }
 
 class DefaultAppContainer(
     val db: RepItDoItDatabase? = null,
@@ -42,10 +47,18 @@ class DefaultAppContainer(
             WorkoutRepositoryImpl(db, dispatcher)
         }
 
+    private val achievementRepository: AchievementRepository =
+        if (db == null || dispatcher == null) {
+            FakeAchievementsRepositoryImpl()
+        } else {
+            AchievementsRepositoryImpl(db, dispatcher)
+        }
+
 
     /*
         USE CASES
      */
+    override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(achievementRepository)
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
     override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)

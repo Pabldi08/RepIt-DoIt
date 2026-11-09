@@ -8,6 +8,7 @@ CREATE TABLE AchievementCondition (
     comparison_operator TEXT NOT NULL CHECK (length(trim(comparison_operator)) > 0),
     target_value REAL NOT NULL,
     exercise_id TEXT,
+    workout_id TEXT,
     period_days INTEGER,
     FOREIGN KEY (achievement_id) REFERENCES Achievement(id) ON DELETE CASCADE,
     FOREIGN KEY (exercise_id) REFERENCES Exercise(id) ON DELETE RESTRICT
