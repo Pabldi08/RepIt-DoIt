@@ -20,8 +20,9 @@ INNER JOIN WorkoutSession ws
     ON se.session_id = ws.id
 WHERE ws.user_id = :userId
   AND ws.status = 'COMPLETED'
-  AND ss.completed_at IS NOT NULL
+  AND ws.finished_at <= :sessionToTimestamp
   AND ss.completed_at >= :fromTimestamp
+  AND ss.completed_at <= :toTimestamp
   AND (
       :exerciseId IS NULL
       OR se.exercise_id = :exerciseId
@@ -29,10 +30,17 @@ WHERE ws.user_id = :userId
   AND (
       :workoutId IS NULL
       OR ws.workout_id = :workoutId
+  )
+  AND (
+      :workoutType IS NULL
+      OR EXISTS (
+          SELECT 1 FROM WorkoutSessionType st
+          WHERE st.session_id = ws.id AND st.workout_type = :workoutType
+      )
   );
 
 getCompletedExerciseReps:
-SELECT COALESCE(SUM(ss.reps), 0) AS current_value
+SELECT CAST(COALESCE(SUM(ss.reps), 0) AS INTEGER) AS current_value
 FROM SessionSet ss
 INNER JOIN SessionExercise se
     ON ss.session_exercise_id = se.id
@@ -40,8 +48,9 @@ INNER JOIN WorkoutSession ws
     ON se.session_id = ws.id
 WHERE ws.user_id = :userId
   AND ws.status = 'COMPLETED'
-  AND ss.completed_at IS NOT NULL
+  AND ws.finished_at <= :sessionToTimestamp
   AND ss.completed_at >= :fromTimestamp
+  AND ss.completed_at <= :toTimestamp
   AND (
       :exerciseId IS NULL
       OR se.exercise_id = :exerciseId
@@ -49,6 +58,13 @@ WHERE ws.user_id = :userId
   AND (
       :workoutId IS NULL
       OR ws.workout_id = :workoutId
+  )
+  AND (
+      :workoutType IS NULL
+      OR EXISTS (
+          SELECT 1 FROM WorkoutSessionType st
+          WHERE st.session_id = ws.id AND st.workout_type = :workoutType
+      )
   );
 
 selectSessionSetById:

@@ -1,0 +1,31 @@
+-- Stable type codes are shared with WorkoutSessionType and AchievementCondition.
+CREATE TABLE WorkoutTypeAssignment (
+    workout_id TEXT NOT NULL REFERENCES Workout(id) ON DELETE CASCADE,
+    workout_type TEXT NOT NULL CHECK (workout_type IN ('CHEST', 'TRICEPS', 'BACK', 'BICEPS', 'LEGS', 'SHOULDERS')),
+    PRIMARY KEY (workout_id, workout_type)
+);
+
+selectWorkoutTypes:
+SELECT types.workout_type
+FROM WorkoutTypeAssignment types
+JOIN Workout w ON w.id = types.workout_id
+WHERE w.id = :workoutId AND w.user_id = :userId
+ORDER BY types.workout_type;
+
+assignWorkoutType:
+INSERT INTO WorkoutTypeAssignment (workout_id, workout_type)
+SELECT id, :workoutType
+FROM Workout
+WHERE id = :workoutId AND user_id = :userId
+  AND NOT EXISTS (
+      SELECT 1 FROM WorkoutTypeAssignment
+      WHERE workout_id = :workoutId AND workout_type = :workoutType
+  );
+
+removeWorkoutType:
+DELETE FROM WorkoutTypeAssignment
+WHERE workout_id = :workoutId AND workout_type = :workoutType
+  AND EXISTS (
+      SELECT 1 FROM Workout
+      WHERE id = :workoutId AND user_id = :userId
+  );

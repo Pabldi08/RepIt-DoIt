@@ -1,0 +1,5 @@
+CREATE TABLE WorkoutSessionType (
+    session_id TEXT NOT NULL REFERENCES WorkoutSession(id) ON DELETE CASCADE,
+    workout_type TEXT NOT NULL CHECK (workout_type IN ('CHEST', 'TRICEPS', 'BACK', 'BICEPS', 'LEGS', 'SHOULDERS')),
+    PRIMARY KEY (session_id, workout_type)
+);
