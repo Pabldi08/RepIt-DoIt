@@ -6,17 +6,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
+import com.pad.repitdoit.di.HomeUseCasesAC
 import com.pad.repitdoit.features.home.presentation.HomeViewModel
 
 @Composable
 fun HomeScreenRoot(
     windowSize: AppWindowSize,
-    appContainer: AppContainer,
+    appContainer: HomeUseCasesAC,
     onWorkoutPreview: (String) -> Unit
 ) {
     val viewModel: HomeViewModel = viewModel {
         HomeViewModel (
-            getHomeDailyWorkoutsUseCase = appContainer.getHomeDailyWorkoutsUseCase
+            appContainer = appContainer
         )
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

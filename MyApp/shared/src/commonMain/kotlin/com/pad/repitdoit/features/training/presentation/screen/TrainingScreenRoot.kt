@@ -5,12 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pad.repitdoit.di.AppContainer
+import com.pad.repitdoit.di.TrainingUseCasesAC
 import com.pad.repitdoit.features.training.presentation.TrainingViewModel
 import com.pad.repitdoit.features.training.presentation.layout.TrainingLayout
 
 @Composable
 fun TrainingScreenRoot(
-    appContainer: AppContainer,
+    appContainer: TrainingUseCasesAC,
     initialWorkoutId: String? = null
 ) {
     val viewModel: TrainingViewModel = viewModel {
