@@ -4,6 +4,7 @@ data class Achievement(
     val id: String,
     val name: String,
     val desc: String,
-    val progress: Int,
-    val achivementGoal: Int
+    // Both are null when the conditions cannot be represented as one progress counter.
+    val progress: Long?,
+    val achivementGoal: Double?
 )
