@@ -1,5 +1,4 @@
--- Business rules: required_reward_id must reference a KEY; at least one
--- AchievementCondition is required before this achievement can be used.
+-- Any owned Reward can grant access. At least one AchievementCondition is required.
 CREATE TABLE Achievement (
     id TEXT NOT NULL PRIMARY KEY,
     required_reward_id TEXT NOT NULL,
@@ -14,7 +13,7 @@ CREATE TABLE Achievement (
 CREATE INDEX idx_achievement_required_reward ON Achievement(required_reward_id);
 
 -- Raw catalog CRUD, not the list of achievements visible/unlocked for a user.
--- Eligibility, required KEY type and conditions are business validations.
+-- Eligibility depends on reward ownership and condition validity.
 selectAllAchievements:
 SELECT * FROM Achievement ORDER BY name ASC, id;
 

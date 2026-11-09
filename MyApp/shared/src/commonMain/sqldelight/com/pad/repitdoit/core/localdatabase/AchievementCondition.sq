@@ -1,6 +1,5 @@
 -- The specification corrects the PDF spellings achivement_id and comparisson_operator.
--- Allowed condition types/operators and period_days semantics are pending.
--- Do not constrain their catalog or numeric ranges until business rules exist.
+-- For progress, period_days is an optional rolling window of 24-hour days.
 CREATE TABLE AchievementCondition (
     id TEXT NOT NULL PRIMARY KEY,
     achievement_id TEXT NOT NULL,
@@ -8,8 +7,9 @@ CREATE TABLE AchievementCondition (
     comparison_operator TEXT NOT NULL CHECK (length(trim(comparison_operator)) > 0),
     target_value REAL NOT NULL,
     exercise_id TEXT,
-    workout_id TEXT,
     period_days INTEGER,
+    workout_id TEXT REFERENCES Workout(id) ON DELETE RESTRICT,
+    workout_type TEXT CHECK (workout_type IN ('CHEST', 'TRICEPS', 'BACK', 'BICEPS', 'LEGS', 'SHOULDERS')),
     FOREIGN KEY (achievement_id) REFERENCES Achievement(id) ON DELETE CASCADE,
     FOREIGN KEY (exercise_id) REFERENCES Exercise(id) ON DELETE RESTRICT
 );
@@ -25,16 +25,17 @@ SELECT * FROM AchievementCondition WHERE achievement_id = :achievement_id ORDER 
 
 insertAchievementCondition:
 INSERT INTO AchievementCondition (
-    id, achievement_id, condition_type, comparison_operator, target_value, exercise_id, period_days
+    id, achievement_id, condition_type, comparison_operator, target_value, exercise_id, workout_id, period_days, workout_type
 )
 VALUES (
-    :id, :achievement_id, :condition_type, :comparison_operator, :target_value, :exercise_id, :period_days
+    :id, :achievement_id, :condition_type, :comparison_operator, :target_value, :exercise_id, :workout_id, :period_days, :workout_type
 );
 
 updateAchievementCondition:
 UPDATE AchievementCondition
 SET condition_type = :condition_type, comparison_operator = :comparison_operator,
-    target_value = :target_value, exercise_id = :exercise_id, period_days = :period_days
+    target_value = :target_value, exercise_id = :exercise_id,
+    workout_id = :workout_id, period_days = :period_days, workout_type = :workout_type
 WHERE id = :id AND achievement_id = :achievement_id;
 
 -- Business logic must prevent using achievements without any conditions.

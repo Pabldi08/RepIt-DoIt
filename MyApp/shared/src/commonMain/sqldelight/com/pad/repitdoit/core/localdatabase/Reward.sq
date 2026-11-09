@@ -22,7 +22,6 @@ insertReward:
 INSERT INTO Reward (id, code, name, reward_type, asset_url, description)
 VALUES (:id, :code, :name, :reward_type, :asset_url, :description);
 
--- Validate dependent achievements before changing a required KEY's type.
 updateReward:
 UPDATE Reward
 SET code = :code, name = :name, reward_type = :reward_type,
