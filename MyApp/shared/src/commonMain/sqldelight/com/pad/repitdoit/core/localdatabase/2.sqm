@@ -1,0 +1,15 @@
+CREATE TABLE WorkoutTypeAssignment (
+    workout_id TEXT NOT NULL REFERENCES Workout(id) ON DELETE CASCADE,
+    workout_type TEXT NOT NULL CHECK (workout_type IN ('CHEST', 'TRICEPS', 'BACK', 'BICEPS', 'LEGS', 'SHOULDERS')),
+    PRIMARY KEY (workout_id, workout_type)
+);
+
+CREATE TABLE WorkoutSessionType (
+    session_id TEXT NOT NULL REFERENCES WorkoutSession(id) ON DELETE CASCADE,
+    workout_type TEXT NOT NULL CHECK (workout_type IN ('CHEST', 'TRICEPS', 'BACK', 'BICEPS', 'LEGS', 'SHOULDERS')),
+    PRIMARY KEY (session_id, workout_type)
+);
+
+-- No historical classification can be inferred for sessions already recorded.
+ALTER TABLE AchievementCondition
+ADD COLUMN workout_type TEXT CHECK (workout_type IN ('CHEST', 'TRICEPS', 'BACK', 'BICEPS', 'LEGS', 'SHOULDERS'));
