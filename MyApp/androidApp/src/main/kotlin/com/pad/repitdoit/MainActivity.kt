@@ -23,9 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             App(
                 appContainer = container,
-                qrCameraScreen = { onClose ->
-                    QrCameraScreen(onClose = onClose)
-                }
+                qrCameraScreen = { QrCameraScreen() }
             )
         }
     }

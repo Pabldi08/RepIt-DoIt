@@ -2,13 +2,13 @@ package com.pad.repitdoit.camera
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
-import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -18,15 +18,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
-fun QrCameraScreen(onClose: () -> Unit) {
+fun QrCameraScreen() {
     val context = LocalContext.current
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     var permissionGranted by remember {
         mutableStateOf(
-            context.checkSelfPermission(Manifest.permission.CAMERA) ==
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED
         )
     }
@@ -58,7 +61,7 @@ fun QrCameraScreen(onClose: () -> Unit) {
             ) {
                 Text("Consultar máquina por QR")
 
-                TextButton(onClick = onClose) {
+                TextButton(onClick = { backDispatcher?.onBackPressed() }) {
                     Text("Cerrar")
                 }
             }
@@ -100,64 +103,63 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    var surfaceRequest by remember {
-        mutableStateOf<SurfaceRequest?>(null)
+    var viewSurfaceProvider by remember {
+        mutableStateOf<Preview.SurfaceProvider?>(null)
     }
     var error by remember { mutableStateOf(false) }
-
-    DisposableEffect(context, lifecycleOwner) {
-        val preview = Preview.Builder().build()
-        val cameraFuture = ProcessCameraProvider.getInstance(context)
-
-        var cameraProvider: ProcessCameraProvider? = null
-        var closed = false
-
-        // Se ejecuta cuando CameraX está preparado.
-        cameraFuture.addListener({
-            if (!closed) {
-                try {
-                    val provider = cameraFuture.get()
-                    cameraProvider = provider
-
-                    preview.setSurfaceProvider { request ->
-                        surfaceRequest = request
-                    }
-
-                    provider.bindToLifecycle(
-                        lifecycleOwner,
-                        CameraSelector.DEFAULT_BACK_CAMERA,
-                        preview
-                    )
-                } catch (exception: Exception) {
-                    error = true
-                }
-            }
-        }, context.mainExecutor)
-
-        // Se ejecuta al salir de la pantalla.
-        onDispose {
-            closed = true
-            cameraProvider?.unbind(preview)
-            preview.surfaceProvider = null
-        }
-    }
 
     Box(
         modifier = modifier.background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
+        AndroidView(
+            factory = { viewContext ->
+                PreviewView(viewContext).apply {
+                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                    viewSurfaceProvider = surfaceProvider
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+
         if (error) {
             Text(
                 text = "No se ha podido abrir la cámara.",
                 color = Color.White
             )
-        } else {
-            surfaceRequest?.let { request ->
-                CameraXViewfinder(
-                    surfaceRequest = request,
-                    modifier = Modifier.fillMaxSize()
-                )
+        }
+    }
+
+    val previewSurfaceProvider = viewSurfaceProvider ?: return
+    DisposableEffect(context, lifecycleOwner, previewSurfaceProvider) {
+        val preview = Preview.Builder().build()
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+
+        var cameraProvider: ProcessCameraProvider? = null
+        var closed = false
+
+        cameraProviderFuture.addListener(Runnable {
+            if (!closed) {
+                try {
+                    val provider = cameraProviderFuture.get()
+                    cameraProvider = provider
+
+                    val cameraSelector = CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build()
+
+                    preview.setSurfaceProvider(previewSurfaceProvider)
+                    provider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+                } catch (exception: Exception) {
+                    error = true
+                }
             }
+        }, ContextCompat.getMainExecutor(context))
+
+        onDispose {
+            closed = true
+            cameraProvider?.unbind(preview)
+            preview.setSurfaceProvider(null)
         }
     }
 }

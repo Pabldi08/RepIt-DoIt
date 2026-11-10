@@ -15,7 +15,7 @@ fun AppNavigation(
     navController: NavHostController,
     windowSize: AppWindowSize,
     appContainer: AppContainer,
-    qrCameraScreen: @Composable (() -> Unit) -> Unit
+    qrCameraScreen: @Composable () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -43,9 +43,7 @@ fun AppNavigation(
         }
 
         composable<Route.QrCamera> {
-            qrCameraScreen {
-                navController.popBackStack()
-            }
+            qrCameraScreen()
         }
 
         composable<Route.Profile> {

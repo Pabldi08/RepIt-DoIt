@@ -25,7 +25,7 @@ enum class AppWindowSize {
 @Composable
 fun App(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable (() -> Unit) -> Unit = { ScannerScreen() }
+    qrCameraScreen: @Composable () -> Unit = { ScannerScreen() }
 ) {
     AppTheme {
         AppContent(appContainer, qrCameraScreen)
@@ -35,7 +35,7 @@ fun App(
 @Composable
 private fun AppContent(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable (() -> Unit) -> Unit
+    qrCameraScreen: @Composable () -> Unit
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
