@@ -1,19 +1,19 @@
-package com.pad.repitdoit.features.achievement.data.repository
+package com.pad.repitdoit.features.gamification.data.repository
 
 import com.pad.repitdoit.core.localdatabase.AchievementCondition
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
-import com.pad.repitdoit.features.achievement.domain.model.Achievement
-import com.pad.repitdoit.features.achievement.domain.repository.AchievementRepository
+import com.pad.repitdoit.features.gamification.domain.model.Achievement
+import com.pad.repitdoit.features.gamification.domain.repository.GamificationRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
-class AchievementsRepositoryImpl(
+class GamificationRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,
     private val userId: String
-) : AchievementRepository {
+) : GamificationRepository {
     override suspend fun getAllowedAchievements(): List<Achievement> = withContext(dispatcher) {
         val now = Clock.System.now()
         val toTimestamp = now.toEpochMilliseconds()

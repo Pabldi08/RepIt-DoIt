@@ -2,10 +2,10 @@ package com.pad.repitdoit.di
 
 import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
-import com.pad.repitdoit.features.achievement.data.repository.AchievementsRepositoryImpl
-import com.pad.repitdoit.features.achievement.data.repository.FakeAchievementsRepositoryImpl
-import com.pad.repitdoit.features.achievement.domain.repository.AchievementRepository
-import com.pad.repitdoit.features.achievement.domain.usecase.GetAllowedAchievementsUseCase
+import com.pad.repitdoit.features.gamification.data.repository.FakeGamificationRepositoryImpl
+import com.pad.repitdoit.features.gamification.data.repository.GamificationRepositoryImpl
+import com.pad.repitdoit.features.gamification.domain.repository.GamificationRepository
+import com.pad.repitdoit.features.gamification.domain.usecase.GetAllowedAchievementsUseCase
 import com.pad.repitdoit.features.home.data.repository.FakeHomeRepositoryImpl
 import com.pad.repitdoit.features.home.data.repository.HomeRepositoryImpl
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
@@ -24,7 +24,7 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCas
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
-interface AppContainer : AchievementUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC { }
+interface AppContainer : GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC { }
 
 class DefaultAppContainer(
     val db: RepItDoItDatabase? = null,
@@ -47,18 +47,18 @@ class DefaultAppContainer(
             WorkoutRepositoryImpl(db, dispatcher)
         }
 
-    private val achievementRepository: AchievementRepository =
+    private val gamificationRepository: GamificationRepository =
         if (db == null || dispatcher == null) {
-            FakeAchievementsRepositoryImpl()
+            FakeGamificationRepositoryImpl()
         } else {
-            AchievementsRepositoryImpl(db, dispatcher, LOCAL_TEST_USER_ID)
+            GamificationRepositoryImpl(db, dispatcher, LOCAL_TEST_USER_ID)
         }
 
 
     /*
         USE CASES
      */
-    override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(achievementRepository)
+    override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(gamificationRepository)
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
     override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)

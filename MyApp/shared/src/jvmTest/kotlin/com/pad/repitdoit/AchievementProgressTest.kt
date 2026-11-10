@@ -5,8 +5,8 @@ import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.core.localdatabase.testDb
 import com.pad.repitdoit.di.DefaultAppContainer
-import com.pad.repitdoit.features.achievement.data.repository.AchievementsRepositoryImpl
-import com.pad.repitdoit.features.achievement.domain.usecase.GetAllowedAchievementsUseCase
+import com.pad.repitdoit.features.gamification.data.repository.AchievementsRepositoryImpl
+import com.pad.repitdoit.features.gamification.domain.usecase.GetAllowedAchievementsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.util.Properties

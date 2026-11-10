@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.achievement.domain.model
+package com.pad.repitdoit.features.gamification.domain.model
 
 data class Achievement(
     val id: String,
