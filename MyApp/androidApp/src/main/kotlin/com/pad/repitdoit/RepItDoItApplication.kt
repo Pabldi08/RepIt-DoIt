@@ -20,7 +20,10 @@ class RepItDoItApplication : Application() {
         val db = createDatabase(
             AndroidDatabaseDriverFactory(applicationContext)
         )
-        testDb(db).seed()
+        testDb(db).apply {
+            loadInitialDatabase()
+            seed()
+        }
         appContainer = DefaultAppContainer (
             db = db,
             dispatcher = Dispatchers.IO

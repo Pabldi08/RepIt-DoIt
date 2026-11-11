@@ -25,8 +25,8 @@ class AchievementProgressTest {
             val user = LOCAL_TEST_USER_ID
             val push = "test-workout-001"
             val cardio = "test-workout-002"
-            val bench = "test-ex-001"
-            val press = "test-ex-002"
+            val bench = "908d354a-8282-5726-9115-9f322536e428"
+            val press = "05997e70-373b-5097-8be8-2037ea2b82f0"
             val useCase = DefaultAppContainer(db, Dispatchers.Unconfined).getAllowedAchievementsUseCase
 
             testDb(db).seed()
@@ -135,8 +135,8 @@ class AchievementProgressTest {
             val other = "other"
             val push = "test-workout-001"
             val cardio = "test-workout-002"
-            val bench = "test-ex-001"
-            val press = "test-ex-002"
+            val bench = "908d354a-8282-5726-9115-9f322536e428"
+            val press = "05997e70-373b-5097-8be8-2037ea2b82f0"
             val time = Clock.System.now().toEpochMilliseconds() - 60_000
             db.userQueries.insertUser(other, "Other", "Other user", null)
             db.workoutQueries.insertWorkout("other-push", other, "Pecho", null, null, null, time, time)
@@ -204,7 +204,7 @@ class AchievementProgressTest {
             db.userRewardQueries.insertUserReward("grant", user, "key", time - 100)
             db.addAchievement("general", "EXERCISE_REPS", workout = workout)
             db.userAchievementQueries.insertUserAchievement("unlocked", user, "general", time)
-            db.addSession("legacy", user, workout, time, "test-ex-001", 8)
+            db.addSession("legacy", user, workout, time, "908d354a-8282-5726-9115-9f322536e428", 8)
             removeVersionThreeSchema(driver)
 
             RepItDoItDatabase.Schema.migrate(driver, 2, RepItDoItDatabase.Schema.version)
@@ -232,6 +232,7 @@ class AchievementProgressTest {
         val properties = Properties().apply { setProperty("foreign_keys", "true") }
         JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY, properties).use { driver ->
             RepItDoItDatabase.Schema.create(driver)
+            testDb(RepItDoItDatabase(driver)).loadInitialDatabase()
             block(RepItDoItDatabase(driver), driver)
         }
     }
