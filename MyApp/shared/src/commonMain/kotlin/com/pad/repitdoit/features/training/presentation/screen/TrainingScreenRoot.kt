@@ -12,7 +12,8 @@ import com.pad.repitdoit.features.training.presentation.layout.TrainingLayout
 @Composable
 fun TrainingScreenRoot(
     appContainer: TrainingUseCasesAC,
-    initialWorkoutId: String? = null
+    initialWorkoutId: String? = null,
+    onAddExercise: (workoutId: String) -> Unit
 ) {
     val viewModel: TrainingViewModel = viewModel {
         TrainingViewModel(
@@ -24,6 +25,7 @@ fun TrainingScreenRoot(
     TrainingLayout(
         state = uiState,
         initialWorkoutId = initialWorkoutId,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onAddExercise = onAddExercise
     )
 }

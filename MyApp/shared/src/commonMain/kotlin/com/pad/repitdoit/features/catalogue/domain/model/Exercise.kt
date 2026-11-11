@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.training.domain.model
+package com.pad.repitdoit.features.catalogue.domain.model
 
 data class Exercise(
     val id: String,

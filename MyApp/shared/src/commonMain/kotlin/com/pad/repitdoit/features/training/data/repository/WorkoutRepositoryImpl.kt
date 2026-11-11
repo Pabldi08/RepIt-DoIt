@@ -3,7 +3,6 @@ package com.pad.repitdoit.features.training.data.repository
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.core.utility.generateId
 import com.pad.repitdoit.core.utility.loadImage
-import com.pad.repitdoit.features.training.domain.model.Exercise
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
@@ -18,12 +17,6 @@ class WorkoutRepositoryImpl (
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher
 ) : WorkoutRepository {
-
-    override suspend fun getExercises(): List<Exercise> = withContext(dispatcher) {
-        db.exerciseQueries.selectAllExercises().executeAsList().map { exercise ->
-            Exercise(exercise.id, exercise.name, exercise.description)
-        }
-    }
 
     override suspend fun getWorkout(
         workoutId: String

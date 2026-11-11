@@ -48,7 +48,8 @@ fun TrainingWorkoutDetailScreen(
     onBack: () -> Unit,
     onShowDialog: (TrainingDialog) -> Unit,
     onStart: () -> Unit = {},
-    onDeleteExercise: (String) -> Unit = {}
+    onDeleteExercise: (String) -> Unit = {},
+    onAddExercise: () -> Unit
 ) {
     Box(
         Modifier.fillMaxSize(),
@@ -188,7 +189,7 @@ fun TrainingWorkoutDetailScreen(
             }
             item {
                 OutlinedButton(
-                    onClick = { onShowDialog(TrainingDialog.AddExercise(workout.id)) },
+                    onClick = onAddExercise,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("+ Añadir ejercicio")

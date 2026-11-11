@@ -56,12 +56,13 @@ private data class TrainingDetailDestination(
 fun TrainingLayout(
     state: TrainingState,
     initialWorkoutId: String? = null,
-    onAction: (TrainingAction) -> Unit
+    onAction: (TrainingAction) -> Unit,
+    onAddExercise: (workoutId: String) -> Unit
 ) {
     var activeDialog by remember { mutableStateOf<TrainingDialog?>(null) }
     val onShowDialog: (TrainingDialog) -> Unit = { dialog ->
         // Añadir ejercicio sigue pendiente hasta disponer de su formulario.
-        if (activeDialog == null && dialog !is TrainingDialog.AddExercise) {
+        if (activeDialog == null) {
             activeDialog = dialog
         }
     }
@@ -88,10 +89,6 @@ fun TrainingLayout(
                 },
                 onCancelAction = { activeDialog = null }
             )
-
-            is TrainingDialog.AddExercise -> {
-                // TODO: Mostrar el selector/formulario y enviar addExerciseToWorkout al confirmar.
-            }
 
             null -> Unit
         }
@@ -268,7 +265,8 @@ fun TrainingLayout(
                                         }
                                     }
                                 },
-                                onBack = onBack
+                                onBack = onBack,
+                                onAddExercise = { onAddExercise(workout.id)}
                             )
                         } else {
                             val exercise = workout.workoutExercises.find {

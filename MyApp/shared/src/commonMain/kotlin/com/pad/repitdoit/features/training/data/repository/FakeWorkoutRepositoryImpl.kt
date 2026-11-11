@@ -1,7 +1,7 @@
 package com.pad.repitdoit.features.training.data.repository
 
 import com.pad.repitdoit.core.utility.generateId
-import com.pad.repitdoit.features.training.domain.model.Exercise
+import com.pad.repitdoit.features.catalogue.domain.model.Exercise
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
@@ -58,10 +58,6 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
     private val archivedWorkoutIds = mutableSetOf<String>()
     private val exercises = workouts.values.flatMap { it.workoutExercises }
         .map { Exercise(it.exerciseId, it.name, null) }.distinctBy { it.id }.sortedBy { it.name }
-
-    override suspend fun getExercises(): List<Exercise> {
-        return exercises
-    }
 
     override suspend fun getWorkout(workoutId: String): Workout? {
         return workouts[workoutId]

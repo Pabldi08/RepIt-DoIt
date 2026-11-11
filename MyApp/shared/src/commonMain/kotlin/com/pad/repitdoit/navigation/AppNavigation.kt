@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
+import com.pad.repitdoit.features.catalogue.presentation.screen.CatalogueScreenRoot
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
@@ -33,7 +34,12 @@ fun AppNavigation(
 
         composable<Route.Training> {
             TrainingScreenRoot(
-                appContainer = appContainer
+                appContainer = appContainer,
+                onAddExercise = { workoutId ->
+                    navController.navigate(
+                        Route.Catalogue(workoutId = workoutId)
+                    )
+                }
             )
         }
 
@@ -49,13 +55,28 @@ fun AppNavigation(
             ProfileScreenRoot(windowSize, appContainer)
         }
 
-        composable<Route.Workout>{ backStackEntry ->
+        composable<Route.Workout> { backStackEntry ->
             val route = backStackEntry.toRoute<Route.Workout>()
             TrainingScreenRoot(
                 appContainer = appContainer,
-                initialWorkoutId = route.workoutId
+                initialWorkoutId = route.workoutId,
+                onAddExercise = { workoutId ->
+                    navController.navigate(
+                        Route.Catalogue(workoutId = workoutId)
+                    )
+                }
             )
         }
 
+        composable<Route.Catalogue> { backStackEntry ->
+            val route = backStackEntry.toRoute<Route.Catalogue>()
+
+            CatalogueScreenRoot(
+                appContainer = appContainer,
+                machineId = route.machineId,
+                onBack = { navController.popBackStack() },
+                onAddExercise = {} //Aun no esta enganchado el añadir ejercicio como tal
+            )
+        }
     }
 }
