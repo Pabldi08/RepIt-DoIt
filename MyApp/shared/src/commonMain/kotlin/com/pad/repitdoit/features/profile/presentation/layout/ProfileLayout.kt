@@ -13,33 +13,42 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.features.profile.presentation.components.ProfileOverviewCard
+import com.pad.repitdoit.features.profile.presentation.ProfileUiState
 import com.pad.repitdoit.core.ui.common.Header
 
 @Composable
-fun ProfileMediumLayout() {
+internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState) {
+    val horizontalPadding = if (windowSize == AppWindowSize.Medium) 32.dp else 20.dp
+
     Column(
         modifier = Modifier.fillMaxSize().padding(top = 40.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Header(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp).height(40.dp)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).height(40.dp)
         )
         LazyColumn(
             modifier = Modifier.fillMaxWidth().weight(1f),
-            contentPadding = PaddingValues(start = 32.dp, end = 32.dp, bottom = 20.dp),
+            contentPadding = PaddingValues(
+                start = horizontalPadding,
+                end = horizontalPadding,
+                bottom = 20.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { Text("Mi progreso", style = MaterialTheme.typography.titleMediumEmphasized) }
+            item { Text("Mi perfil", style = MaterialTheme.typography.titleMediumEmphasized) }
             item {
-                ProfileOverviewCard(
-                    name = "Alex Rivera",
-                    rank = "Nivel 3 · Explorador",
-                    streakDays = 7,
-                    level = 3,
-                    currentXp = 1280,
-                    nextLevelXp = 2000
-                )
+                val profile = state.profile
+                if (profile == null) {
+                    Text("Cargando perfil…")
+                } else {
+                    ProfileOverviewCard(
+                        name = profile.displayName,
+                        username = profile.username
+                    )
+                }
             }
         }
     }
