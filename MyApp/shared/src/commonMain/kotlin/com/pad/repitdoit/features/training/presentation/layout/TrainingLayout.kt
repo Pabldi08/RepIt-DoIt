@@ -8,19 +8,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneExpansionAnchor
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationItem
-import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,9 +27,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.core.ui.common.OnBackHandler
-import com.pad.repitdoit.features.training.presentation.TrainingUIState
+import com.pad.repitdoit.core.ui.common.textPopup
+import com.pad.repitdoit.features.training.presentation.TrainingAction
+import com.pad.repitdoit.features.training.presentation.TrainingDialog
+import com.pad.repitdoit.features.training.presentation.TrainingState
 import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
 import com.pad.repitdoit.features.training.presentation.screen.TrainingExerciseDetailScreen
 import com.pad.repitdoit.features.training.presentation.screen.TrainingOverviewScreen
@@ -53,10 +54,49 @@ private data class TrainingDetailDestination(
 @Composable
 
 fun TrainingLayout(
-    state: TrainingUIState,
+    state: TrainingState,
     initialWorkoutId: String? = null,
-    onCreateWorkout: (String) -> Unit
+    onAction: (TrainingAction) -> Unit
 ) {
+    var activeDialog by remember { mutableStateOf<TrainingDialog?>(null) }
+    val onShowDialog: (TrainingDialog) -> Unit = { dialog ->
+        // Añadir ejercicio sigue pendiente hasta disponer de su formulario.
+        if (activeDialog == null && dialog !is TrainingDialog.AddExercise) {
+            activeDialog = dialog
+        }
+    }
+
+    // Un solo diálogo compartido por los dos paneles.
+    key(activeDialog) {
+        when (val dialog = activeDialog) {
+            TrainingDialog.CreateWorkout -> textPopup(
+                title = "Añadir entrenamiento",
+                placeHolderText = "Nombre del entrenamiento",
+                onConfirmAction = { name ->
+                    onAction(TrainingAction.createWorkout(name))
+                    activeDialog = null
+                },
+                onCancelAction = { activeDialog = null }
+            )
+
+            is TrainingDialog.RenameWorkout -> textPopup(
+                title = "Renombrar entrenamiento",
+                placeHolderText = "Nuevo nombre",
+                onConfirmAction = { name ->
+                    onAction(TrainingAction.renameWorkout(dialog.workoutId, name))
+                    activeDialog = null
+                },
+                onCancelAction = { activeDialog = null }
+            )
+
+            is TrainingDialog.AddExercise -> {
+                // TODO: Mostrar el selector/formulario y enviar addExerciseToWorkout al confirmar.
+            }
+
+            null -> Unit
+        }
+    }
+
     val plan = TrainingPreviewData.plan
     // Los tamaños de la app deciden cuándo mostrar ambos paneles, incluido Medium.
 
@@ -125,7 +165,7 @@ fun TrainingLayout(
                     plan = plan,
                     state = state,
                     selectedWorkoutId = destination?.workoutId,
-                    onCreateWorkout = onCreateWorkout,
+                    onShowDialog = onShowDialog,
 //                    onWorkoutDetails = { id ->
 //                        if (TrainingPreviewData.workout(id) != null) {
 //                            val key = Json.encodeToString(TrainingDetailDestination(plan.id, id))
@@ -210,6 +250,7 @@ fun TrainingLayout(
                         if (exerciseId == null) {
                             TrainingWorkoutDetailScreen(
                                 workout = workout,
+                                onShowDialog = onShowDialog,
                                 onExercise = { selectedExerciseId ->
                                     val key = Json.encodeToString(
                                         value = TrainingDetailDestination(
