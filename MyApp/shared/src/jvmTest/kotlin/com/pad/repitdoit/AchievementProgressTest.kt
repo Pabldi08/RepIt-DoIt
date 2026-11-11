@@ -5,7 +5,7 @@ import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.core.localdatabase.testDb
 import com.pad.repitdoit.di.DefaultAppContainer
-import com.pad.repitdoit.features.gamification.data.repository.AchievementsRepositoryImpl
+import com.pad.repitdoit.features.gamification.data.repository.GamificationRepositoryImpl
 import com.pad.repitdoit.features.gamification.domain.usecase.GetAllowedAchievementsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -183,7 +183,7 @@ class AchievementProgressTest {
                     .associate { it.id to it.progress }
             )
             val otherUseCase = GetAllowedAchievementsUseCase(
-                AchievementsRepositoryImpl(db, Dispatchers.Unconfined, other)
+                GamificationRepositoryImpl(db, Dispatchers.Unconfined, other)
             )
             assertEquals(
                 mapOf("chest" to 1L, "triceps" to 0L, "back" to 0L, "general" to 1L,
