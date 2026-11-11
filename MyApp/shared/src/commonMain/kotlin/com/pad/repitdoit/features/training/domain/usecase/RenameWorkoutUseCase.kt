@@ -8,12 +8,13 @@ class RenameWorkoutUseCase (
     suspend operator fun invoke (
         workoutId: String,
         name: String
-    ) {
+    ) : String {
         val trimName = name.trim()
         require(trimName.isNotEmpty()) {
             "El nombre del entrenamiento no puede estar vacio"
         }
 
         repository.renameWorkout(workoutId, trimName)
+        return trimName
     }
 }

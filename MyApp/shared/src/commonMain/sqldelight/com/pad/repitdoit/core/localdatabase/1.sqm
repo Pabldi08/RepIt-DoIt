@@ -1,0 +1,31 @@
+CREATE TABLE AchievementCondition_v2 (
+    id TEXT NOT NULL PRIMARY KEY,
+    achievement_id TEXT NOT NULL,
+    condition_type TEXT NOT NULL CHECK (length(trim(condition_type)) > 0),
+    comparison_operator TEXT NOT NULL CHECK (length(trim(comparison_operator)) > 0),
+    target_value REAL NOT NULL,
+    exercise_id TEXT,
+    period_days INTEGER,
+    workout_id TEXT REFERENCES Workout(id) ON DELETE RESTRICT,
+    FOREIGN KEY (achievement_id) REFERENCES Achievement(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES Exercise(id) ON DELETE RESTRICT
+);
+
+-- Some version 1 builds already had workout_id without a foreign key.
+-- The scalar subquery resolves workout_id against the legacy table first.
+-- If the column is absent, it resolves to the NULL in the outer query.
+INSERT INTO AchievementCondition_v2 (
+    id, achievement_id, condition_type, comparison_operator,
+    target_value, exercise_id, period_days, workout_id
+)
+SELECT old.id, old.achievement_id, old.condition_type, old.comparison_operator,
+       old.target_value, old.exercise_id, old.period_days,
+       (SELECT workout_id FROM AchievementCondition legacy WHERE legacy.id = old.id)
+FROM AchievementCondition old
+CROSS JOIN (SELECT NULL AS workout_id) fallback;
+
+DROP TABLE AchievementCondition;
+ALTER TABLE AchievementCondition_v2 RENAME TO AchievementCondition;
+
+CREATE INDEX idx_achievement_condition_achievement ON AchievementCondition(achievement_id);
+CREATE INDEX idx_achievement_condition_exercise ON AchievementCondition(exercise_id);

@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.presentation.TrainingDialog
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.icon_details
@@ -21,7 +22,10 @@ internal fun TrainingDetailHeader(
     //subtitle: String,
     onBack: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        modifier = Modifier.padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         TextButton(
             onClick = onBack
         ) { Text("‹ Volver") }
@@ -42,9 +46,9 @@ fun TrainingWorkoutDetailScreen(
     workout: Workout,
     onExercise: (String) -> Unit,
     onBack: () -> Unit,
+    onShowDialog: (TrainingDialog) -> Unit,
     onStart: () -> Unit = {},
-    onDeleteExercise: (String) -> Unit = {},
-    onAddExercise: () -> Unit = {}
+    onDeleteExercise: (String) -> Unit = {}
 ) {
     Box(
         Modifier.fillMaxSize(),
@@ -54,16 +58,38 @@ fun TrainingWorkoutDetailScreen(
             modifier = Modifier
                 .widthIn(max = 960.dp)
                 .fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                TrainingDetailHeader(
-                    title = workout.name,
-                    //subtitle ="${TrainingPreviewData.plan.name} · ${workout.day}",
-                    onBack = onBack
-                )
+                TextButton(
+                    onClick = onBack
+                ) { Text("‹ Volver") }
             }
+            item {
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    //verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        workout.name,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    TextButton(
+                        onClick = { onShowDialog(TrainingDialog.RenameWorkout(workout.id)) }
+                    ) {
+                        Text("rename")
+                    }
+                }
+            }
+//            item {
+//                TrainingDetailHeader(
+//                    title = workout.name,
+//                    //subtitle ="${TrainingPreviewData.plan.name} · ${workout.day}",
+//                    onBack = onBack
+//                )
+//            }
             item {
                 Surface(
                     shape = RoundedCornerShape(20.dp),
@@ -161,7 +187,10 @@ fun TrainingWorkoutDetailScreen(
                 }
             }
             item {
-                OutlinedButton(onClick = onAddExercise, modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = { onShowDialog(TrainingDialog.AddExercise(workout.id)) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("+ Añadir ejercicio")
                 }
             }

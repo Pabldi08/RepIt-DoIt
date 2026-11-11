@@ -4,7 +4,7 @@ class testDb(
     private val database: RepItDoItDatabase
 ) {
     fun seed() {
-        val userId = "test-user-001"
+        val userId = LOCAL_TEST_USER_ID
         val planId = "test-plan-001"
 
         val existingPlan = database.trainingPlanQueries

@@ -1,4 +1,4 @@
--- obtained_at is Unix milliseconds and starts the progress window for KEY rewards.
+-- obtained_at is Unix milliseconds and starts the progress window when the reward is required by an achievement.
 -- Initial KEY_LEVEL_0 grants and achievement reward grants belong to business logic.
 CREATE TABLE UserReward (
     id TEXT NOT NULL PRIMARY KEY,
@@ -23,7 +23,7 @@ insertUserReward:
 INSERT INTO UserReward (id, user_id, reward_id, obtained_at)
 VALUES (:id, :user_id, :reward_id, :obtained_at);
 
--- Explicit correction only: this changes the progress window of KEY rewards.
+-- Explicit correction only: this changes the progress window of achievements that require this reward.
 -- Normal grants must preserve obtained_at and handle already-owned rewards.
 updateUserReward:
 UPDATE UserReward SET obtained_at = :obtained_at
