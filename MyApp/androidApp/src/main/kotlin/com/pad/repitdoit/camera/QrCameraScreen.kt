@@ -6,6 +6,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -107,6 +108,7 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
         mutableStateOf<Preview.SurfaceProvider?>(null)
     }
     var error by remember { mutableStateOf(false) }
+    var equipmentId by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = modifier.background(Color.Black),
@@ -128,15 +130,34 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
                 color = Color.White
             )
         }
+
+        equipmentId?.let { id ->
+            Surface(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
+                Text("ID leído: $id", modifier = Modifier.padding(12.dp))
+            }
+        }
     }
 
     val previewSurfaceProvider = viewSurfaceProvider ?: return
     DisposableEffect(context, lifecycleOwner, previewSurfaceProvider) {
         val preview = Preview.Builder().build()
+        val imageAnalysis = ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .build()
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
         var cameraProvider: ProcessCameraProvider? = null
         var closed = false
+        val mainExecutor = ContextCompat.getMainExecutor(context)
+        val qrAnalyzer = QrCodeAnalyzer(mainExecutor) { id ->
+            if (!closed && equipmentId == null) {
+                equipmentId = id
+                imageAnalysis.clearAnalyzer()
+            }
+        }
+        if (equipmentId == null) {
+            imageAnalysis.setAnalyzer(mainExecutor, qrAnalyzer.analyzer)
+        }
 
         cameraProviderFuture.addListener(Runnable {
             if (!closed) {
@@ -149,16 +170,18 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
                         .build()
 
                     preview.setSurfaceProvider(previewSurfaceProvider)
-                    provider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+                    provider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
                 } catch (exception: Exception) {
                     error = true
                 }
             }
-        }, ContextCompat.getMainExecutor(context))
+        }, mainExecutor)
 
         onDispose {
             closed = true
-            cameraProvider?.unbind(preview)
+            imageAnalysis.clearAnalyzer()
+            cameraProvider?.unbind(preview, imageAnalysis)
+            qrAnalyzer.close()
             preview.setSurfaceProvider(null)
         }
     }
