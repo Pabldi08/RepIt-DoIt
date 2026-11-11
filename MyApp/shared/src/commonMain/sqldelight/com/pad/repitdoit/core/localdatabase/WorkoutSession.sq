@@ -28,14 +28,33 @@ CREATE TABLE WorkoutSession (
 CREATE INDEX idx_workout_session_user_started ON WorkoutSession(user_id, started_at);
 CREATE INDEX idx_workout_session_workout ON WorkoutSession(workout_id, user_id);
 
+getCompletedWorkoutCount:
+SELECT COUNT(*) AS current_value
+FROM WorkoutSession ws
+WHERE ws.user_id = :userId
+  AND ws.status = 'COMPLETED'
+  AND ws.finished_at >= :fromTimestamp
+  AND ws.finished_at <= :toTimestamp
+  AND (
+      :workoutId IS NULL
+      OR ws.workout_id = :workoutId
+  )
+  AND (
+      :workoutType IS NULL
+      OR EXISTS (
+          SELECT 1 FROM WorkoutSessionType st
+          WHERE st.session_id = ws.id AND st.workout_type = :workoutType
+      )
+  );
+
 selectWorkoutSessionById:
 SELECT * FROM WorkoutSession WHERE id = :id AND user_id = :user_id;
 
 selectWorkoutSessionsByUser:
 SELECT * FROM WorkoutSession WHERE user_id = :user_id ORDER BY started_at DESC, id;
 
--- Caller supplies snapshots captured when the session starts.
-insertWorkoutSession:
+-- Caller supplies name/description snapshots. Capture types in the same transaction.
+insertWorkoutSession {
 INSERT INTO WorkoutSession (
     id, user_id, workout_id, workout_name_snapshot, workout_description_snapshot,
     started_at, finished_at, status, notes
@@ -44,6 +63,12 @@ VALUES (
     :id, :user_id, :workout_id, :workout_name_snapshot, :workout_description_snapshot,
     :started_at, :finished_at, :status, :notes
 );
+
+INSERT INTO WorkoutSessionType (session_id, workout_type)
+SELECT :id, workout_type
+FROM WorkoutTypeAssignment
+WHERE workout_id = :workout_id;
+}
 
 -- State and finish time change together to satisfy the status CHECK.
 -- Original identity, start time and snapshots are preserved.
