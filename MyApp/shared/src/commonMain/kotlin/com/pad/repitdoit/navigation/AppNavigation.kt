@@ -8,7 +8,7 @@ import androidx.navigation.toRoute
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
-import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreen
+import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
 @Composable
 fun AppNavigation(
@@ -47,7 +47,7 @@ fun AppNavigation(
         }
 
         composable<Route.Profile> {
-            ProfileScreen(windowSize)
+            ProfileScreenRoot(windowSize, appContainer)
         }
 
         composable<Route.Workout>{ backStackEntry ->

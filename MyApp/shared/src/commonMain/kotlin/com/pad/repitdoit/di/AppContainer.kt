@@ -5,6 +5,9 @@ import com.pad.repitdoit.features.home.data.repository.FakeHomeRepositoryImpl
 import com.pad.repitdoit.features.home.data.repository.HomeRepositoryImpl
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
 import com.pad.repitdoit.features.home.domain.usecase.GetHomeDailyWorkoutsUseCase
+import com.pad.repitdoit.features.profile.data.repository.FakeProfileRepositoryImpl
+import com.pad.repitdoit.features.profile.domain.repository.ProfileRepository
+import com.pad.repitdoit.features.profile.domain.usecase.GetProfileUseCase
 import com.pad.repitdoit.features.training.data.repository.FakeWorkoutRepositoryImpl
 import com.pad.repitdoit.features.training.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
@@ -21,6 +24,8 @@ interface AppContainer {
     val getWorkoutUseCase: GetWorkoutUseCase
     val getUsersWorkoutsUseCase: GetUsersWorkoutsUseCase
     val createWorkoutUseCase: CreateWorkoutUseCase
+
+    val getProfileUseCase: GetProfileUseCase
 }
 
 class DefaultAppContainer(
@@ -45,6 +50,8 @@ class DefaultAppContainer(
         }
 
 
+    private val profileRepository: ProfileRepository = FakeProfileRepositoryImpl()
+
     /*
         USE CASES
      */
@@ -52,5 +59,6 @@ class DefaultAppContainer(
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
     override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)
     override val createWorkoutUseCase = CreateWorkoutUseCase(workoutRepository)
+    override val getProfileUseCase = GetProfileUseCase(profileRepository)
 
 }
