@@ -26,6 +26,6 @@ fun TrainingScreenRoot(
         windowSize = windowSize,
         state = uiState,
         initialWorkoutId = initialWorkoutId,
-        onCreateWorkout = viewModel::createWorkout
+        onAction = viewModel::onAction
     )
 }

@@ -7,40 +7,24 @@ import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.core.ui.common.Header
-import com.pad.repitdoit.core.ui.common.textPopup
-import com.pad.repitdoit.features.training.presentation.components.ExerciseItem
+import com.pad.repitdoit.features.training.presentation.TrainingDialog
 import com.pad.repitdoit.features.training.presentation.components.TrainingCard
 import com.pad.repitdoit.features.training.presentation.TrainingPlanPreview
 import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
-import com.pad.repitdoit.features.training.presentation.TrainingUIState
+import com.pad.repitdoit.features.training.presentation.TrainingState
 
 @Composable
 internal fun TrainingOverviewScreen(
     plan: TrainingPlanPreview = TrainingPreviewData.plan,
-    state: TrainingUIState,
+    state: TrainingState,
     selectedWorkoutId: String? = null,
-    onCreateWorkout: (String) -> Unit,
+    onShowDialog: (TrainingDialog) -> Unit,
     onWorkoutDetails: (String) -> Unit
 ) {
-    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
-
-    if (showCreateDialog) {
-        textPopup(
-            title = "Añadir entrenamiento",
-            placeHolderText = "Nombre del entrenamiento",
-            onConfirmAction = onCreateWorkout,
-            onCancelAction = { showCreateDialog = false }
-        )
-    }
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         modifier = Modifier.fillMaxSize(),
@@ -125,8 +109,22 @@ internal fun TrainingOverviewScreen(
         item(
             span = { GridItemSpan(maxLineSpan) }
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Entrenamientos", style = MaterialTheme.typography.titleLarge)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Entrenamientos",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                TextButton(
+                    onClick = { onShowDialog(TrainingDialog.CreateWorkout) }
+                ) {
+                    Text(
+                        text = "+ Crear"
+                    )
+                }
             }
         }
 
@@ -147,7 +145,7 @@ internal fun TrainingOverviewScreen(
 
         item(span = { GridItemSpan(maxLineSpan) }) {
             OutlinedButton(
-                onClick = {showCreateDialog = true},
+                onClick = { onShowDialog(TrainingDialog.CreateWorkout) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("+ Añadir entrenamiento")

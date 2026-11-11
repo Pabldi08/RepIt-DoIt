@@ -20,8 +20,8 @@ interface WorkoutRepository {
         exerciseId: String,
         numReps: Int,
         numSeries: Int,
-        weight: Double = 0.0,
-        restSec: Int = 0
+        weight: Double,
+        restSec: Int
     ) : WorkoutExercise
     suspend fun updateWorkoutExercise(
         workoutId: String,
