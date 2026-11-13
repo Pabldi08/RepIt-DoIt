@@ -8,6 +8,10 @@ CREATE TABLE MuscleExercise (
 
 CREATE INDEX idx_muscle_exercise_exercise ON MuscleExercise(exercise_id);
 
+getExerciseByMuscleId:
+SELECT exercise_id FROM MuscleExercise
+WHERE muscle_id = :muscle_id ORDER BY exercise_id;
+
 selectMuscleExercise:
 SELECT * FROM MuscleExercise
 WHERE muscle_id = :muscle_id AND exercise_id = :exercise_id;
