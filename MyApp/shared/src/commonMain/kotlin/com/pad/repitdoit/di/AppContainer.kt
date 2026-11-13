@@ -22,6 +22,9 @@ import com.pad.repitdoit.features.training.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
 import com.pad.repitdoit.features.catalogue.domain.usecase.GetExercisesUseCase
+import com.pad.repitdoit.features.dummy.data.repository.FakeDummyRepositoryImpl
+import com.pad.repitdoit.features.dummy.domain.repository.DummyRepository
+import com.pad.repitdoit.features.dummy.domain.usecase.GetMuscleNameByIdUseCase
 import com.pad.repitdoit.features.training.domain.usecase.AddExerciseToWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.UpdateWorkoutExerciseUseCase
 import com.pad.repitdoit.features.training.domain.usecase.RemoveExerciseFromWorkoutUseCase
@@ -30,8 +33,11 @@ import com.pad.repitdoit.features.training.domain.usecase.RenameWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
+import com.pad.repitdoit.features.dummy.domain.model.Exercise
+import com.pad.repitdoit.features.dummy.domain.usecase.GetExercisesByMuscleUseCase
 
-interface AppContainer : GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC, CatalogueUseCasesAC {
+interface AppContainer : DummyUseCasesAC, GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC, CatalogueUseCasesAC {
     val getProfileUseCase: GetProfileUseCase
 
 }
@@ -72,6 +78,12 @@ class DefaultAppContainer(
             GamificationRepositoryImpl(db, dispatcher, LOCAL_TEST_USER_ID)
         }
 
+    private val dummyRepository: DummyRepository =
+        if (db == null || dispatcher == null) {
+            FakeDummyRepositoryImpl()
+        } else {
+            DummyRepositoryImpl(db, dispatcher)
+        }
 
     private val profileRepository: ProfileRepository = FakeProfileRepositoryImpl()
 
@@ -91,5 +103,7 @@ class DefaultAppContainer(
     override val removeWorkoutUseCase = RemoveWorkoutUseCase(workoutRepository)
     override val renameWorkoutUseCase = RenameWorkoutUseCase(workoutRepository)
     override val getProfileUseCase = GetProfileUseCase(profileRepository)
+    override val getMuscleNameByIdUseCase = GetMuscleNameByIdUseCase(dummyRepository)
+    override val getExercisesByMuscleUseCase = GetExercisesByMuscleUseCase(dummyRepository)
 
 }
