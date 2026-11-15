@@ -1,7 +1,8 @@
 package com.pad.repitdoit.features.profile.domain.repository
 
-import com.pad.repitdoit.features.profile.domain.model.UserProfile
+import com.pad.repitdoit.features.profile.domain.model.User
 
 interface ProfileRepository {
-    suspend fun getProfile(): UserProfile
+    suspend fun getProfile(): User
+    suspend fun updateUser(user: User)
 }
