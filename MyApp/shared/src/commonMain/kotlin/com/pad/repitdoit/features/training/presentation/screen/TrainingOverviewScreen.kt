@@ -23,6 +23,7 @@ internal fun TrainingOverviewScreen(
     onWorkoutDetails: (String) -> Unit,
     onChoosePlan: () -> Unit,
     onPlanDayDetails: (planId: String, weekday: Int) -> Unit,
+    onStartWorkout: (String) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
@@ -149,7 +150,6 @@ internal fun TrainingOverviewScreen(
             }
         }
 
-
         item(
             span = { GridItemSpan(maxLineSpan) }
         ) {
@@ -183,7 +183,7 @@ internal fun TrainingOverviewScreen(
                 xp = workout.workoutExercises.size * 50,
                 isSelected = workout.id == selectedWorkoutId,
                 onDetails = { onWorkoutDetails(workout.id) },
-                onStart = { /* Pendiente de conectar */ },
+                onStart = { onStartWorkout(workout.id) },
                 onRemove = { onShowDialog(TrainingDialog.RemoveWorkout(workout.id)) }
             )
         }

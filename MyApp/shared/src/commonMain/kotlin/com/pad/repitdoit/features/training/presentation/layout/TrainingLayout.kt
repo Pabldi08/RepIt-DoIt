@@ -74,6 +74,7 @@ fun TrainingLayout(
     state: TrainingState,
     initialWorkoutId: String? = null,
     onAction: (TrainingAction) -> Unit,
+    onStartWorkout: (workoutId: String) -> Unit,
     onAddExercise: (workoutId: String) -> Unit
 ) {
     var activeDialog by remember { mutableStateOf<TrainingDialog?>(null) }
@@ -306,8 +307,8 @@ fun TrainingLayout(
                     onShowDialog = onShowDialog,
                     onWorkoutDetails = { workoutId ->
                         navigateToDetail(TrainingDetailDestination.WorkoutDetail(workoutId))
-                    }
-
+                    },
+                    onStartWorkout = onStartWorkout
                 )
             }
         },
@@ -378,7 +379,8 @@ fun TrainingLayout(
                                         TrainingDialog.RemoveExerciseFromWorkout(workout.id, workoutExerciseId)
                                     )
                                 },
-                                onAddExercise = { onAddExercise(workout.id) }
+                                onAddExercise = { onAddExercise(workout.id) },
+                                onStart = { onStartWorkout(workout.id) },
                             )
                         }
                     }
