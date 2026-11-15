@@ -57,6 +57,7 @@ fun TrainingLayout(
     state: TrainingState,
     initialWorkoutId: String? = null,
     onAction: (TrainingAction) -> Unit,
+    onStartWorkout: (workoutId: String) -> Unit,
     onAddExercise: (workoutId: String) -> Unit
 ) {
     var activeDialog by remember { mutableStateOf<TrainingDialog?>(null) }
@@ -176,6 +177,7 @@ fun TrainingLayout(
 //                            }
 //                        } else onWorkoutDetails(id)
 //                    }
+                    onStartWorkout = onStartWorkout,
                     onWorkoutDetails = { workoutId ->
                         val key = Json.encodeToString(
                             TrainingDetailDestination(
@@ -266,6 +268,7 @@ fun TrainingLayout(
                                     }
                                 },
                                 onBack = onBack,
+                                onStart = { onStartWorkout(workout.id) },
                                 onAddExercise = { onAddExercise(workout.id)}
                             )
                         } else {

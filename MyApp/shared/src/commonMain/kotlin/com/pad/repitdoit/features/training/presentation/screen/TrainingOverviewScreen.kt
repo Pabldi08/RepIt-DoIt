@@ -23,7 +23,8 @@ internal fun TrainingOverviewScreen(
     state: TrainingState,
     selectedWorkoutId: String? = null,
     onShowDialog: (TrainingDialog) -> Unit,
-    onWorkoutDetails: (String) -> Unit
+    onWorkoutDetails: (String) -> Unit,
+    onStartWorkout: (String) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
@@ -139,7 +140,7 @@ internal fun TrainingOverviewScreen(
                 xp = workout.workoutExercises.size * 50,
                 isSelected = workout.id == selectedWorkoutId,
                 onDetails = { onWorkoutDetails(workout.id) },
-                onStart = { /* Pendiente de conectar */ }
+                onStart = { onStartWorkout(workout.id) }
             )
         }
 

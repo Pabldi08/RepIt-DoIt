@@ -21,11 +21,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.Posture
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,15 +76,30 @@ fun MainScaffold(
     onNavigate: (Route) -> Unit,
     showScanOptions: Boolean,
     onQrClick: () -> Unit,
+    showingWorkoutSession: Boolean,
     content: @Composable () -> Unit
 ) {
     var addMenuExpanded by remember { mutableStateOf(false) }
     var addButtonCenter by remember { mutableStateOf<Offset?>(null) }
     var nfcPanelVisible by remember { mutableStateOf(false) }
     var scaffoldOrigin by remember { mutableStateOf(Offset.Zero) }
-    val navigationLayout = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
-        currentWindowAdaptiveInfo()
-    )
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val windowSize = LocalWindowInfo.current.containerSize
+    val isLandscape = windowSize.width > windowSize.height
+    val isTabletop = adaptiveInfo.windowPosture.isTabletop
+    val isSessionFlex = isTabletop && isLandscape
+    val navigationInfo = if (isTabletop && !isLandscape) {
+        WindowAdaptiveInfo(adaptiveInfo.windowSizeClass, Posture())
+    } else {
+        adaptiveInfo
+    }
+    val useSessionRail = showingWorkoutSession && !isSessionFlex &&
+        adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val navigationLayout = if (useSessionRail) {
+        NavigationSuiteType.NavigationRail
+    } else {
+        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(navigationInfo)
+    }
     val isNavigationBar = navigationLayout == NavigationSuiteType.NavigationBar
 
     Box(

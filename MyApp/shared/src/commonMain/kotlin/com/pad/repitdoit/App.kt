@@ -3,6 +3,8 @@ package com.pad.repitdoit
 
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
@@ -42,11 +44,18 @@ private fun AppContent(
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
+    var activeWorkoutId by rememberSaveable { mutableStateOf<String?>(null) }
 
     MainScaffold(
         showScanOptions = supportsScanOptions(),
         currentDestination = backStackEntry?.destination,
-        onNavigate = { route -> navController.navigate(route)},
+        showingWorkoutSession = activeWorkoutId != null &&
+            backStackEntry?.destination?.hasRoute<Route.Training>() == true,
+        onNavigate = { route ->
+            if (route != Route.Training || navController.currentDestination?.hasRoute<Route.Training>() != true) {
+                navController.navigate(route) { launchSingleTop = true }
+            }
+        },
         onQrClick = {
             navController.navigate(Route.QrCamera) {
                 launchSingleTop = true
@@ -57,7 +66,15 @@ private fun AppContent(
             navController = navController,
             windowSize = windowSize,
             appContainer = appContainer,
-            qrCameraScreen = qrCameraScreen
+            qrCameraScreen = qrCameraScreen,
+            activeWorkoutId = activeWorkoutId,
+            onStartWorkout = { workoutId ->
+                if (activeWorkoutId == null) activeWorkoutId = workoutId
+                if (navController.currentDestination?.hasRoute<Route.Training>() != true) {
+                    navController.navigate(Route.Training) { launchSingleTop = true }
+                }
+            },
+            onCloseWorkout = { activeWorkoutId = null }
         )
     }
 }
