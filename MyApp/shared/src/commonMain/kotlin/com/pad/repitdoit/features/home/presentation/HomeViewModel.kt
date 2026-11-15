@@ -22,7 +22,7 @@ class HomeViewModel (
 
     private fun loadDailyWorkouts() {
         viewModelScope.launch {
-            val workouts = appContainer.getHomeDailyWorkoutsUseCase("test-user-001", 1)
+            val workouts = appContainer.getHomeDailyWorkoutsUseCase(1)
             println("HOME_VM: Rutinas recibidas: ${workouts.size}")
             _uiState.update {
                 it.copy(
