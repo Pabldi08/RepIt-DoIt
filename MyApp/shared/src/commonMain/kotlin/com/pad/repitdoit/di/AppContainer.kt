@@ -31,6 +31,13 @@ import com.pad.repitdoit.features.training.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
 import com.pad.repitdoit.features.catalogue.domain.usecase.GetExercisesUseCase
+import com.pad.repitdoit.features.profile.data.repository.ProfileRepositoryImpl
+import com.pad.repitdoit.features.session.domain.usecase.CreateUserUseCase
+import com.pad.repitdoit.features.profile.domain.usecase.UpdateUserUseCase
+import com.pad.repitdoit.features.session.data.repositories.FakeSessionRepositoryImpl
+import com.pad.repitdoit.features.session.data.repositories.SessionRepositoryImpl
+import com.pad.repitdoit.features.session.domain.repository.SessionRepository
+import com.pad.repitdoit.features.session.domain.usecase.VerifyUserUseCase
 import com.pad.repitdoit.features.training.domain.usecase.AddExerciseToWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.UpdateWorkoutExerciseUseCase
 import com.pad.repitdoit.features.training.domain.usecase.RemoveExerciseFromWorkoutUseCase
@@ -42,10 +49,15 @@ import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetExerciseContextUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
-interface AppContainer : GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC, CatalogueUseCasesAC, WorkoutExerciseSetupUseCasesAC {
-    val getProfileUseCase: GetProfileUseCase
-
-}
+interface AppContainer :
+    SessionUseCasesAC,
+    ProfileUseCasesAC,
+    GamificationUseCaseAC,
+    TrainingUseCasesAC,
+    HomeUseCasesAC,
+    CatalogueUseCasesAC,
+    WorkoutExerciseSetupUseCasesAC
+{}
 
 
 class DefaultAppContainer(
@@ -84,8 +96,23 @@ class DefaultAppContainer(
         }
 
 
-    private val profileRepository: ProfileRepository = FakeProfileRepositoryImpl()
+    private val profileRepository: ProfileRepository =
+        if (db == null || dispatcher == null) {
+            FakeProfileRepositoryImpl()
+        } else {
+            ProfileRepositoryImpl(
+                db,
+                dispatcher,
+                LOCAL_TEST_USER_ID
+            )
+        }
 
+    private val sessionRepository: SessionRepository =
+        if (db == null || dispatcher == null) {
+            FakeSessionRepositoryImpl()
+        } else {
+            SessionRepositoryImpl(db, dispatcher)
+        }
     /*
         USE CASES
      */
@@ -111,5 +138,8 @@ class DefaultAppContainer(
     override val removeWorkoutUseCase = RemoveWorkoutUseCase(workoutRepository)
     override val renameWorkoutUseCase = RenameWorkoutUseCase(workoutRepository)
     override val getProfileUseCase = GetProfileUseCase(profileRepository)
+    override val createUserUseCase = CreateUserUseCase(sessionRepository)
+    override val updateUserUseCase = UpdateUserUseCase(profileRepository)
+    override val verifyUserUseCase = VerifyUserUseCase(sessionRepository)
 
 }
