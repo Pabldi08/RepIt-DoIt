@@ -1,3 +1,4 @@
+
 package com.pad.repitdoit.features.profile.data.repository
 
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
@@ -9,11 +10,15 @@ import kotlinx.coroutines.withContext
 class ProfileRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,
-    private val userId: String
+    private val currentUserId: () -> String?
 ) : ProfileRepository {
 
     override suspend fun getProfile(): User =
         withContext(dispatcher) {
+
+            val userId = checkNotNull(currentUserId()) {
+                "No hay ninguna sesión activa"
+            }
 
             val row = db.userQueries
                 .selectUserById(userId)
@@ -27,6 +32,10 @@ class ProfileRepositoryImpl(
 
     override suspend fun updateUser(user: User): Unit =
         withContext(dispatcher) {
+
+            val userId = checkNotNull(currentUserId()) {
+                "No hay ninguna sesión activa"
+            }
 
             db.userQueries.updateUserProfile(
                 username = user.username,

@@ -183,7 +183,7 @@ class AchievementProgressTest {
                     .associate { it.id to it.progress }
             )
             val otherUseCase = GetAllowedAchievementsUseCase(
-                GamificationRepositoryImpl(db, Dispatchers.Unconfined, other)
+                GamificationRepositoryImpl(db, Dispatchers.Unconfined, {other})
             )
             assertEquals(
                 mapOf("chest" to 1L, "triceps" to 0L, "back" to 0L, "general" to 1L,
