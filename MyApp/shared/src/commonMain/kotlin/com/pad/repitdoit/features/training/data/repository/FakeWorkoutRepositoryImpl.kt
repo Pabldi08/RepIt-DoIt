@@ -1,8 +1,10 @@
 package com.pad.repitdoit.features.training.data.repository
 
 import com.pad.repitdoit.core.utility.generateId
-import com.pad.repitdoit.features.catalogue.domain.model.Exercise
+import com.pad.repitdoit.features.training.domain.model.ExerciseContext
 import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.TrainingPlan
+import com.pad.repitdoit.features.training.domain.model.ScheduledWorkout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import repitdoit.shared.generated.resources.Res
@@ -13,7 +15,6 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
         "001" to Workout(
             id = "001",
             name = "Tren Superior",
-            estimatedTime = 0,
             image = Res.drawable.training_muscles,
             workoutExercises = listOf(
                 WorkoutExercise(
@@ -56,15 +57,111 @@ class FakeWorkoutRepositoryImpl: WorkoutRepository {
         )
     )
     private val archivedWorkoutIds = mutableSetOf<String>()
+    private val plans = mutableMapOf(
+        "fake-plan-001" to
+            TrainingPlan(
+                id = "fake-plan-001",
+                name = "Plan semanal de prueba",
+                isActive = false,
+                schedule = workouts["001"]?.let { workout ->
+                    listOf(1, 3, 5).map { day ->
+                        ScheduledWorkout(
+                            id = "fake-schedule-$day",
+                            workoutId = workout.id,
+                            workoutName = workout.name,
+                            numEx = workout.workoutExercises.size,
+                            weekday = day,
+                            position = 0
+                        )
+                    }
+                }.orEmpty()
+            )
+    )
+
+    override suspend fun getTrainingPlans(): List<TrainingPlan> = plans.values
+        .sortedWith(compareBy({ it.name.lowercase() }, { it.name }, { it.id }))
+        .map { plan ->
+        plan.copy(schedule = plan.schedule.mapNotNull { entry ->
+            val workout = workouts[entry.workoutId]?.takeUnless { it.id in archivedWorkoutIds }
+                ?: return@mapNotNull null
+            entry.copy(
+                workoutName = workout.name,
+                numEx = workout.workoutExercises.size
+            )
+        }.sortedWith(compareBy({ it.weekday }, { it.position })))
+    }
+
+    private fun requirePlan(planId: String): TrainingPlan = requireNotNull(plans[planId]) {
+        "El plan no existe o no pertenece al usuario"
+    }
+
+    override suspend fun selectTrainingPlan(planId: String) {
+        requirePlan(planId)
+        plans.keys.toList().forEach { id ->
+            plans[id] = plans.getValue(id).copy(isActive = id == planId)
+        }
+    }
+
+    override suspend fun createTrainingPlan(name: String): TrainingPlan {
+        val plan = TrainingPlan(generateId(), name, false)
+        plans[plan.id] = plan
+        return plan
+    }
+
+    override suspend fun renameTrainingPlan(planId: String, name: String) {
+        plans[planId] = requirePlan(planId).copy(name = name)
+    }
+
+    override suspend fun deleteTrainingPlan(planId: String) {
+        requirePlan(planId)
+        plans.remove(planId)
+    }
+
+    override suspend fun addWorkoutToPlan(planId: String, workoutId: String, weekday: Int) {
+        val plan = requirePlan(planId)
+        val workout = requireActiveWorkout(workoutId)
+        val position = plan.schedule.filter { it.weekday == weekday }.maxOfOrNull { it.position }
+            ?.plus(1) ?: 0
+        val entry = ScheduledWorkout(
+            generateId(), workout.id, workout.name,
+            workout.workoutExercises.size, weekday, position
+        )
+        plans[planId] = plan.copy(schedule = plan.schedule + entry)
+    }
+
+    override suspend fun removeWorkoutFromPlan(planId: String, scheduleId: String) {
+        val plan = requirePlan(planId)
+        require(plan.schedule.any { it.id == scheduleId }) { "La rutina programada no pertenece a este plan" }
+        plans[planId] = plan.copy(schedule = plan.schedule.filterNot { it.id == scheduleId })
+    }
+
+    override suspend fun moveWorkoutToPlanDay(planId: String, scheduleId: String, weekday: Int) {
+        val plan = requirePlan(planId)
+        val entry = requireNotNull(plan.schedule.find { it.id == scheduleId }) {
+            "La rutina programada no pertenece a este plan"
+        }
+        if (entry.weekday == weekday) return
+        val position = plan.schedule.filter { it.weekday == weekday }.maxOfOrNull { it.position }
+            ?.plus(1) ?: 0
+        plans[planId] = plan.copy(schedule = plan.schedule.map {
+            if (it.id == scheduleId) it.copy(weekday = weekday, position = position) else it
+        })
+    }
+
     private val exercises = workouts.values.flatMap { it.workoutExercises }
-        .map { Exercise(it.exerciseId, it.name, null) }.distinctBy { it.id }.sortedBy { it.name }
+        .map { ExerciseContext(it.exerciseId, it.name, null, null) }
+        .distinctBy { it.id }.sortedBy { it.name }
+
+    override suspend fun getExerciseContext(exerciseId: String): ExerciseContext? {
+        return exercises.find { it.id == exerciseId }
+    }
 
     override suspend fun getWorkout(workoutId: String): Workout? {
         return workouts[workoutId]
     }
 
     override suspend fun createWorkout(name: String): Workout {
-        val workout = Workout(generateId(), name, estimatedTime = 0, image = Res.drawable.training_muscles)
+        val workout = Workout(generateId(), name, image = Res.drawable.training_muscles)
         workouts[workout.id] = workout
         return workout
     }

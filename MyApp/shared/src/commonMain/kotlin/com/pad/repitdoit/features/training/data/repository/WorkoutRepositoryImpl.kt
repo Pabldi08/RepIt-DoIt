@@ -1,9 +1,13 @@
 package com.pad.repitdoit.features.training.data.repository
 
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
+import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.utility.generateId
 import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.features.training.domain.model.TrainingPlan
+import com.pad.repitdoit.features.training.domain.model.ScheduledWorkout
+import com.pad.repitdoit.features.training.domain.model.ExerciseContext
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,6 +21,154 @@ class WorkoutRepositoryImpl (
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher
 ) : WorkoutRepository {
+
+    private fun requirePlan(planId: String) = requireNotNull(
+        db.trainingPlanQueries.selectPlanById(planId, LOCAL_TEST_USER_ID).executeAsOneOrNull()
+    ) { "El plan no existe o no pertenece al usuario" }
+
+    override suspend fun selectTrainingPlan(planId: String): Unit = withContext(dispatcher) {
+        db.transaction {
+            // Validar antes de desactivar para conservar el anterior si el destino no existe.
+            val plan = requirePlan(planId)
+            val activePlan = db.trainingPlanQueries.selectActivePlan(LOCAL_TEST_USER_ID)
+                .executeAsOneOrNull()
+            val timestamp = maxOf(
+                Clock.System.now().toEpochMilliseconds(),
+                plan.updated_at,
+                activePlan?.updated_at ?: 0L
+            )
+            db.trainingPlanQueries.deactivateUserPlans(timestamp, LOCAL_TEST_USER_ID)
+            db.trainingPlanQueries.activateTrainingPlan(timestamp, planId, LOCAL_TEST_USER_ID)
+        }
+    }
+
+    private fun requireSchedule(planId: String, scheduleId: String) = requireNotNull(
+        db.trainingPlanQueries.selectPlanScheduleEntry(scheduleId, planId, LOCAL_TEST_USER_ID)
+            .executeAsOneOrNull()
+    ) { "La rutina programada no pertenece a este plan" }
+
+    override suspend fun createTrainingPlan(name: String): TrainingPlan = withContext(dispatcher) {
+        val id = generateId()
+        val timestamp = Clock.System.now().toEpochMilliseconds()
+        db.trainingPlanQueries.insertTrainingPlan(id, LOCAL_TEST_USER_ID, name, timestamp, timestamp)
+        TrainingPlan(id = id, name = name, isActive = false)
+    }
+
+    override suspend fun renameTrainingPlan(planId: String, name: String): Unit = withContext(dispatcher) {
+        db.transaction {
+            val plan = requirePlan(planId)
+            val timestamp = maxOf(Clock.System.now().toEpochMilliseconds(), plan.updated_at)
+            db.trainingPlanQueries.updateTrainingPlan(name, timestamp, planId, LOCAL_TEST_USER_ID)
+        }
+    }
+
+    override suspend fun deleteTrainingPlan(planId: String): Unit = withContext(dispatcher) {
+        db.transaction {
+            requirePlan(planId)
+            db.trainingPlanQueries.deleteTrainingPlan(planId, LOCAL_TEST_USER_ID)
+        }
+    }
+
+    override suspend fun addWorkoutToPlan(planId: String, workoutId: String, weekday: Int): Unit =
+        withContext(dispatcher) {
+            db.transaction {
+                val plan = requirePlan(planId)
+                val workout = requireNotNull(
+                    db.workoutQueries.selectWorkoutById(workoutId, LOCAL_TEST_USER_ID).executeAsOneOrNull()
+                ) { "La rutina no existe o no pertenece al usuario" }
+                require(workout.archived_at == null) { "La rutina está archivada" }
+                val scheduleId = generateId()
+                db.trainingPlanQueries.addWorkoutToPlan(
+                    schedule_id = scheduleId,
+                    weekday = weekday.toLong(),
+                    plan_id = planId,
+                    user_id = LOCAL_TEST_USER_ID,
+                    workout_id = workoutId
+                )
+                requireSchedule(planId, scheduleId)
+                db.trainingPlanQueries.touchTrainingPlan(
+                    updated_at = maxOf(Clock.System.now().toEpochMilliseconds(), plan.updated_at),
+                    plan_id = planId,
+                    user_id = LOCAL_TEST_USER_ID
+                )
+            }
+        }
+
+    override suspend fun removeWorkoutFromPlan(planId: String, scheduleId: String): Unit =
+        withContext(dispatcher) {
+            db.transaction {
+                val plan = requirePlan(planId)
+                requireSchedule(planId, scheduleId)
+                db.trainingPlanQueries.removeWorkoutFromPlan(scheduleId, planId, LOCAL_TEST_USER_ID)
+                db.trainingPlanQueries.touchTrainingPlan(
+                    updated_at = maxOf(Clock.System.now().toEpochMilliseconds(), plan.updated_at),
+                    plan_id = planId,
+                    user_id = LOCAL_TEST_USER_ID
+                )
+            }
+        }
+
+    override suspend fun moveWorkoutToPlanDay(planId: String, scheduleId: String, weekday: Int): Unit =
+        withContext(dispatcher) {
+            db.transaction {
+                val plan = requirePlan(planId)
+                val entry = requireSchedule(planId, scheduleId)
+                if (entry.weekday != weekday.toLong()) {
+                    db.trainingPlanQueries.moveWorkoutToPlanDay(
+                        weekday = weekday.toLong(),
+                        plan_id = planId,
+                        user_id = LOCAL_TEST_USER_ID,
+                        schedule_id = scheduleId
+                    )
+                    db.trainingPlanQueries.touchTrainingPlan(
+                        updated_at = maxOf(Clock.System.now().toEpochMilliseconds(), plan.updated_at),
+                        plan_id = planId,
+                        user_id = LOCAL_TEST_USER_ID
+                    )
+                }
+            }
+        }
+
+    override suspend fun getTrainingPlans(): List<TrainingPlan> = withContext(dispatcher) {
+        db.transactionWithResult {
+            db.trainingPlanQueries.selectPlansByUser(LOCAL_TEST_USER_ID)
+                .executeAsList().map { plan ->
+                    val schedule = db.trainingPlanQueries.selectPlanSchedule(
+                        plan_id = plan.id,
+                        user_id = LOCAL_TEST_USER_ID
+                    ).executeAsList().map { entry ->
+                        ScheduledWorkout(
+                            id = entry.schedule_id,
+                            workoutId = entry.workout_id,
+                            workoutName = entry.workout_name,
+                            numEx = entry.num_ex.toInt(),
+                            weekday = entry.weekday.toInt(),
+                            position = entry.position.toInt()
+                        )
+                    }
+                    TrainingPlan(
+                        id = plan.id,
+                        name = plan.name,
+                        isActive = plan.is_active == 1L,
+                        schedule = schedule
+                    )
+                }
+        }
+    }
+
+    override suspend fun getExerciseContext(
+        exerciseId: String
+    ): ExerciseContext? = withContext(dispatcher) {
+            val exercise = db.exerciseQueries.selectExerciseById(exerciseId)
+                .executeAsOneOrNull() ?: return@withContext null
+            if (exercise.is_active != 1L) return@withContext null
+            ExerciseContext(
+                id = exercise.id,
+                name = exercise.name,
+                description = exercise.description,
+                imageUrl = exercise.image_url
+            )
+        }
 
     override suspend fun getWorkout(
         workoutId: String
@@ -48,7 +200,6 @@ class WorkoutRepositoryImpl (
             id = workout.id,
             name = workout.name,
             workoutExercises = exercises,
-            estimatedTime = workout.estimated_time?.toInt() ?:0,
             image = loadImage(workout.image_url)
         )
     }
@@ -60,7 +211,8 @@ class WorkoutRepositoryImpl (
         // Generar id unico y obtener timestamp
 
         val id = generateId()
-        val timestamp = 261025171100
+        val time = Clock.System.now()
+        val timestamp = time.toEpochMilliseconds()
 
         db.workoutQueries.insertWorkout(
             id = id,
@@ -76,7 +228,6 @@ class WorkoutRepositoryImpl (
         Workout(
             id = id,
             name = name,
-            estimatedTime = 0,
             image = Res.drawable.placeholder
         )
     }
@@ -87,7 +238,8 @@ class WorkoutRepositoryImpl (
     ) = withContext(dispatcher){
         //Validar nombre
         // Coger timestamp actual
-        val timestamp = 261026171100
+        val time = Clock.System.now()
+        val timestamp = time.toEpochMilliseconds()
         val workout = db.workoutQueries.renameWorkout(
             id = workoutId,
             user_id = "test-user-001",
@@ -205,7 +357,6 @@ class WorkoutRepositoryImpl (
                         id = workout.id,
                         name = workout.name,
                         workoutExercises = exercises,
-                        estimatedTime = workout.estimated_time?.toInt() ?: 0,
                         image = loadImage(workout.image_url)
                     )
                 }

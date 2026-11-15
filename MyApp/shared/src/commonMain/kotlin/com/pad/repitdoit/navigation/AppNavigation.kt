@@ -2,6 +2,7 @@ package com.pad.repitdoit.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
@@ -11,6 +12,7 @@ import com.pad.repitdoit.features.catalogue.presentation.screen.CatalogueScreenR
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
+import com.pad.repitdoit.features.training.presentation.screen.WorkoutExerciseSetupScreenRoot
 @Composable
 fun AppNavigation(
     navController: NavHostController,
@@ -75,7 +77,46 @@ fun AppNavigation(
                 appContainer = appContainer,
                 machineId = route.machineId,
                 onBack = { navController.popBackStack() },
-                onAddExercise = {} //Aun no esta enganchado el añadir ejercicio como tal
+                onAddExercise = { exerciseId ->
+                    val origin = navController.previousBackStackEntry
+                    navController.navigate(
+                        Route.WorkoutExerciseSetup(
+                            exerciseId = exerciseId,
+                            workoutId = route.workoutId,
+                            returnToTraining = origin?.destination?.hasRoute<Route.Training>() == true,
+                            returnWorkoutId = if (origin?.destination?.hasRoute<Route.Workout>() == true) {
+                                origin.toRoute<Route.Workout>().workoutId
+                            } else null
+                        )
+                    )
+                }
+            )
+        }
+
+        composable<Route.WorkoutExerciseSetup> { backStackEntry ->
+            val route = backStackEntry.toRoute<Route.WorkoutExerciseSetup>()
+            WorkoutExerciseSetupScreenRoot(
+                appContainer = appContainer,
+                exerciseId = route.exerciseId,
+                workoutId = route.workoutId,
+                onBack = { navController.popBackStack() },
+                onSaved = { savedWorkoutId ->
+                    val returnedToOrigin = when {
+                        route.returnToTraining ->
+                            navController.popBackStack<Route.Training>(inclusive = false)
+                        route.returnWorkoutId == savedWorkoutId ->
+                            navController.popBackStack(
+                                Route.Workout(savedWorkoutId), inclusive = false
+                            )
+                        else -> false
+                    }
+                    if (!returnedToOrigin) {
+                        navController.navigate(Route.Workout(savedWorkoutId)) {
+                            popUpTo<Route.Catalogue> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                }
             )
         }
     }

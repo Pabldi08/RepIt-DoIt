@@ -29,7 +29,7 @@ selectPlansByUser:
 SELECT *
 FROM TrainingPlan
 WHERE user_id = ?
-ORDER BY updated_at DESC;
+ORDER BY name COLLATE NOCASE ASC, name ASC, id ASC;
 
 selectPlanById:
 SELECT *
@@ -82,3 +82,105 @@ deleteTrainingPlan:
 DELETE FROM TrainingPlan
 WHERE id = ?
   AND user_id = ?;
+
+-- Schedule operations are exposed here so they belong to trainingPlanQueries.
+-- Archived workouts are kept in storage but omitted from the visible schedule.
+selectPlanSchedule:
+SELECT
+    WorkoutSchedule.id AS schedule_id,
+    WorkoutSchedule.training_plan_id,
+    WorkoutSchedule.workout_id,
+    WorkoutSchedule.weekday,
+    WorkoutSchedule.position,
+    Workout.name AS workout_name,
+    Workout.image_url AS workout_image_url,
+    (
+        SELECT COUNT(*)
+        FROM WorkoutExercise
+        WHERE WorkoutExercise.workout_id = WorkoutSchedule.workout_id
+    ) AS num_ex
+FROM WorkoutSchedule
+INNER JOIN TrainingPlan
+    ON TrainingPlan.id = WorkoutSchedule.training_plan_id
+    AND TrainingPlan.user_id = WorkoutSchedule.user_id
+INNER JOIN Workout
+    ON Workout.id = WorkoutSchedule.workout_id
+    AND Workout.user_id = WorkoutSchedule.user_id
+WHERE TrainingPlan.id = :plan_id
+  AND TrainingPlan.user_id = :user_id
+  AND Workout.archived_at IS NULL
+ORDER BY WorkoutSchedule.weekday ASC, WorkoutSchedule.position ASC;
+
+-- Includes hidden entries, useful when validating a move/removal in the repository.
+selectPlanScheduleEntry:
+SELECT * FROM WorkoutSchedule
+WHERE id = :schedule_id
+  AND training_plan_id = :plan_id
+  AND user_id = :user_id;
+
+-- Appends a workout to a day. An invalid owner, plan or archived workout inserts no row.
+-- Call inside the same transaction as touchTrainingPlan and validate the affected entry.
+addWorkoutToPlan:
+INSERT INTO WorkoutSchedule (
+    id, user_id, training_plan_id, workout_id, weekday, position
+)
+SELECT
+    :schedule_id,
+    TrainingPlan.user_id,
+    TrainingPlan.id,
+    Workout.id,
+    :weekday,
+    (
+        SELECT COALESCE(MAX(WorkoutSchedule.position), -1) + 1
+        FROM WorkoutSchedule
+        WHERE WorkoutSchedule.training_plan_id = :plan_id
+          AND WorkoutSchedule.user_id = :user_id
+          AND WorkoutSchedule.weekday = :weekday
+    )
+FROM TrainingPlan
+INNER JOIN Workout ON Workout.user_id = TrainingPlan.user_id
+WHERE TrainingPlan.id = :plan_id
+  AND TrainingPlan.user_id = :user_id
+  AND Workout.id = :workout_id
+  AND Workout.archived_at IS NULL;
+
+-- A schedule ID identifies an occurrence; removing it never deletes the workout itself.
+removeWorkoutFromPlan:
+DELETE FROM WorkoutSchedule
+WHERE id = :schedule_id
+  AND training_plan_id = :plan_id
+  AND user_id = :user_id;
+
+-- Moves an occurrence to the end of a different day, without position collisions.
+moveWorkoutToPlanDay:
+UPDATE WorkoutSchedule
+SET weekday = :weekday,
+    position = (
+        SELECT COALESCE(MAX(target.position), -1) + 1
+        FROM WorkoutSchedule AS target
+        WHERE target.training_plan_id = :plan_id
+          AND target.user_id = :user_id
+          AND target.weekday = :weekday
+    )
+WHERE id = :schedule_id
+  AND training_plan_id = :plan_id
+  AND user_id = :user_id
+  AND weekday != :weekday;
+
+clearPlanDay:
+DELETE FROM WorkoutSchedule
+WHERE training_plan_id = :plan_id
+  AND user_id = :user_id
+  AND weekday = :weekday;
+
+clearPlanSchedule:
+DELETE FROM WorkoutSchedule
+WHERE training_plan_id = :plan_id
+  AND user_id = :user_id;
+
+-- Update the parent after a schedule edit, in the same transaction.
+touchTrainingPlan:
+UPDATE TrainingPlan
+SET updated_at = MAX(updated_at, :updated_at)
+WHERE id = :plan_id
+  AND user_id = :user_id;

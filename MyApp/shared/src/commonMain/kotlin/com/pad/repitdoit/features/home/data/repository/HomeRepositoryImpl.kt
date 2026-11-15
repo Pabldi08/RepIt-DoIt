@@ -33,8 +33,7 @@ class HomeRepositoryImpl (
             HomeDailyWorkout(
                 id = workout.id,
                 name = workout.name,
-                exerciseCount = workout.exercise_count.toInt(),
-                estimatedTime = workout.estimated_time?.toInt()
+                exerciseCount = workout.exercise_count.toInt()
             )
         }
     }

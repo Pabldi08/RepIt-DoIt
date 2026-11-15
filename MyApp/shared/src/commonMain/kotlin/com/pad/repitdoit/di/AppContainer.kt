@@ -1,5 +1,14 @@
 package com.pad.repitdoit.di
 
+import com.pad.repitdoit.features.training.domain.usecase.SelectTrainingPlanUseCase
+
+import com.pad.repitdoit.features.training.domain.usecase.CreateTrainingPlanUseCase
+import com.pad.repitdoit.features.training.domain.usecase.RenameTrainingPlanUseCase
+import com.pad.repitdoit.features.training.domain.usecase.DeleteTrainingPlanUseCase
+import com.pad.repitdoit.features.training.domain.usecase.AddWorkoutToPlanUseCase
+import com.pad.repitdoit.features.training.domain.usecase.RemoveWorkoutFromPlanUseCase
+import com.pad.repitdoit.features.training.domain.usecase.MoveWorkoutToPlanDayUseCase
+
 import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.features.catalogue.data.repository.CatalogueRepositoryImpl
@@ -28,10 +37,12 @@ import com.pad.repitdoit.features.training.domain.usecase.RemoveExerciseFromWork
 import com.pad.repitdoit.features.training.domain.usecase.RemoveWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.RenameWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCase
+import com.pad.repitdoit.features.training.domain.usecase.GetUsersTrainingPlansUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.GetExerciseContextUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
-interface AppContainer : GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC, CatalogueUseCasesAC {
+interface AppContainer : GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC, CatalogueUseCasesAC, WorkoutExerciseSetupUseCasesAC {
     val getProfileUseCase: GetProfileUseCase
 
 }
@@ -81,7 +92,16 @@ class DefaultAppContainer(
     override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(gamificationRepository)
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
+    override val getExerciseContextUseCase = GetExerciseContextUseCase(workoutRepository)
     override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)
+    override val getUsersTrainingPlansUseCase = GetUsersTrainingPlansUseCase(workoutRepository)
+    override val selectTrainingPlanUseCase = SelectTrainingPlanUseCase(workoutRepository)
+    override val createTrainingPlanUseCase = CreateTrainingPlanUseCase(workoutRepository)
+    override val renameTrainingPlanUseCase = RenameTrainingPlanUseCase(workoutRepository)
+    override val deleteTrainingPlanUseCase = DeleteTrainingPlanUseCase(workoutRepository)
+    override val addWorkoutToPlanUseCase = AddWorkoutToPlanUseCase(workoutRepository)
+    override val removeWorkoutFromPlanUseCase = RemoveWorkoutFromPlanUseCase(workoutRepository)
+    override val moveWorkoutToPlanDayUseCase = MoveWorkoutToPlanDayUseCase(workoutRepository)
     override val createWorkoutUseCase = CreateWorkoutUseCase(workoutRepository)
     override val getExercisesUseCase = GetExercisesUseCase(catalogueRepository)
     override val getExercisesByMachineUseCase = GetExercisesByMachineUseCase(catalogueRepository)

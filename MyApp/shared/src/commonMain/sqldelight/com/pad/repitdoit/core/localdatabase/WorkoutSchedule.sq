@@ -54,7 +54,6 @@ selectDailyWorkouts:
     SELECT
         Workout.id,
         Workout.name,
-        Workout.estimated_time,
         COUNT(WorkoutExercise.id) AS exercise_count
     FROM WorkoutSchedule
 
@@ -78,7 +77,6 @@ selectDailyWorkouts:
         WorkoutSchedule.id,
         Workout.id,
         Workout.name,
-        Workout.estimated_time,
         WorkoutSchedule.position
 
     ORDER BY WorkoutSchedule.position ASC;

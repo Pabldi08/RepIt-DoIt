@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -16,6 +20,7 @@ import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationIt
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -29,26 +34,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.OnBackHandler
 import com.pad.repitdoit.core.ui.common.textPopup
-import com.pad.repitdoit.features.training.presentation.TrainingAction
-import com.pad.repitdoit.features.training.presentation.TrainingDialog
-import com.pad.repitdoit.features.training.presentation.TrainingState
-import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
+import com.pad.repitdoit.features.training.presentation.action.TrainingAction
+import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
+import com.pad.repitdoit.features.training.presentation.state.TrainingState
+import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseEditState
 import com.pad.repitdoit.features.training.presentation.screen.TrainingExerciseDetailScreen
 import com.pad.repitdoit.features.training.presentation.screen.TrainingOverviewScreen
 import com.pad.repitdoit.features.training.presentation.screen.TrainingWorkoutDetailScreen
+import com.pad.repitdoit.features.training.presentation.screen.PlanSelectionScreen
+import com.pad.repitdoit.features.training.presentation.screen.PlanDetailScreen
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 // Una clave String permite que el navegador conserve la selección en todas las plataformas.
-// El ID del ejercicio solo aparece cuando el panel de detalle muestra sus series.
 @Serializable
-private data class TrainingDetailDestination(
-  //  val planId: String,
-    val workoutId: String,
-    val exerciseId: String? = null
-)
+private sealed interface TrainingDetailDestination {
+    @Serializable
+    data object PlanSelection : TrainingDetailDestination
+
+    @Serializable
+    data class PlanDayDetail(val planId: String, val weekday: Int) : TrainingDetailDestination
+
+    @Serializable
+    data class WorkoutDetail(val workoutId: String) : TrainingDetailDestination
+
+    @Serializable
+    data class ExerciseDetail(
+        val workoutId: String,
+        val exerciseId: String
+    ) : TrainingDetailDestination
+}
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -61,15 +78,110 @@ fun TrainingLayout(
 ) {
     var activeDialog by remember { mutableStateOf<TrainingDialog?>(null) }
     val onShowDialog: (TrainingDialog) -> Unit = { dialog ->
-        // Añadir ejercicio sigue pendiente hasta disponer de su formulario.
         if (activeDialog == null) {
             activeDialog = dialog
         }
     }
 
-    // Un solo diálogo compartido por los dos paneles.
+    // One single dialog popup through both panels
     key(activeDialog) {
         when (val dialog = activeDialog) {
+            is TrainingDialog.RemoveWorkout -> {
+                val workoutName = state.workouts.find { it.id == dialog.workoutId }?.name
+                AlertDialog(
+                    onDismissRequest = { activeDialog = null },
+                    title = { Text("Eliminar rutina") },
+                    text = {
+                        val subject = workoutName?.let { "la rutina «$it»" } ?: "esta rutina"
+                        Text("¿Quieres eliminar $subject? Dejará de aparecer en tus entrenamientos y planes semanales. Los ejercicios del catálogo se conservarán.")
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onAction(TrainingAction.RemoveWorkout(dialog.workoutId))
+                            activeDialog = null
+                        }) { Text("Eliminar") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { activeDialog = null }) { Text("Cancelar") }
+                    }
+                )
+            }
+            is TrainingDialog.RemoveExerciseFromWorkout -> {
+                val exerciseName = state.workouts.find { it.id == dialog.workoutId }
+                    ?.workoutExercises?.find { it.id == dialog.workoutExerciseId }?.name
+                AlertDialog(
+                    onDismissRequest = { activeDialog = null },
+                    title = { Text("Quitar ejercicio") },
+                    text = {
+                        Text(
+                            if (exerciseName != null) {
+                                "¿Quieres quitar «$exerciseName» de esta rutina? El ejercicio seguirá disponible en el catálogo."
+                            } else {
+                                "¿Quieres quitar este ejercicio de la rutina? Seguirá disponible en el catálogo."
+                            }
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onAction(
+                                TrainingAction.removeExerciseFromWorkout(
+                                    dialog.workoutId,
+                                    dialog.workoutExerciseId
+                                )
+                            )
+                            activeDialog = null
+                        }) { Text("Quitar") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { activeDialog = null }) { Text("Cancelar") }
+                    }
+                )
+            }
+            TrainingDialog.CreatePlan -> textPopup(
+                title = "Crear plan",
+                placeHolderText = "Nombre del plan",
+                onConfirmAction = { name ->
+                    onAction(TrainingAction.CreatePlan(name))
+                    activeDialog = null
+                },
+                onCancelAction = { activeDialog = null }
+            )
+            is TrainingDialog.DeletePlan -> AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Eliminar plan") },
+                text = { Text("Se eliminará el plan y su distribución semanal. Las rutinas se conservarán.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onAction(TrainingAction.DeletePlan(dialog.planId))
+                        activeDialog = null
+                    }) { Text("Eliminar") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { activeDialog = null }) { Text("Cancelar") }
+                }
+            )
+            is TrainingDialog.AddWorkoutToPlan -> AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Añadir rutina al día") },
+                text = {
+                    if (state.workouts.isEmpty()) {
+                        Text("No tienes rutinas disponibles. Crea una desde Entrenamientos.")
+                    } else {
+                        LazyColumn(Modifier.heightIn(max = 400.dp)) {
+                            items(state.workouts, key = { it.id }) { workout ->
+                                TextButton(onClick = {
+                                    onAction(TrainingAction.AddWorkoutToPlan(dialog.planId, workout.id, dialog.weekday))
+                                    activeDialog = null
+                                }) { Text(workout.name) }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = { activeDialog = null }) { Text("Cancelar") }
+                }
+            )
             TrainingDialog.CreateWorkout -> textPopup(
                 title = "Añadir entrenamiento",
                 placeHolderText = "Nombre del entrenamiento",
@@ -90,11 +202,20 @@ fun TrainingLayout(
                 onCancelAction = { activeDialog = null }
             )
 
+            is TrainingDialog.RenamePlan -> textPopup(
+                title = "Renombrar plan",
+                placeHolderText = "Nuevo nombre",
+                onConfirmAction = { name ->
+                    onAction(TrainingAction.RenamePlan(dialog.planId, name))
+                    activeDialog = null
+                },
+                onCancelAction = { activeDialog = null }
+            )
+
             null -> Unit
         }
     }
 
-    val plan = TrainingPreviewData.plan
     // Los tamaños de la app deciden cuándo mostrar ambos paneles, incluido Medium.
 
     val initialHistory = remember(initialWorkoutId) {
@@ -110,8 +231,8 @@ fun TrainingLayout(
                 add(
                     ThreePaneScaffoldDestinationItem(
                         pane = ListDetailPaneScaffoldRole.Detail,
-                        contentKey = Json.encodeToString(
-                            TrainingDetailDestination(
+                        contentKey = Json.encodeToString<TrainingDetailDestination>(
+                            TrainingDetailDestination.WorkoutDetail(
                                 workoutId = workoutId
                             )
                         )
@@ -133,6 +254,22 @@ fun TrainingLayout(
     val destination = navigator.currentDestination?.contentKey?.let { key ->
         Json.decodeFromString<TrainingDetailDestination>(key)
     }
+    val selectedWorkoutId = when (destination) {
+        is TrainingDetailDestination.WorkoutDetail -> destination.workoutId
+        is TrainingDetailDestination.ExerciseDetail -> destination.workoutId
+        else -> null
+    }
+    val navigateToDetail: (TrainingDetailDestination) -> Unit = { target ->
+        val key = Json.encodeToString<TrainingDetailDestination>(target)
+        if (navigator.currentDestination?.contentKey != key) {
+            scope.launch {
+                navigator.navigateTo(
+                    pane = ListDetailPaneScaffoldRole.Detail,
+                    contentKey = key
+                )
+            }
+        }
+    }
 
     var lastDetailDestination by remember {
         mutableStateOf<TrainingDetailDestination?>(destination)
@@ -142,7 +279,6 @@ fun TrainingLayout(
             lastDetailDestination = destination
         }
     }
-//    val workout = plan.workouts.find { it.id == destination?.workoutId }
     val backBehavior = BackNavigationBehavior.PopUntilContentChange
     val onBack: () -> Unit = {
         scope.launch { navigator.navigateBack(backBehavior) }
@@ -159,37 +295,17 @@ fun TrainingLayout(
         listPane = {
             AnimatedPane {
                 TrainingOverviewScreen(
-                    plan = plan,
                     state = state,
-                    selectedWorkoutId = destination?.workoutId,
+                    selectedWorkoutId = selectedWorkoutId,
+                    onChoosePlan = {
+                        navigateToDetail(TrainingDetailDestination.PlanSelection)
+                    },
+                    onPlanDayDetails = { planId, weekday ->
+                        navigateToDetail(TrainingDetailDestination.PlanDayDetail(planId, weekday))
+                    },
                     onShowDialog = onShowDialog,
-//                    onWorkoutDetails = { id ->
-//                        if (TrainingPreviewData.workout(id) != null) {
-//                            val key = Json.encodeToString(TrainingDetailDestination(plan.id, id))
-//                            if (navigator.currentDestination?.contentKey != key) {
-//                                scope.launch {
-//                                    navigator.navigateTo(
-//                                        ListDetailPaneScaffoldRole.Detail,
-//                                        key
-//                                    )
-//                                }
-//                            }
-//                        } else onWorkoutDetails(id)
-//                    }
                     onWorkoutDetails = { workoutId ->
-                        val key = Json.encodeToString(
-                            TrainingDetailDestination(
-                                workoutId = workoutId
-                            )
-                        )
-                        if (navigator.currentDestination?.contentKey != key) {
-                            scope.launch {
-                                navigator.navigateTo(
-                                    pane = ListDetailPaneScaffoldRole.Detail,
-                                    contentKey = key
-                                )
-                            }
-                        }
+                        navigateToDetail(TrainingDetailDestination.WorkoutDetail(workoutId))
                     }
 
                 )
@@ -197,34 +313,6 @@ fun TrainingLayout(
         },
         detailPane = {
             AnimatedPane {
-//                when {
-//                    destination == null -> TrainingDetailPlaceholder()
-//                    workout == null || destination.planId != plan.id -> TrainingUnavailableScreen(onBack)
-//                    destination.exerciseId == null -> TrainingWorkoutDetailScreen(
-//                        workout = workout,
-//                        onExercise = { exerciseId ->
-//                            scope.launch {
-//                                navigator.navigateTo(
-//                                    pane = ListDetailPaneScaffoldRole.Detail,
-//                                    contentKey = Json.encodeToString(
-//                                        value = TrainingDetailDestination(
-//                                            planId = plan.id,
-//                                            workoutId = workout.id,
-//                                            exerciseId
-//                                        )
-//                                    )
-//                                )
-//                            }
-//                        },
-//                        onBack = onBack
-//                    )
-//                    else -> {
-//                        val exercise = workout.exercises.find { it.id == destination.exerciseId }
-//                        if (exercise != null) {
-//                            TrainingExerciseDetailScreen(workout, exercise, onBack)
-//                        } else TrainingUnavailableScreen(onBack)
-//                    }
-//                }
                 val selectedDestination =
                     if (navigator.scaffoldDirective.maxHorizontalPartitions == 1) {
                         destination ?: lastDetailDestination
@@ -232,52 +320,89 @@ fun TrainingLayout(
                         destination
                     }
 
-                if (selectedDestination == null) {
-                    TrainingDetailPlaceholder()
-                } else {
-                    val workout = state.workouts.find{
-                        it.id == selectedDestination.workoutId
+                when (selectedDestination) {
+                    null -> TrainingDetailPlaceholder()
+                    TrainingDetailDestination.PlanSelection -> {
+                        PlanSelectionScreen(
+                            state = state,
+                            onSelectPlan = { planId ->
+                                onAction(TrainingAction.SelectPlan(planId))
+                                onBack()
+                            },
+                            onShowDialog = onShowDialog,
+                            onBack = onBack
+                        )
                     }
+                    is TrainingDetailDestination.PlanDayDetail -> {
+                        val plan = state.plans.find { it.id == selectedDestination.planId }
+                        when {
+                            plan != null -> PlanDetailScreen(
+                                plan = plan,
+                                weekday = selectedDestination.weekday,
+                                onAction = onAction,
+                                onShowDialog = onShowDialog,
+                                onWorkoutDetails = { workoutId ->
+                                    navigateToDetail(TrainingDetailDestination.WorkoutDetail(workoutId))
+                                },
+                                onBack = onBack,
+                                errorMessage = state.errorMessage,
+                                isSaving = state.isSavingPlan
+                            )
+                            state.isLoadingPlans -> androidx.compose.material3.CircularProgressIndicator()
+                            else -> TrainingUnavailableScreen(onBack)
+                        }
+                    }
+                    is TrainingDetailDestination.WorkoutDetail -> {
+                        val workout = state.workouts.find {
+                            it.id == selectedDestination.workoutId
+                        }
 
-                    if (workout == null) {
-                        TrainingUnavailableScreen(onBack)
-                    } else {
-                        val exerciseId = selectedDestination.exerciseId
-
-                        if (exerciseId == null) {
+                        if (workout == null) {
+                            TrainingUnavailableScreen(onBack)
+                        } else {
                             TrainingWorkoutDetailScreen(
                                 workout = workout,
                                 onShowDialog = onShowDialog,
                                 onExercise = { selectedExerciseId ->
-                                    val key = Json.encodeToString(
-                                        value = TrainingDetailDestination(
+                                    navigateToDetail(
+                                        TrainingDetailDestination.ExerciseDetail(
                                             workoutId = selectedDestination.workoutId,
                                             exerciseId = selectedExerciseId
                                         )
                                     )
 
-                                    if (navigator.currentDestination?.contentKey != key) {
-                                        scope.launch {
-                                            navigator.navigateTo(
-                                                pane = ListDetailPaneScaffoldRole.Detail,
-                                                contentKey = key
-                                            )
-                                        }
-                                    }
                                 },
                                 onBack = onBack,
-                                onAddExercise = { onAddExercise(workout.id)}
+                                onDeleteExercise = { workoutExerciseId ->
+                                    onShowDialog(
+                                        TrainingDialog.RemoveExerciseFromWorkout(workout.id, workoutExerciseId)
+                                    )
+                                },
+                                onAddExercise = { onAddExercise(workout.id) }
                             )
+                        }
+                    }
+                    is TrainingDetailDestination.ExerciseDetail -> {
+                        val workout = state.workouts.find {
+                            it.id == selectedDestination.workoutId
+                        }
+                        if (workout == null) {
+                            TrainingUnavailableScreen(onBack)
                         } else {
+                            val exerciseId = selectedDestination.exerciseId
                             val exercise = workout.workoutExercises.find {
                                 it.id == exerciseId
                             }
 
                             if (exercise != null) {
+                                LaunchedEffect(exercise.id) {
+                                    onAction(TrainingAction.SelectExercise(exercise.id))
+                                }
                                 TrainingExerciseDetailScreen(
-                                    workout = workout,
                                     exercise = exercise,
-                                    hardcodedExercise = TrainingPreviewData.plan.workouts.first().exercises.first(),
+                                    editState = if (state.editingExerciseId == exercise.id)
+                                        state.exerciseEdit else WorkoutExerciseEditState(),
+                                    onAction = onAction,
                                     onBack = onBack
                                 )
                             } else {

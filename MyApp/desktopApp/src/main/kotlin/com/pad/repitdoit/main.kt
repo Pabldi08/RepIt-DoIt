@@ -11,6 +11,10 @@ import kotlinx.coroutines.Dispatchers
 fun main() {
 
     val db = createDatabase(JvmDatabaseDriverFactory())
+    testDb(db).apply {
+        loadInitialDatabase()
+        seed()
+    }
 
     val container = DefaultAppContainer(
         db = db,

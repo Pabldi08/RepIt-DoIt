@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
@@ -26,11 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.icon_details
+import repitdoit.shared.generated.resources.icon_edit
 import repitdoit.shared.generated.resources.icon_play
 
 data class ExerciseItem(
@@ -46,6 +49,7 @@ fun TrainingCard(
     xp: Int,
     onDetails: () -> Unit,
     onStart: () -> Unit,
+    onRemove: () -> Unit,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false
 ) {
@@ -66,28 +70,26 @@ fun TrainingCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = title,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
-
-//                Surface(
-//                    shape = RoundedCornerShape(50),
-//                    color = MaterialTheme.colorScheme.secondaryContainer,
-//                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-//                ) {
-//                    Text(
-//                        text = day,
-//                        modifier = Modifier.padding(
-//                            horizontal = 12.dp,
-//                            vertical = 4.dp
-//                        ),
-//                        style = MaterialTheme.typography.labelSmall
-//                    )
-//                }
+                Button(
+                    onClick = onRemove,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Icon(
+                        painterResource(loadImage("iconTrash")),
+                        contentDescription = "Delete Button"
+                    )
+                }
             }
         }
         Row(
@@ -122,19 +124,23 @@ fun TrainingCard(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
             )
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(
-                    onClick = onDetails,
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.icon_details),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Detalles")
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+//                OutlinedButton(
+//                    onClick = onDetails,
+//                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+//                ) {
+//                    Icon(
+//                        painter = painterResource(Res.drawable.icon_details),
+//                        contentDescription = null,
+//                        modifier = Modifier.size(16.dp)
+//                    )
+//                    Spacer(modifier = Modifier.width(4.dp))
+//                    Text("Detalles")
+//                }
                 Button(
                     onClick = onStart,
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)

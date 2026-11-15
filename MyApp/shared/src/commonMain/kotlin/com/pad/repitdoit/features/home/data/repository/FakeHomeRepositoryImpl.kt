@@ -12,8 +12,7 @@ class FakeHomeRepositoryImpl: HomeRepository {
             HomeDailyWorkout(
                 "001",
                 "Tren Superior",
-                10,
-                60
+                10
             )
         )
 

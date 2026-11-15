@@ -19,7 +19,6 @@ data class TrainingWorkoutPreview(
     val id: String,
     val title: String,
     val day: String,
-    val minutes: Int,
     val xp: Int,
     val image: DrawableResource,
     val exercises: List<TrainingExercisePreview>
@@ -57,18 +56,18 @@ object TrainingPreviewData {
             TrainingDayPreview("Domingo", null)
         ),
         workouts = listOf(
-            TrainingWorkoutPreview("demo-upper", "Tren superior", "Lunes", 50, 200, Res.drawable.training_muscles, listOf(
+            TrainingWorkoutPreview("demo-upper", "Tren superior", "Lunes", 200, Res.drawable.training_muscles, listOf(
                 previewExercise("bench", "Press de banca", 40),
                 previewExercise("row", "Remo con mancuerna", 16, 12),
                 previewExercise("pulldown", "Jalón al pecho", 50),
                 previewExercise("curl", "Curl de bíceps", 20)
             )),
-            TrainingWorkoutPreview("demo-legs", "Pierna", "Miércoles", 45, 150, Res.drawable.training_legs, listOf(
+            TrainingWorkoutPreview("demo-legs", "Pierna", "Miércoles", 150, Res.drawable.training_legs, listOf(
                 previewExercise("leg-press", "Press de piernas", 150),
                 previewExercise("abductor", "Abductores", 40, 12),
                 previewExercise("extension", "Extensión de cuádriceps", 80)
             )),
-            TrainingWorkoutPreview("demo-full", "Cuerpo completo", "Viernes", 55, 250, Res.drawable.training_muscles, listOf(
+            TrainingWorkoutPreview("demo-full", "Cuerpo completo", "Viernes", 250, Res.drawable.training_muscles, listOf(
                 previewExercise("squat", "Sentadilla", 40),
                 previewExercise("bench", "Press de banca", 30, 12),
                 previewExercise("row", "Remo con mancuerna", 14, 12)

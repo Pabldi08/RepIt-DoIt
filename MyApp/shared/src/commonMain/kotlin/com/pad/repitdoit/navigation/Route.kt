@@ -29,5 +29,13 @@ sealed interface Route {
     data class Catalogue(
         val machineId: String? = null,
         val workoutId: String? = null
-    )
+    ) : Route
+
+    @Serializable
+    data class WorkoutExerciseSetup(
+        val exerciseId: String,
+        val workoutId: String? = null,
+        val returnToTraining: Boolean = false,
+        val returnWorkoutId: String? = null
+    ) : Route
 }

@@ -11,19 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.Header
-import com.pad.repitdoit.features.training.presentation.TrainingDialog
+import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
 import com.pad.repitdoit.features.training.presentation.components.TrainingCard
-import com.pad.repitdoit.features.training.presentation.TrainingPlanPreview
-import com.pad.repitdoit.features.training.presentation.TrainingPreviewData
-import com.pad.repitdoit.features.training.presentation.TrainingState
+import com.pad.repitdoit.features.training.presentation.state.TrainingState
 
 @Composable
 internal fun TrainingOverviewScreen(
-    plan: TrainingPlanPreview = TrainingPreviewData.plan,
     state: TrainingState,
     selectedWorkoutId: String? = null,
     onShowDialog: (TrainingDialog) -> Unit,
-    onWorkoutDetails: (String) -> Unit
+    onWorkoutDetails: (String) -> Unit,
+    onChoosePlan: () -> Unit,
+    onPlanDayDetails: (planId: String, weekday: Int) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
@@ -38,6 +37,18 @@ internal fun TrainingOverviewScreen(
             Header(Modifier.fillMaxWidth().height(40.dp))
         }
 
+        val selectedPlan = state.selectedPlan
+        val scheduleByDay = selectedPlan
+            ?.schedule
+            .orEmpty()
+            .groupBy { it.weekday }
+        val trainingDays = selectedPlan
+            ?.schedule
+            .orEmpty()
+            .map {it.weekday}
+            .distinct()
+            .size
+
         item(
             span = { GridItemSpan(maxLineSpan) }
         ) {
@@ -50,53 +61,85 @@ internal fun TrainingOverviewScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = plan.name,
+                    text = selectedPlan?.name
+                        ?: "Ningún plan seleccionado",
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = "${plan.days.count { it.workoutId != null }} entrenamientos · ${plan.days.count { it.workoutId == null }} días de descanso",
+                    text = if (selectedPlan == null) {
+                        "Selecciona un plan para ver su distribución semanal"
+                    } else {
+                        "$trainingDays días de entrenamiento · ${7 - trainingDays} días de descanso"
+
+                    },
                     style = MaterialTheme.typography.bodyMedium
                 )
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { /* Pendiente de conectar */ }
-                    ) { Text("Elegir rutina") }
-                    OutlinedButton(
-                        onClick = { /* Pendiente de conectar */ }
-                    ) { Text("Personalizar") }
+                        onClick = onChoosePlan
+                    ) {
+                        Text(
+                            text = "Elegir plan"
+                        )
+                    }
                 }
             }
         }
 
+        val dayNames = listOf(
+            "Lunes", "Martes", "Miércoles", "Jueves",
+            "Viernes", "Sábado", "Domingo"
+        )
         item(
             span = { GridItemSpan(maxLineSpan) }
         ) {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(plan.days) { day ->
-                    val workout = plan.workouts.find { it.id == day.workoutId }
+                items((1..7).toList()) { weekday ->
+                    val workouts = scheduleByDay[weekday]
+                        .orEmpty()
+                        .sortedBy { it.position }
+
+                    val firstWorkout = workouts.firstOrNull()
+                    val extraCount = workouts.size - 1
                     OutlinedCard(
-                        onClick = { workout?.let { onWorkoutDetails(it.id) } },
-                        enabled = workout != null,
+                        enabled = selectedPlan != null,
+                        onClick = {
+                            selectedPlan?.let { plan ->
+                                onPlanDayDetails(plan.id, weekday)
+                            }
+                        },
                         modifier = Modifier.width(148.dp),
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Column(
+                            Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             Text(
-                                text = day.label,
+                                text = dayNames[weekday - 1],
                                 style = MaterialTheme.typography.labelLarge,
-                                color = if (workout != null) MaterialTheme.colorScheme.primary
+                                color = if (workouts.isNotEmpty()) MaterialTheme.colorScheme.primary
                                         else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = workout?.title ?: "Descanso",
+                                text = when {
+                                    selectedPlan == null -> "—"
+                                    firstWorkout == null -> "Descanso"
+                                    extraCount > 0 -> "${firstWorkout.workoutName} + $extraCount"
+                                    else -> firstWorkout.workoutName
+                                },
                                 style = MaterialTheme.typography.titleSmall
                             )
                             Text(
-                                text = workout?.let { "${it.minutes} min · ${it.exercises.size} ejercicios" } ?: "Recupera energías",
+                                text = when {
+                                    selectedPlan == null -> " "
+                                    firstWorkout == null -> "Recupera energías"
+                                    else -> "${firstWorkout.numEx} ejercicios"
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -105,6 +148,7 @@ internal fun TrainingOverviewScreen(
                 }
             }
         }
+
 
         item(
             span = { GridItemSpan(maxLineSpan) }
@@ -139,17 +183,9 @@ internal fun TrainingOverviewScreen(
                 xp = workout.workoutExercises.size * 50,
                 isSelected = workout.id == selectedWorkoutId,
                 onDetails = { onWorkoutDetails(workout.id) },
-                onStart = { /* Pendiente de conectar */ }
+                onStart = { /* Pendiente de conectar */ },
+                onRemove = { onShowDialog(TrainingDialog.RemoveWorkout(workout.id)) }
             )
-        }
-
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            OutlinedButton(
-                onClick = { onShowDialog(TrainingDialog.CreateWorkout) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("+ Añadir entrenamiento")
-            }
         }
     }
 }

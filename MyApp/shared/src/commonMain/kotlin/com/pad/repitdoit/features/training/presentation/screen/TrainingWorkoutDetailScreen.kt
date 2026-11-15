@@ -9,37 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.core.ui.common.ReturnButton
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.Workout
-import com.pad.repitdoit.features.training.presentation.TrainingDialog
+import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.icon_details
 import repitdoit.shared.generated.resources.icon_play
-
-@Composable
-internal fun TrainingDetailHeader(
-    title: String,
-    //subtitle: String,
-    onBack: () -> Unit
-) {
-    Column(
-        modifier = Modifier.padding(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        TextButton(
-            onClick = onBack
-        ) { Text("‹ Volver") }
-        Text(
-            title,
-            style = MaterialTheme.typography.headlineMedium
-        )
-//        Text(
-//            subtitle,
-//            style = MaterialTheme.typography.bodyMedium,
-//            color = MaterialTheme.colorScheme.onSurfaceVariant
-//        )
-    }
-}
 
 @Composable
 fun TrainingWorkoutDetailScreen(
@@ -63,34 +40,29 @@ fun TrainingWorkoutDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                TextButton(
-                    onClick = onBack
-                ) { Text("‹ Volver") }
+                ReturnButton(
+                    onBack = onBack
+                )
             }
             item {
                 Row (
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    //verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         workout.name,
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineMedium,
                     )
                     TextButton(
                         onClick = { onShowDialog(TrainingDialog.RenameWorkout(workout.id)) }
                     ) {
-                        Text("rename")
+                        Icon (
+                            painterResource(loadImage("icon_edit")),
+                            contentDescription = "Edit button"
+                        )
                     }
                 }
             }
-//            item {
-//                TrainingDetailHeader(
-//                    title = workout.name,
-//                    //subtitle ="${TrainingPreviewData.plan.name} · ${workout.day}",
-//                    onBack = onBack
-//                )
-//            }
             item {
                 Surface(
                     shape = RoundedCornerShape(20.dp),
@@ -104,7 +76,7 @@ fun TrainingWorkoutDetailScreen(
                     ) {
                         val size = workout.workoutExercises.size
                         Text(
-                            text = "$size ejercicios · ${workout.estimatedTime} min · +${size * 50} XP",
+                            text = "$size ejercicios · +${size * 50} XP",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Button(
@@ -122,10 +94,23 @@ fun TrainingWorkoutDetailScreen(
                 }
             }
             item {
-                Text(
-                    text = "Ejercicios",
-                    style = MaterialTheme.typography.titleLarge
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Ejercicios",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    TextButton(
+                        onClick = onAddExercise
+                    ) {
+                        Text (
+                            text = "+ añadir"
+                        )
+                    }
+                }
                 Text(
                     text = "Toca un ejercicio para ver sus series y su historial.",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -185,14 +170,6 @@ fun TrainingWorkoutDetailScreen(
                             }
                         }
                     }
-                }
-            }
-            item {
-                OutlinedButton(
-                    onClick = onAddExercise,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("+ Añadir ejercicio")
                 }
             }
         }

@@ -6,6 +6,5 @@ data class Workout (
     val id: String,
     val name: String,
     val workoutExercises: List<WorkoutExercise> = emptyList(),
-    val estimatedTime: Int,
     val image: DrawableResource
 )

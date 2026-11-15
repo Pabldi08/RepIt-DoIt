@@ -25,7 +25,7 @@ fun DailyWorkoutCard(
         )
         ActionCard(
             title = workout.name,
-            subtitle = "${workout.exerciseCount} ejercicios · ${workout.estimatedTime} min",
+            subtitle = "${workout.exerciseCount} ejercicios",
             onClick = onClick
         )
     }

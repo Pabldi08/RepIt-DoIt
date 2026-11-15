@@ -5,6 +5,7 @@ CREATE TABLE Workout (
     name TEXT NOT NULL,
     description TEXT,
     image_url TEXT,
+    -- Legacy column retained for compatibility with existing databases; unused by the app.
     estimated_time INTEGER,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL,

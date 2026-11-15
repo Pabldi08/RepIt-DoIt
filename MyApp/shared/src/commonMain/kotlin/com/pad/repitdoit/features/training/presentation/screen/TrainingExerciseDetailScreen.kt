@@ -15,16 +15,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pad.repitdoit.features.training.presentation.TrainingExercisePreview
+import com.pad.repitdoit.core.ui.common.ReturnButton
 import com.pad.repitdoit.features.training.presentation.TrainingSetPreview
-import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
+import com.pad.repitdoit.features.training.presentation.action.TrainingAction
+import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseEditState
+import com.pad.repitdoit.features.training.presentation.components.FormField
 
 @Composable
 fun TrainingExerciseDetailScreen(
-    workout: Workout,
     exercise: WorkoutExercise,
-    hardcodedExercise: TrainingExercisePreview,
+    editState: WorkoutExerciseEditState,
+    onAction: (TrainingAction) -> Unit,
     onBack: () -> Unit
 ) {
     Box(
@@ -39,12 +41,19 @@ fun TrainingExerciseDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                TrainingDetailHeader(
-                    title = exercise.name,
-                    //subtitle = "${TrainingPreviewData.plan.name} · ${workout.title}",
+                ReturnButton(
                     onBack = onBack
                 )
             }
+
+            item {
+                Text(
+                    exercise.name,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+
+            // Ver si se queda o se va
             item {
                 Surface(
                     shape = RoundedCornerShape(size = 20.dp),
@@ -65,119 +74,54 @@ fun TrainingExerciseDetailScreen(
                     }
                 }
             }
-            item {
-                Text(
-                    text = "Series programadas\n(sigue hardcodeado",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-            item {
-                TrainingTableRow(
-                    first = "Serie",
-                    second ="Repeticiones",
-                    third = "Peso",
-                    heading = true
-                )
-            }
-            itemsIndexed(hardcodedExercise.sets) {
-                index,
-                set ->
-                    TrainingSetRow(
-                        exerciseId = exercise.id,
-                        index = index,
-                        set = set
-                    )
-            }
-            item {
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "Historial en esta rutina\n(sigue hardcodeado)",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-            item {
-                TrainingTableRow(
-                    first = "Fecha",
-                    second = "Series × reps",
-                    third ="Peso",
-                    heading = true
-                )
-            }
-            itemsIndexed(hardcodedExercise.history) {
-                _, session ->
-                    TrainingTableRow(
-                        first = session.date,
-                        second= session.sets,
-                        third = session.weight
-                    )
-            }
-            item {
-                OutlinedCard(
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Evolución",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = "Próximamente",
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "Aquí irá la gráfica con la evolución de los pesos.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
-@Composable
-private fun TrainingSetRow(exerciseId: String, index: Int, set: TrainingSetPreview) {
-    // Estado local de los campos. La persistencia se conectará con el ViewModel.
-    var reps by remember(exerciseId, index, set) { mutableStateOf(set.reps.toString()) }
-    var weight by remember(exerciseId, index, set) { mutableStateOf(set.weightKg.toString()) }
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 14.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("${index + 1}", Modifier.weight(1.3f))
-        OutlinedTextField(
-            value = reps,
-            onValueChange = { reps = it },
-            label = { Text("Reps") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.weight(1f)
-        )
-        OutlinedTextField(
-            value = weight,
-            onValueChange = { weight = it },
-            label = { Text("Kg") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true,
-            modifier = Modifier.weight(0.8f)
-        )
-    }
-}
+            item {
+                FormField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = editState.weight ?: exercise.weight.toString(),
+                    label = "Peso (kg)",
+                    keyboardType = KeyboardType.Decimal,
+                    onValueChange = { onAction(TrainingAction.ChangeWeight(exercise.id, it)) },
+                    errorMessage = editState.weightError
+                )
+            }
 
-@Composable
-private fun TrainingTableRow(first: String, second: String, third: String, heading: Boolean = false) {
-    Surface(shape = RoundedCornerShape(12.dp), color = if (heading) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface) {
-        Row(Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            val style = if (heading) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium
-            Text(first, Modifier.weight(1.3f), style = style)
-            Text(second, Modifier.weight(1f), style = style)
-            Text(third, Modifier.weight(0.8f), style = style)
+            item {
+                FormField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = editState.numSeries ?: exercise.numSets.toString(),
+                    label = "Número de series",
+                    keyboardType = KeyboardType.Number,
+                    onValueChange = { onAction(TrainingAction.ChangeNumSeries(exercise.id, it)) },
+                    errorMessage = editState.numSeriesError
+                )
+            }
+
+            item {
+                FormField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = editState.numReps ?: exercise.numReps.toString(),
+                    label = "Repeticiones",
+                    keyboardType = KeyboardType.Number,
+                    onValueChange = { onAction(TrainingAction.ChangeNumReps(exercise.id, it)) },
+                    errorMessage = editState.numRepsError
+                )
+            }
+
+            item {
+                FormField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = editState.restSec ?: exercise.restSec.toString(),
+                    label = "Descanso (segundos)",
+                    keyboardType = KeyboardType.Number,
+                    onValueChange = { onAction(TrainingAction.ChangeRestSec(exercise.id, it)) },
+                    errorMessage = editState.restSecError
+                )
+            }
+
+            editState.saveError?.let { message ->
+                item { Text(message, color = MaterialTheme.colorScheme.error) }
+            }
         }
     }
 }
