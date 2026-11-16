@@ -40,6 +40,9 @@ import com.pad.repitdoit.features.session.domain.usecase.GetCurrentSessionUseCas
 import com.pad.repitdoit.features.session.domain.usecase.LoginUseCase
 import com.pad.repitdoit.features.session.domain.usecase.LogoutUseCase
 import com.pad.repitdoit.features.session.domain.usecase.VerifyUserUseCase
+import com.pad.repitdoit.features.dummy.data.repository.FakeDummyRepositoryImpl
+import com.pad.repitdoit.features.dummy.domain.repository.DummyRepository
+import com.pad.repitdoit.features.dummy.domain.usecase.GetMuscleNameByIdUseCase
 import com.pad.repitdoit.features.training.domain.usecase.AddExerciseToWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.UpdateWorkoutExerciseUseCase
 import com.pad.repitdoit.features.training.domain.usecase.RemoveExerciseFromWorkoutUseCase
@@ -50,10 +53,14 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersTrainingPlansU
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetExerciseContextUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
+import com.pad.repitdoit.features.dummy.domain.model.Exercise
+import com.pad.repitdoit.features.dummy.domain.usecase.GetExercisesByMuscleUseCase
 
 interface AppContainer :
     SessionUseCasesAC,
     ProfileUseCasesAC,
+    DummyUseCasesAC,
     GamificationUseCaseAC,
     TrainingUseCasesAC,
     HomeUseCasesAC,
@@ -123,6 +130,14 @@ class DefaultAppContainer(
                 ::currentUserId
             )
         }
+        
+    private val dummyRepository: DummyRepository =
+        if (db == null || dispatcher == null) {
+            FakeDummyRepositoryImpl()
+        } else {
+            DummyRepositoryImpl(db, dispatcher)
+        }
+
     /*
         USE CASES
      */
@@ -154,4 +169,7 @@ class DefaultAppContainer(
     override val loginUseCase = LoginUseCase(sessionRepository)
     override val logoutUseCase = LogoutUseCase(sessionRepository)
     override val getCurrentSessionUseCase = GetCurrentSessionUseCase(sessionRepository)
+    override val getMuscleNameByIdUseCase = GetMuscleNameByIdUseCase(dummyRepository)
+    override val getExercisesByMuscleUseCase = GetExercisesByMuscleUseCase(dummyRepository)
+
 }

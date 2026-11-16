@@ -6,6 +6,9 @@ CREATE TABLE Muscle (
     muscle_group TEXT
 );
 
+getMuscleNameById:
+SELECT name FROM Muscle WHERE id = :id;
+
 selectAllMuscles:
 SELECT * FROM Muscle ORDER BY name ASC;
 
