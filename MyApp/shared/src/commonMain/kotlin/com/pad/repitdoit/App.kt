@@ -30,10 +30,11 @@ enum class AppWindowSize {
 fun App(
     appContainer: AppContainer,
     qrCameraScreen: @Composable ((String) -> Unit) -> Unit = { _ -> ScannerScreen() },
-    nfcEquipmentIds: Flow<String> = emptyFlow()
+    nfcEquipmentIds: Flow<String> = emptyFlow(),
+    toScreen: Route? = null
 ) {
     AppTheme {
-        AppContent(appContainer, qrCameraScreen, nfcEquipmentIds)
+        AppContent(appContainer, qrCameraScreen, nfcEquipmentIds, toScreen)
     }
 }
 
@@ -41,7 +42,8 @@ fun App(
 private fun AppContent(
     appContainer: AppContainer,
     qrCameraScreen: @Composable ((String) -> Unit) -> Unit,
-    nfcEquipmentIds: Flow<String>
+    nfcEquipmentIds: Flow<String>,
+    toScreen: Route?
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
@@ -69,7 +71,12 @@ private fun AppContent(
             qrCameraScreen = qrCameraScreen
         )
     }
-
+    LaunchedEffect(toScreen) {
+        val route = toScreen ?: return@LaunchedEffect
+        navController.navigate(route) {
+            launchSingleTop = true
+        }
+    }
     LaunchedEffect(nfcEquipmentIds, navController) {
         nfcEquipmentIds.collect { equipmentId ->
             nfcPanelVisible = false
