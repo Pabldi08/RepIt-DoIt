@@ -2,7 +2,6 @@ package com.pad.repitdoit
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,8 +13,13 @@ import com.pad.repitdoit.core.localdatabase.createDatabase
 import com.pad.repitdoit.di.DefaultAppContainer
 import com.pad.repitdoit.camera.QrCameraScreen
 import com.pad.repitdoit.nfc.readNfcEquipmentId
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class MainActivity : ComponentActivity() {
+    private val nfcScans = Channel<String>(Channel.BUFFERED)
+    private val nfcEquipmentIds = nfcScans.receiveAsFlow()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -26,23 +30,24 @@ class MainActivity : ComponentActivity() {
         setContent {
             App(
                 appContainer = container,
-                qrCameraScreen = { QrCameraScreen() }
+                qrCameraScreen = { onEquipmentId -> QrCameraScreen(onEquipmentId) },
+                nfcEquipmentIds = nfcEquipmentIds
             )
         }
 
         if (savedInstanceState == null) {
-            showNfcEquipmentId(intent)
+            handleNfcIntent(intent)
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        showNfcEquipmentId(intent)
+        handleNfcIntent(intent)
     }
 
-    private fun showNfcEquipmentId(intent: Intent) {
+    private fun handleNfcIntent(intent: Intent) {
         val equipmentId = intent.readNfcEquipmentId() ?: return
-        Toast.makeText(this, "ID leído: $equipmentId", Toast.LENGTH_SHORT).show()
+        nfcScans.trySend(equipmentId)
     }
 }
 

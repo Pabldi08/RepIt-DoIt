@@ -18,7 +18,7 @@ fun AppNavigation(
     navController: NavHostController,
     windowSize: AppWindowSize,
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -50,7 +50,11 @@ fun AppNavigation(
         }
 
         composable<Route.QrCamera> {
-            qrCameraScreen()
+            qrCameraScreen { equipmentId ->
+                navController.navigate(Route.Catalogue(machineId = equipmentId)) {
+                    popUpTo<Route.QrCamera> { inclusive = true }
+                }
+            }
         }
 
         composable<Route.Profile> {

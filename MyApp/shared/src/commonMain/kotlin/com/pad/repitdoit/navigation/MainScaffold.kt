@@ -72,11 +72,12 @@ fun MainScaffold(
     onNavigate: (Route) -> Unit,
     showScanOptions: Boolean,
     onQrClick: () -> Unit,
+    nfcPanelVisible: Boolean,
+    onNfcPanelVisibilityChange: (Boolean) -> Unit,
     content: @Composable () -> Unit
 ) {
     var addMenuExpanded by remember { mutableStateOf(false) }
     var addButtonCenter by remember { mutableStateOf<Offset?>(null) }
-    var nfcPanelVisible by remember { mutableStateOf(false) }
     var scaffoldOrigin by remember { mutableStateOf(Offset.Zero) }
     val navigationLayout = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
         currentWindowAdaptiveInfo()
@@ -114,7 +115,7 @@ fun MainScaffold(
 
         OnBackHandler(enabled = addMenuExpanded || nfcPanelVisible) {
             if (nfcPanelVisible) {
-                nfcPanelVisible = false
+                onNfcPanelVisibilityChange(false)
             } else {
                 addMenuExpanded = false
             }
@@ -128,21 +129,17 @@ fun MainScaffold(
                 isNavigationBar = isNavigationBar,
                 onNfcClick = {
                     addMenuExpanded = false
-                    nfcPanelVisible = true
+                    onNfcPanelVisibilityChange(true)
                 },
                 onQrClick = {
                     addMenuExpanded = false
                     onQrClick()
-                },
-                onManualClick = {
-                    addMenuExpanded = false
-                    TODO()
                 }
             )
         }
         NfcInfoPanel(
             visible = showScanOptions && nfcPanelVisible,
-            onDismiss = { nfcPanelVisible = false },
+            onDismiss = { onNfcPanelVisibilityChange(false) },
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
@@ -183,51 +180,51 @@ fun NavigationSuiteScope.AppNavigationItems(
         },
         label = { Text ("Training") }
     )
-    item(
-        selected = false,
-        onClick = onAddClick,
-        icon = {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .onGloballyPositioned {
-                        onAddButtonPositioned(it.boundsInRoot().center)
-                    }
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
-                    )
-                    .semantics {
-                        contentDescription =
-                            if (addMenuExpanded) "Close Menu"
-                            else "Add exercise"
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "+",
-                    fontSize = 32.sp,
-                    lineHeight = 32.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
-
-    )
     if (showScanOptions) {
-        item (
-            selected = currentDestination?.hasRoute<Route.Scanner>() == true,
-            onClick = { onNavigate(Route.Scanner) },
+        item(
+            selected = false,
+            onClick = onAddClick,
             icon = {
-                Icon (
-                    painter = painterResource(Res.drawable.iconScanner),
-                    contentDescription = "Scanner",
-                    modifier = Modifier.size(24.dp)
-                )
-            },
-            label = { Text ("Scanner") }
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .onGloballyPositioned {
+                            onAddButtonPositioned(it.boundsInRoot().center)
+                        }
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        )
+                        .semantics {
+                            contentDescription =
+                                if (addMenuExpanded) "Close Menu"
+                                else "Add exercise"
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "+",
+                        fontSize = 32.sp,
+                        lineHeight = 32.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+
         )
     }
+    item (
+        selected = currentDestination?.hasRoute<Route.Scanner>() == true,
+        onClick = { onNavigate(Route.Scanner) },
+        icon = {
+            Icon (
+                painter = painterResource(Res.drawable.iconScanner),
+                contentDescription = "Scanner",
+                modifier = Modifier.size(24.dp)
+            )
+        },
+        label = { Text ("Scanner") }
+    )
     item (
         selected = currentDestination?.hasRoute<Route.Profile>() == true,
         onClick = { onNavigate(Route.Profile) },
@@ -272,7 +269,6 @@ private fun AddExerciseMenu(
     isNavigationBar: Boolean,
     onNfcClick: () -> Unit,
     onQrClick: () -> Unit,
-    onManualClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
@@ -293,9 +289,9 @@ private fun AddExerciseMenu(
             Row(
                 modifier = Modifier
                     .onSizeChanged { menuSize = it }
-                    .absoluteOffset {
-                        // Position the whole row relative to the + button.
-                        val clearance = 38.dp.toPx() // Button radius (22dp) + gap (16dp).
+
+                    .absoluteOffset { //Funciones que hacen lo relacionado con la posición de las burbujas
+                        val clearance = 38.dp.toPx()
                         val x = when {
                             isNavigationBar -> anchorCenter.x - menuSize.width / 2f
                             isLtr -> anchorCenter.x + clearance
@@ -334,12 +330,6 @@ private fun AddExerciseMenu(
                         onClick = onQrClick
                     )
                 }
-                AddMenuAction(
-                    text = "Add manually",
-                    icon = Res.drawable.addManually,
-                    enabled = expanded,
-                    onClick = onManualClick
-                )
             }
         }
     }

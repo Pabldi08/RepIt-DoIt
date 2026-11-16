@@ -3,8 +3,10 @@ package com.pad.repitdoit
 
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
@@ -15,6 +17,8 @@ import com.pad.repitdoit.navigation.AppNavigation
 import com.pad.repitdoit.navigation.MainScaffold
 import com.pad.repitdoit.navigation.Route
 import com.pad.repitdoit.navigation.ScannerScreen
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 enum class AppWindowSize {
     Compact,
@@ -25,28 +29,33 @@ enum class AppWindowSize {
 @Composable
 fun App(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit = { ScannerScreen() }
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit = { _ -> ScannerScreen() },
+    nfcEquipmentIds: Flow<String> = emptyFlow()
 ) {
     AppTheme {
-        AppContent(appContainer, qrCameraScreen)
+        AppContent(appContainer, qrCameraScreen, nfcEquipmentIds)
     }
 }
 
 @Composable
 private fun AppContent(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit,
+    nfcEquipmentIds: Flow<String>
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
+    var nfcPanelVisible by remember { mutableStateOf(false) }
 
     MainScaffold(
         showScanOptions = supportsScanOptions(),
         currentDestination = backStackEntry?.destination,
         onNavigate = { route -> navController.navigate(route)},
+        nfcPanelVisible = nfcPanelVisible,
+        onNfcPanelVisibilityChange = { nfcPanelVisible = it },
         onQrClick = {
             navController.navigate(Route.QrCamera) {
                 launchSingleTop = true
@@ -59,6 +68,29 @@ private fun AppContent(
             appContainer = appContainer,
             qrCameraScreen = qrCameraScreen
         )
+    }
+
+    LaunchedEffect(nfcEquipmentIds, navController) {
+        nfcEquipmentIds.collect { equipmentId ->
+            nfcPanelVisible = false
+
+            val currentEntry = navController.currentBackStackEntry
+            val currentMachineId = currentEntry
+                ?.takeIf { it.destination.hasRoute<Route.Catalogue>() }
+                ?.toRoute<Route.Catalogue>()
+                ?.machineId
+
+            if (currentMachineId == equipmentId) return@collect
+
+            navController.navigate(Route.Catalogue(machineId = equipmentId)) {
+                when {
+                    currentMachineId != null ->
+                        popUpTo<Route.Catalogue> { inclusive = true }
+                    currentEntry?.destination?.hasRoute<Route.QrCamera>() == true ->
+                        popUpTo<Route.QrCamera> { inclusive = true }
+                }
+            }
+        }
     }
 }
 

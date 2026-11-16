@@ -26,6 +26,8 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.worker.runtime)
+    implementation(libs.kotlinxSerializationJson)
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)

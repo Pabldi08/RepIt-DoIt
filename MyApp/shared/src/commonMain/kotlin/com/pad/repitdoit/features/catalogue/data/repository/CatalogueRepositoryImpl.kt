@@ -16,7 +16,13 @@ class CatalogueRepositoryImpl(
         }
     }
 
-    override suspend fun getExercisesByMachine(machineId: String): List<Exercise> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getExercisesByMachine(machineId: String): List<Exercise> =
+        withContext(dispatcher) {
+            db.exerciseEquipmentQueries
+                .selectExercisesByEquipment(machineId)
+                .executeAsList()
+                .map { exercise ->
+                    Exercise(exercise.id, exercise.name, exercise.description)
+                }
+        }
 }
