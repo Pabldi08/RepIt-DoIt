@@ -17,6 +17,11 @@ import com.pad.repitdoit.navigation.AppNavigation
 import com.pad.repitdoit.navigation.MainScaffold
 import com.pad.repitdoit.navigation.Route
 import com.pad.repitdoit.navigation.ScannerScreen
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import com.pad.repitdoit.features.session.presentation.screen.AuthRoot
 
 enum class AppWindowSize {
     Compact,
@@ -27,10 +32,45 @@ enum class AppWindowSize {
 @Composable
 fun App(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit = { ScannerScreen() }
+    qrCameraScreen: @Composable () -> Unit = {
+        ScannerScreen()
+    }
 ) {
+
     AppTheme {
-        AppContent(appContainer, qrCameraScreen)
+
+        val session by appContainer
+            .getCurrentSessionUseCase()
+            .collectAsStateWithLifecycle()
+
+        key(session?.id) {
+
+            val screenOwner = remember {
+                object : ViewModelStoreOwner {
+                    override val viewModelStore = ViewModelStore()
+                }
+            }
+
+            DisposableEffect(screenOwner) {
+                onDispose {
+                    screenOwner.viewModelStore.clear()
+                }
+            }
+
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides screenOwner
+            ) {
+
+                if (session == null) {
+                    AuthRoot(appContainer)
+                } else {
+                    AppContent(
+                        appContainer,
+                        qrCameraScreen
+                    )
+                }
+            }
+        }
     }
 }
 

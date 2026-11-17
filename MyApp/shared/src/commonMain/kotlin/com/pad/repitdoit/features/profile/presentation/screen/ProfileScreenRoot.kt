@@ -9,11 +9,25 @@ import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.profile.presentation.ProfileViewModel
 
 @Composable
-fun ProfileScreenRoot(windowSize: AppWindowSize, appContainer: AppContainer) {
-    val viewModel: ProfileViewModel = viewModel {
-        ProfileViewModel(appContainer.getProfileUseCase)
-    }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+fun ProfileScreenRoot(
+    windowSize: AppWindowSize,
+    appContainer: AppContainer
+) {
 
-    ProfileScreen(windowSize, uiState)
+    val viewModel: ProfileViewModel = viewModel {
+
+        ProfileViewModel(
+            getProfileUseCase = appContainer.getProfileUseCase,
+            logoutUseCase = appContainer.logoutUseCase
+        )
+    }
+
+    val uiState by viewModel.uiState
+        .collectAsStateWithLifecycle()
+
+    ProfileScreen(
+        windowSize = windowSize,
+        uiState = uiState,
+        onLogout = viewModel::logout
+    )
 }
