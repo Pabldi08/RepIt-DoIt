@@ -105,7 +105,7 @@ class DefaultAppContainer(
 
     private val workoutRepository: WorkoutRepository =
         if (db == null || dispatcher == null) {
-            FakeWorkoutRepositoryImpl()
+            FakeWorkoutRepositoryImpl(::currentUserId)
         } else {
             WorkoutRepositoryImpl(
                 db,
