@@ -13,10 +13,10 @@ import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOW
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.core.platform.supportsScanOptions
 import com.pad.repitdoit.core.ui.theme.AppTheme
+import com.pad.repitdoit.features.gamification.presentation.screen.GamificationScreenRoot
 import com.pad.repitdoit.navigation.AppNavigation
 import com.pad.repitdoit.navigation.MainScaffold
 import com.pad.repitdoit.navigation.Route
-import com.pad.repitdoit.navigation.ScannerScreen
 
 enum class AppWindowSize {
     Compact,
@@ -27,7 +27,7 @@ enum class AppWindowSize {
 @Composable
 fun App(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit = { ScannerScreen() }
+    qrCameraScreen: @Composable () -> Unit = { GamificationScreenRoot(appContainer) }
 ) {
     AppTheme {
         AppContent(appContainer, qrCameraScreen)

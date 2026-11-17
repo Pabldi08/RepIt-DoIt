@@ -47,3 +47,11 @@ WHERE id = :id;
 -- Otherwise dependent conditions and reward associations are removed.
 deleteAchievement:
 DELETE FROM Achievement WHERE id = :id;
+
+-- Includes locked achievements and scopes both ownership relations to the current user.
+selectAchievementsForUser:
+SELECT a.*, ur.obtained_at AS available_from, ua.unlocked_at
+FROM Achievement a
+LEFT JOIN UserReward ur ON ur.reward_id = a.required_reward_id AND ur.user_id = :userId
+LEFT JOIN UserAchievement ua ON ua.achievement_id = a.id AND ua.user_id = :userId
+ORDER BY a.name, a.id;

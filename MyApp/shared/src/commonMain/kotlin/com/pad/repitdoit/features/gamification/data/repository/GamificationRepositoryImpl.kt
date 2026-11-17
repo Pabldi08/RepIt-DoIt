@@ -2,7 +2,7 @@ package com.pad.repitdoit.features.gamification.data.repository
 
 import com.pad.repitdoit.core.localdatabase.AchievementCondition
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
-import com.pad.repitdoit.features.gamification.domain.model.Achievement
+import com.pad.repitdoit.features.gamification.domain.model.*
 import com.pad.repitdoit.features.gamification.domain.repository.GamificationRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -14,28 +14,57 @@ class GamificationRepositoryImpl(
     private val dispatcher: CoroutineDispatcher,
     private val userId: String
 ) : GamificationRepository {
-    override suspend fun getAllowedAchievements(): List<Achievement> = withContext(dispatcher) {
+    override suspend fun getTotalXp(): Long = withContext(dispatcher) {
+        db.userQueries.selectUserById(userId).executeAsOne().total_xp
+    }
+
+    override suspend fun getAllowedAchievements(): List<Achievement> =
+        getAchievements().filter { it.availableFrom != null && it.conditions.isNotEmpty() }
+
+    override suspend fun getRewards(): List<Reward> = withContext(dispatcher) {
+        db.transactionWithResult { readRewards().filter { it.type != RewardType.KEY } }
+    }
+
+    private fun readRewards(): List<Reward> {
+        val owned = db.userRewardQueries.selectRewardsByUser(userId).executeAsList()
+            .associate { it.reward_id to it.obtained_at }
+        return db.rewardQueries.selectAllRewards().executeAsList().map {
+            Reward(it.id, it.code, it.name, it.description, RewardType.valueOf(it.reward_type),
+                it.asset_url, owned[it.id])
+        }
+    }
+
+    override suspend fun getAchievements(): List<Achievement> = withContext(dispatcher) {
         val now = Clock.System.now()
         val toTimestamp = now.toEpochMilliseconds()
         db.transactionWithResult {
-            db.achievementQueries.getAllowedAchievementsByUser(userId).executeAsList().map { row ->
-                val condition = db.achievementConditionQueries
-                    .selectConditionsByAchievement(row.id)
-                    .executeAsList()
-                    .singleOrNull()
-                val progress = condition?.let {
-                    val fromTimestamp = it.period_days?.let { days ->
-                        maxOf(row.available_from, (now - days.days).toEpochMilliseconds())
-                    } ?: row.available_from
-                    readProgress(it, fromTimestamp, toTimestamp)
-                }
-
+            val rewardsById = readRewards().associateBy { it.id }
+            db.achievementQueries.selectAchievementsForUser(userId).executeAsList().map { row ->
+                val conditions = db.achievementConditionQueries
+                    .selectConditionsByAchievement(row.id).executeAsList().map { condition ->
+                        val progress = row.available_from?.let { availableFrom ->
+                            val fromTimestamp = condition.period_days?.let { days ->
+                                maxOf(availableFrom, (now - days.days).toEpochMilliseconds())
+                            } ?: availableFrom
+                            readProgress(condition, fromTimestamp, toTimestamp)
+                        }
+                        com.pad.repitdoit.features.gamification.domain.model.AchievementCondition(
+                            id = condition.id, type = condition.condition_type,
+                            comparisonOperator = condition.comparison_operator,
+                            targetValue = condition.target_value, exerciseId = condition.exercise_id,
+                            workoutId = condition.workout_id, workoutType = condition.workout_type,
+                            periodDays = condition.period_days, progress = progress
+                        )
+                    }
                 Achievement(
-                    id = row.id,
-                    name = row.name,
-                    desc = row.description.orEmpty(),
-                    progress = progress,
-                    achivementGoal = condition?.target_value?.takeIf { progress != null }
+                    id = row.id, code = row.code, name = row.name,
+                    desc = row.description.orEmpty(), iconUrl = row.icon_url,
+                    requiredRewardId = row.required_reward_id,
+                    conditionLogic = ConditionLogic.valueOf(row.condition_logic),
+                    availableFrom = row.available_from, unlockedAt = row.unlocked_at,
+                    conditions = conditions,
+                    rewards = db.achievementRewardQueries.selectRewardsByAchievement(row.id)
+                        .executeAsList().map { rewardsById.getValue(it.reward_id) }
                 )
             }
         }

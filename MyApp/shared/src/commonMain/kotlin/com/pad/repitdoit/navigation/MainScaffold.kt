@@ -233,20 +233,21 @@ fun NavigationSuiteScope.AppNavigationItems(
         }
 
     )
-    if (showScanOptions) {
+
+   // if (showScanOptions) {
         item (
-            selected = currentDestination?.hasRoute<Route.Scanner>() == true,
-            onClick = { onNavigate(Route.Scanner) },
+            selected = currentDestination?.hasRoute<Route.Gamification>() == true,
+            onClick = { onNavigate(Route.Gamification) },
             icon = {
                 Icon (
                     painter = painterResource(Res.drawable.iconScanner),
-                    contentDescription = "Scanner",
+                    contentDescription = "Gamification",
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text ("Scanner") }
+            label = { Text ("Gamification") }
         )
-    }
+    //}
     item (
         selected = currentDestination?.hasRoute<Route.Profile>() == true,
         onClick = { onNavigate(Route.Profile) },
@@ -259,27 +260,6 @@ fun NavigationSuiteScope.AppNavigationItems(
         },
         label = { Text ("Profile") }
     )
-}
-
-@Composable
-fun ScannerScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painterResource(Res.drawable.placeholder),
-                null
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text( "Scanner screen" )
-        }
-    }
 }
 
 

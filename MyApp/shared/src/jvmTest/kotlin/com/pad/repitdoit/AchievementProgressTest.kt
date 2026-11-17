@@ -69,11 +69,13 @@ class AchievementProgressTest {
             assertEquals(4L, achievements.getValue("workouts").progress)
             assertEquals(2L, achievements.getValue("sets").progress)
             assertEquals(13L, achievements.getValue("reps").progress)
-            assertEquals(2.5, achievements.getValue("reps").achivementGoal)
+            assertEquals(2.5, achievements.getValue("reps").achievementGoal)
             assertEquals(0L, achievements.getValue("zero").progress)
+            assertEquals(2, achievements.getValue("combined").conditions.size)
+            assertEquals(true, achievements.getValue("combined").conditionsSatisfied)
             for (id in listOf("unsupported", "combined")) {
                 assertNull(achievements.getValue(id).progress)
-                assertNull(achievements.getValue(id).achivementGoal)
+                assertNull(achievements.getValue(id).achievementGoal)
             }
         }
     }
@@ -217,7 +219,55 @@ class AchievementProgressTest {
         }
     }
 
+    @Test
+    fun readsCatalogOwnershipAwardsAndUserIsolation() = runBlocking {
+        withDatabase { db, _ ->
+            testDb(db).seed()
+            val user = LOCAL_TEST_USER_ID
+            val time = Clock.System.now().toEpochMilliseconds() - 60_000
+            db.rewardQueries.insertReward("key", "KEY", "Key", "KEY", null, null)
+            db.rewardQueries.insertReward("prize", "PRIZE", "Prize", "COLLECTIBLE", "asset", "Description")
+            db.rewardQueries.insertReward("badge", "BADGE", "Badge", "BADGE", null, null)
+            db.addAchievement("first", "WORKOUT_COUNT")
+            db.achievementRewardQueries.insertAchievementReward("first", "prize")
+            val repository = GamificationRepositoryImpl(db, Dispatchers.Unconfined, user)
+            val locked = repository.getAchievements().single()
+            assertEquals(com.pad.repitdoit.features.gamification.domain.model.AchievementStatus.LOCKED, locked.status)
+            assertNull(locked.conditions.single().progress)
+            assertEquals("Prize", locked.rewards.single().name)
+            assertEquals(setOf("prize", "badge"), repository.getRewards().map { it.id }.toSet())
+            assertEquals(false, repository.getRewards().first { it.id == "prize" }.isOwned)
+
+            db.userRewardQueries.insertUserReward("grant", user, "key", time)
+            assertEquals(com.pad.repitdoit.features.gamification.domain.model.AchievementStatus.AVAILABLE,
+                repository.getAchievements().single().status)
+            db.userAchievementQueries.insertUserAchievement("award", user, "first", time)
+            db.userRewardQueries.insertUserReward("prize-grant", user, "prize", time)
+            val achieved = repository.getAchievements().single()
+            assertEquals(time, achieved.availableFrom)
+            assertEquals(time, achieved.unlockedAt)
+            assertEquals(com.pad.repitdoit.features.gamification.domain.model.AchievementStatus.ACHIEVED, achieved.status)
+            assertEquals(time, achieved.rewards.single().obtainedAt)
+            assertEquals(false, achieved.conditionsSatisfied)
+            val unknown = achieved.conditions.single().copy(progress = null)
+            val satisfied = achieved.conditions.single().copy(progress = 10)
+            val combined = achieved.copy(conditions = listOf(unknown, satisfied))
+            assertNull(combined.conditionsSatisfied)
+            assertEquals(true, combined.copy(
+                conditionLogic = com.pad.repitdoit.features.gamification.domain.model.ConditionLogic.ANY
+            ).conditionsSatisfied)
+            assertNull(achieved.copy(conditions = emptyList()).conditionsSatisfied)
+
+            db.userQueries.insertUser("other", "Other", "Other", null)
+            val other = GamificationRepositoryImpl(db, Dispatchers.Unconfined, "other")
+            assertNull(other.getAchievements().single().unlockedAt)
+            assertNull(other.getAchievements().single().availableFrom)
+            assertEquals(false, other.getRewards().first { it.id == "prize" }.isOwned)
+        }
+    }
+
     private fun removeVersionThreeSchema(driver: JdbcSqliteDriver) {
+        driver.execute(null, "ALTER TABLE User DROP COLUMN total_xp", 0)
         driver.execute(null, "DROP TABLE WorkoutSessionType", 0)
         driver.execute(null, "DROP TABLE WorkoutTypeAssignment", 0)
         driver.execute(null, "ALTER TABLE AchievementCondition DROP COLUMN workout_type", 0)

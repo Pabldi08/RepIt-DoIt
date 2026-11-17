@@ -1,4 +1,4 @@
-package com.pad.repitdoit.features.training.presentation
+package com.pad.repitdoit.features.training.presentation.state
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver

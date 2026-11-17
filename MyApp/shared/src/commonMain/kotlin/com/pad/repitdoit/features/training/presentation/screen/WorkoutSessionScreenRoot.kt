@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.OnBackHandler
 import com.pad.repitdoit.features.training.domain.model.Workout
-import com.pad.repitdoit.features.training.presentation.WorkoutSessionState
-import com.pad.repitdoit.features.training.presentation.workoutClockMillis
+import com.pad.repitdoit.features.training.presentation.state.WorkoutSessionState
+import com.pad.repitdoit.features.training.presentation.state.workoutClockMillis
 import com.pad.repitdoit.features.training.presentation.layout.WorkoutSessionLayout
 import kotlinx.coroutines.delay
 

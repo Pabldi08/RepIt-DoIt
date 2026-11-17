@@ -22,11 +22,12 @@ class testDb(
                 .executeAsOneOrNull()
 
             if (user == null) {
-                database.userQueries.insertUser(
+                database.userQueries.insertUserWithXp(
                     id = userId,
                     username = "TestUser",
                     display_name = "Usuario de prueba",
-                    last_synced_at = null
+                    last_synced_at = null,
+                    total_xp = 1050L
                 )
             }
 

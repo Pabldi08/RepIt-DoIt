@@ -19,6 +19,9 @@ import com.pad.repitdoit.features.gamification.data.repository.FakeGamificationR
 import com.pad.repitdoit.features.gamification.data.repository.GamificationRepositoryImpl
 import com.pad.repitdoit.features.gamification.domain.repository.GamificationRepository
 import com.pad.repitdoit.features.gamification.domain.usecase.GetAllowedAchievementsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetAchievementsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetRewardsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetTotalXpUseCase
 import com.pad.repitdoit.features.home.data.repository.FakeHomeRepositoryImpl
 import com.pad.repitdoit.features.home.data.repository.HomeRepositoryImpl
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
@@ -116,6 +119,9 @@ class DefaultAppContainer(
     /*
         USE CASES
      */
+    override val getAchievementsUseCase = GetAchievementsUseCase(gamificationRepository)
+    override val getTotalXpUseCase = GetTotalXpUseCase(gamificationRepository)
+    override val getRewardsUseCase = GetRewardsUseCase(gamificationRepository)
     override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(gamificationRepository)
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
