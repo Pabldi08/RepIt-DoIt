@@ -22,7 +22,7 @@ class RepItDoItApplication : Application() {
         )
         testDb(db).apply {
             loadInitialDatabase()
-            seed()
+            seedDemo()
         }
         appContainer = DefaultAppContainer (
             db = db,

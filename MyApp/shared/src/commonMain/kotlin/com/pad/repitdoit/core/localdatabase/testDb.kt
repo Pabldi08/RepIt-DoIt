@@ -1,11 +1,23 @@
+
 package com.pad.repitdoit.core.localdatabase
+
+import com.pad.repitdoit.core.utility.hashPassword
+import com.pad.repitdoit.core.utility.matchesPassword
+import kotlin.time.Clock
 
 class testDb(
     private val database: RepItDoItDatabase
 ) {
-    // Requiere haber cargado el catalogo mediante loadInitialDatabase().
+
+    private val userId = LOCAL_TEST_USER_ID
+
+    // DATOS BÁSICOS DE PRUEBA
+
     fun seed() {
-        val userId = LOCAL_TEST_USER_ID
+
+        seedUser()
+        seedTestCredentials()
+
         val planId = "test-plan-001"
 
         val existingPlan = database.trainingPlanQueries
@@ -16,44 +28,20 @@ class testDb(
 
         database.transaction {
 
-            // 1. Usuario
-            val user = database.userQueries
-                .selectUserById(userId)
-                .executeAsOneOrNull()
-
-            if (user == null) {
-                database.userQueries.insertUser(
-                    id = userId,
-                    username = "TestUser",
-                    display_name = "Usuario de prueba",
-                    last_synced_at = null
-                )
-            }
-
-            // 2. Rutinas
-            database.workoutQueries.insertWorkout(
+            seedWorkout(
                 id = "test-workout-001",
-                user_id = userId,
                 name = "Push Day",
                 description = "Entrenamiento de empuje",
-                image_url = "training_muscles",
-                estimated_time = null,
-                created_at = 1000L,
-                updated_at = 1000L
+                timestamp = 1000L
             )
 
-            database.workoutQueries.insertWorkout(
+            seedWorkout(
                 id = "test-workout-002",
-                user_id = userId,
                 name = "Cardio",
                 description = "Entrenamiento cardiovascular",
-                image_url = null,
-                estimated_time = null,
-                created_at = 1000L,
-                updated_at = 1000L
+                timestamp = 1000L
             )
 
-            // 3. Ejercicios del catalogo asociados a Push Day
             database.workoutExerciseQueries
                 .insertWorkoutExercise(
                     id = "test-we-001",
@@ -80,7 +68,6 @@ class testDb(
                     notes = null
                 )
 
-            // 4. Plan de entrenamiento
             database.trainingPlanQueries.insertTrainingPlan(
                 id = planId,
                 user_id = userId,
@@ -89,21 +76,17 @@ class testDb(
                 updated_at = 1000L
             )
 
-            // Desactivar cualquier plan anterior
             database.trainingPlanQueries.deactivateUserPlans(
                 updated_at = 1000L,
                 user_id = userId
             )
 
-            // Activar el plan de prueba
             database.trainingPlanQueries.activateTrainingPlan(
                 updated_at = 1000L,
                 id = planId,
                 user_id = userId
             )
 
-            // 5. Programar ambas rutinas
-            // para todos los días de la semana
             for (day in 1L..7L) {
 
                 database.workoutScheduleQueries
@@ -129,14 +112,563 @@ class testDb(
         }
     }
 
-    // Catalogo inicial: ../docs/RepItDoIt_catalogo_inicial.sql.
-    // Conserva los registros existentes y permite repetir la carga sin duplicados.
+    // USUARIO Y CREDENCIALES
+
+    private fun seedUser() {
+
+        val user = database.userQueries
+            .selectUserById(userId)
+            .executeAsOneOrNull()
+
+        if (user != null) return
+
+        val existingUser = database.userQueries
+            .selectUserByUsername("test")
+            .executeAsOneOrNull()
+
+        check(existingUser == null) {
+            "El nombre test pertenece a otro usuario"
+        }
+
+        database.userQueries.insertUser(
+            id = userId,
+            username = "test",
+            display_name = "Test",
+            last_synced_at = null
+        )
+    }
+
+    private fun seedTestCredentials() {
+
+        val user = database.userQueries
+            .selectUserById(userId)
+            .executeAsOne()
+
+        val existingUser = database.userQueries
+            .selectUserByUsername("test")
+            .executeAsOneOrNull()
+
+        check(
+            existingUser == null ||
+                    existingUser.id == user.id
+        ) {
+            "El nombre test pertenece a otro usuario"
+        }
+
+        val existingHash = database.userCredentialQueries
+            .selectPasswordHashByUserId(userId)
+            .executeAsOneOrNull()
+
+        val passwordHash = existingHash
+            ?.takeIf { matchesPassword("test1234", it) }
+            ?: hashPassword("test1234")
+
+        database.transaction {
+
+            if (
+                user.username != "test" ||
+                user.display_name != "Test"
+            ) {
+                database.userQueries.updateUserProfile(
+                    username = "test",
+                    display_name = "Test",
+                    id = userId
+                )
+            }
+
+            if (existingHash == null) {
+
+                database.userCredentialQueries
+                    .insertUserCredential(
+                        user_id = userId,
+                        password_hash = passwordHash
+                    )
+
+            } else if (existingHash != passwordHash) {
+
+                database.userCredentialQueries
+                    .updateUserCredential(
+                        user_id = userId,
+                        password_hash = passwordHash
+                    )
+            }
+        }
+    }
+
+    // DATOS AMPLIADOS DE DEMOSTRACIÓN
+
+    fun seedDemo() {
+
+        seed()
+
+        val timestamp = Clock.System.now()
+            .toEpochMilliseconds()
+
+        database.transaction {
+
+            seedDemoWorkouts(timestamp)
+            seedDemoTrainingPlans(timestamp)
+        }
+    }
+
+    // CREACIÓN DE RUTINAS
+
+    private fun seedWorkout(
+        id: String,
+        name: String,
+        description: String,
+        timestamp: Long
+    ) {
+
+        database.workoutQueries.insertWorkout(
+            id = id,
+            user_id = userId,
+            name = name,
+            description = description,
+            image_url = if (id == "test-workout-002") {
+                null
+            } else {
+                "training_muscles"
+            },
+            estimated_time = null,
+            created_at = timestamp,
+            updated_at = timestamp
+        )
+    }
+
+    private fun seedDemoWorkout(
+        id: String,
+        name: String,
+        description: String,
+        timestamp: Long,
+        exercises: List<Triple<String, Double, Long>>
+    ) {
+
+        val existing = database.workoutQueries
+            .selectWorkoutById(id, userId)
+            .executeAsOneOrNull()
+
+        if (existing != null) return
+
+        seedWorkout(
+            id = id,
+            name = name,
+            description = description,
+            timestamp = timestamp
+        )
+
+        exercises.forEachIndexed { index, exercise ->
+
+            val (exerciseId, weight, reps) = exercise
+
+            database.workoutExerciseQueries
+                .insertWorkoutExercise(
+                    id = "$id-exercise-$index",
+                    workout_id = id,
+                    exercise_id = exerciseId,
+                    position = index.toLong(),
+                    target_weight = weight,
+                    target_sets = if (index == 0) 4L else 3L,
+                    target_reps = reps,
+                    rest_seconds = if (index == 0) 120L else 60L,
+                    notes = null
+                )
+        }
+    }
+
+    private fun seedDemoWorkouts(timestamp: Long) {
+
+        // ESPALDA Y BÍCEPS
+
+        seedDemoWorkout(
+            id = "test-workout-003",
+            name = "Pull Day",
+            description = "Espalda y bíceps",
+            timestamp = timestamp,
+            exercises = listOf(
+
+                // Jalón al pecho
+                Triple(
+                    "2ed4071f-7f72-5fdc-9551-eb7cb896e015",
+                    50.0, 10L
+                ),
+
+                // Remo con barra
+                Triple(
+                    "de7e0561-4597-5602-8e79-b34b16551b60",
+                    45.0, 10L
+                ),
+
+                // Remo con mancuerna
+                Triple(
+                    "a1c712ac-a54e-5a87-a17e-cb7b3aeca4c1",
+                    22.0, 12L
+                ),
+
+                // Face pull
+                Triple(
+                    "501062f2-a304-5d3e-a030-3d8195c75b08",
+                    20.0, 15L
+                ),
+
+                // Curl con barra
+                Triple(
+                    "7298853d-3859-58bd-8f23-95078f371671",
+                    25.0, 10L
+                ),
+
+                // Curl martillo
+                Triple(
+                    "0e357f3b-43bf-5c10-a5d6-682aea0d7cb5",
+                    14.0, 12L
+                )
+            )
+        )
+
+        // PIERNA
+
+        seedDemoWorkout(
+            id = "test-workout-004",
+            name = "Leg Day",
+            description = "Entrenamiento completo de piernas",
+            timestamp = timestamp,
+            exercises = listOf(
+
+                // Sentadilla
+                Triple(
+                    "c90339d6-640d-5734-b102-e5afe9d11118",
+                    70.0, 8L
+                ),
+
+                // Prensa
+                Triple(
+                    "a52b3544-192e-57dd-973f-d52b201179a2",
+                    120.0, 12L
+                ),
+
+                // Extensión de cuádriceps
+                Triple(
+                    "4e233d96-eb4c-5e7f-8898-3c376c6f3d32",
+                    40.0, 12L
+                ),
+
+                // Peso muerto rumano
+                Triple(
+                    "763d1380-633b-5876-b587-b668928da4f4",
+                    60.0, 10L
+                ),
+
+                // Curl femoral
+                Triple(
+                    "d6dbd523-c081-57fb-868a-492cc503284f",
+                    35.0, 12L
+                ),
+
+                // Gemelos
+                Triple(
+                    "4766745c-bf63-549c-97e6-64579959b133",
+                    30.0, 15L
+                )
+            )
+        )
+
+        // TREN SUPERIOR
+
+        seedDemoWorkout(
+            id = "test-workout-005",
+            name = "Upper Body",
+            description = "Pecho, espalda, hombros y brazos",
+            timestamp = timestamp,
+            exercises = listOf(
+
+                // Press de banca
+                Triple(
+                    "908d354a-8282-5726-9115-9f322536e428",
+                    60.0, 8L
+                ),
+
+                // Remo sentado
+                Triple(
+                    "42f9f70d-3032-5b92-91ed-8844b718cdf4",
+                    45.0, 12L
+                ),
+
+                // Press inclinado
+                Triple(
+                    "1c6a7252-c296-55aa-9f2e-a2d1b5e28c9d",
+                    24.0, 10L
+                ),
+
+                // Jalón al pecho
+                Triple(
+                    "2ed4071f-7f72-5fdc-9551-eb7cb896e015",
+                    50.0, 12L
+                ),
+
+                // Elevaciones laterales
+                Triple(
+                    "318fe537-3564-5f7a-b242-ad53506247f8",
+                    10.0, 15L
+                ),
+
+                // Curl alterno
+                Triple(
+                    "cd325c04-2c2e-5449-892f-4f10e0389d64",
+                    14.0, 12L
+                ),
+
+                // Extensión de tríceps
+                Triple(
+                    "a4a4d1af-7a83-5977-96b8-5a662f9c5d40",
+                    25.0, 12L
+                )
+            )
+        )
+
+        // TREN INFERIOR
+
+        seedDemoWorkout(
+            id = "test-workout-006",
+            name = "Lower Body",
+            description = "Fuerza e hipertrofia del tren inferior",
+            timestamp = timestamp,
+            exercises = listOf(
+
+                // Sentadilla frontal
+                Triple(
+                    "922cc73f-3d8a-5b90-8f8b-489e18eeba5b",
+                    50.0, 10L
+                ),
+
+                // Hip thrust
+                Triple(
+                    "41ca39e6-e04d-5a78-a801-8c079cb36290",
+                    80.0, 10L
+                ),
+
+                // Sentadilla búlgara
+                Triple(
+                    "7cb71d0f-35ad-536d-b24f-29c2063e4a9d",
+                    18.0, 12L
+                ),
+
+                // Curl femoral tumbado
+                Triple(
+                    "fa3454ba-cd22-5186-ab38-4e8b91dc27d7",
+                    30.0, 12L
+                ),
+
+                // Abductores
+                Triple(
+                    "39d5879c-a3ac-5790-bbc6-1aa3f4a7d316",
+                    40.0, 15L
+                ),
+
+                // Gemelos
+                Triple(
+                    "27f8d5df-626a-580e-965a-2e237bef14aa",
+                    20.0, 15L
+                )
+            )
+        )
+
+        // CUERPO COMPLETO
+
+        seedDemoWorkout(
+            id = "test-workout-007",
+            name = "Full Body",
+            description = "Entrenamiento de cuerpo completo",
+            timestamp = timestamp,
+            exercises = listOf(
+
+                // Sentadilla
+                Triple(
+                    "c90339d6-640d-5734-b102-e5afe9d11118",
+                    60.0, 10L
+                ),
+
+                // Press de banca
+                Triple(
+                    "908d354a-8282-5726-9115-9f322536e428",
+                    50.0, 10L
+                ),
+
+                // Remo con barra
+                Triple(
+                    "de7e0561-4597-5602-8e79-b34b16551b60",
+                    40.0, 12L
+                ),
+
+                // Press militar
+                Triple(
+                    "05997e70-373b-5097-8be8-2037ea2b82f0",
+                    30.0, 10L
+                ),
+
+                // Peso muerto
+                Triple(
+                    "d6873a49-4db6-554a-9a0f-a690286de4a6",
+                    80.0, 8L
+                ),
+
+                // Crunch abdominal
+                Triple(
+                    "8a312b00-55d6-5ae7-9dac-b024d56faa7b",
+                    0.0, 20L
+                )
+            )
+        )
+
+        // HOMBROS Y ABDOMEN
+
+        seedDemoWorkout(
+            id = "test-workout-008",
+            name = "Shoulders & Core",
+            description = "Hombros y zona abdominal",
+            timestamp = timestamp,
+            exercises = listOf(
+
+                // Press Arnold
+                Triple(
+                    "ee11c194-45e2-5100-af83-500393829350",
+                    18.0, 10L
+                ),
+
+                // Elevaciones laterales
+                Triple(
+                    "318fe537-3564-5f7a-b242-ad53506247f8",
+                    10.0, 15L
+                ),
+
+                // Pájaros
+                Triple(
+                    "ad35c535-6040-5273-bffa-6ec8bc3545da",
+                    8.0, 15L
+                ),
+
+                // Crunch en polea
+                Triple(
+                    "f5cdf847-6ec2-5ec5-81b6-64e22893075c",
+                    25.0, 15L
+                ),
+
+                // Elevaciones de piernas
+                Triple(
+                    "8ed001dc-3a6e-5312-b6b5-f9b3f972e0e4",
+                    0.0, 15L
+                ),
+
+                // Rueda abdominal
+                Triple(
+                    "2dbc1411-fce5-54ca-a55c-c7e275960ee8",
+                    0.0, 12L
+                )
+            )
+        )
+    }
+
+    // PLANES DE ENTRENAMIENTO
+
+    private fun seedDemoPlan(
+        id: String,
+        name: String,
+        timestamp: Long,
+        schedule: List<Pair<Long, String>>
+    ) {
+
+        val existing = database.trainingPlanQueries
+            .selectPlanById(id, userId)
+            .executeAsOneOrNull()
+
+        if (existing != null) return
+
+        database.trainingPlanQueries.insertTrainingPlan(
+            id = id,
+            user_id = userId,
+            name = name,
+            created_at = timestamp,
+            updated_at = timestamp
+        )
+
+        val workoutsByDay = schedule.groupBy { it.first }
+
+        workoutsByDay.forEach { (day, workouts) ->
+
+            workouts.forEachIndexed { index, workout ->
+
+                database.workoutScheduleQueries
+                    .insertWorkoutSchedule(
+                        id = "$id-$day-$index",
+                        user_id = userId,
+                        training_plan_id = id,
+                        workout_id = workout.second,
+                        weekday = day,
+                        position = index.toLong()
+                    )
+            }
+        }
+    }
+
+    private fun seedDemoTrainingPlans(timestamp: Long) {
+
+        // PUSH PULL LEGS
+
+        seedDemoPlan(
+            id = "test-plan-002",
+            name = "Push Pull Legs",
+            timestamp = timestamp,
+            schedule = listOf(
+                1L to "test-workout-001",
+                2L to "test-workout-003",
+                3L to "test-workout-004",
+                4L to "test-workout-008",
+                5L to "test-workout-001",
+                6L to "test-workout-003"
+            )
+        )
+
+        // UPPER LOWER
+
+        seedDemoPlan(
+            id = "test-plan-003",
+            name = "Upper Lower",
+            timestamp = timestamp,
+            schedule = listOf(
+                1L to "test-workout-005",
+                2L to "test-workout-006",
+                4L to "test-workout-005",
+                5L to "test-workout-006",
+                6L to "test-workout-008"
+            )
+        )
+
+        // FULL BODY
+
+        seedDemoPlan(
+            id = "test-plan-004",
+            name = "Full Body semanal",
+            timestamp = timestamp,
+            schedule = listOf(
+                1L to "test-workout-007",
+                3L to "test-workout-007",
+                5L to "test-workout-007",
+                6L to "test-workout-002"
+            )
+        )
+    }
+
+    // CATÁLOGO INICIAL
+
     fun loadInitialDatabase() = database.transaction {
+
         seedEquipmentBatch0()
+
         seedExerciseBatch0()
         seedExerciseBatch1()
         seedExerciseBatch2()
+
         seedMuscleBatch0()
+
         seedMuscleExerciseBatch0()
         seedMuscleExerciseBatch1()
         seedMuscleExerciseBatch2()
@@ -144,6 +676,7 @@ class testDb(
         seedMuscleExerciseBatch4()
         seedMuscleExerciseBatch5()
         seedMuscleExerciseBatch6()
+
         seedExerciseEquipmentBatch0()
         seedExerciseEquipmentBatch1()
         seedExerciseEquipmentBatch2()
