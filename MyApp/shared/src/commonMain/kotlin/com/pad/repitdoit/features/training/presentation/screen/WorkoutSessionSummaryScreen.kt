@@ -18,8 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.features.training.domain.model.Workout
+import com.pad.repitdoit.getWindowSize
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_summary_success
@@ -31,8 +32,8 @@ internal fun WorkoutSessionSummaryScreen(workout: Workout, durationSeconds: Int,
     val isLandscape = window.width > window.height
     val posture = adaptiveInfo.windowPosture
     val flex = isLandscape && posture.isTabletop
-    val wide = isLandscape ||
-        adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isWideWindow = getWindowSize(adaptiveInfo.windowSizeClass) != AppWindowSize.Compact
+    val wide = isWideWindow || isLandscape
     val hinge = posture.hingeList.firstOrNull { !it.isFlat && !it.isVertical }
     val density = LocalDensity.current
     var windowTop by remember { mutableFloatStateOf(Float.NaN) }
