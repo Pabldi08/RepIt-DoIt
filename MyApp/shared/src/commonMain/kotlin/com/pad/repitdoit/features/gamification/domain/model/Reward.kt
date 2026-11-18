@@ -1,6 +1,6 @@
 package com.pad.repitdoit.features.gamification.domain.model
 
-enum class RewardType { KEY, BADGE, COSMETIC, COLLECTIBLE }
+enum class RewardType { KEY, BADGE, COSMETIC, COLLECTIBLE, PROFILE_FRAME }
 
 data class Reward(
     val id: String,

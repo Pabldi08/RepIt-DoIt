@@ -30,7 +30,7 @@ fun LevelNode(
 ) {
     val backgroundColor = when (status) {
         LevelStatus.COMPLETED -> MaterialTheme.colorScheme.primary
-        LevelStatus.CURRENT -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+        LevelStatus.CURRENT -> MaterialTheme.colorScheme.surfaceVariant
         LevelStatus.LOCKED -> MaterialTheme.colorScheme.surfaceVariant
     }
     val borderColor = when (status) {

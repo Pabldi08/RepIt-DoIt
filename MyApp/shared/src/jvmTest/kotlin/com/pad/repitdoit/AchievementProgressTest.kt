@@ -18,6 +18,49 @@ import kotlin.time.Clock
 
 class AchievementProgressTest {
     @Test
+    fun awardsCompletedAchievementsAndChainedRewardsOnlyOnce() = runBlocking {
+        withDatabase { db, _ ->
+            testDb(db).seed()
+            val user = LOCAL_TEST_USER_ID
+            val timestamp = Clock.System.now().toEpochMilliseconds() - 1000
+            val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            val startingXp = container.getTotalXpUseCase()
+            val initialKey = "KEY_LEVEL_0"
+            db.rewardQueries.insertReward("next", "NEXT_KEY", "Next key", "KEY", null, null)
+            db.rewardQueries.insertReward("prize", "PRIZE", "Prize", "COLLECTIBLE", null, null)
+            db.addAchievement("first", "WORKOUT_COUNT", reward = initialKey)
+            db.addAchievement("second", "WORKOUT_COUNT", reward = "next")
+            db.addAchievement("unsupported", "WORKOUT_COUNT", reward = initialKey, operator = "<")
+            db.achievementQueries.updateAchievementXpReward(30, "first")
+            db.achievementQueries.updateAchievementXpReward(20, "second")
+            db.achievementRewardQueries.insertAchievementReward("first", "next")
+            db.achievementRewardQueries.insertAchievementReward("first", "prize")
+            db.achievementRewardQueries.insertAchievementReward("second", "prize")
+            db.userRewardQueries.insertUserReward("existing", user, "prize", timestamp)
+
+            container.awardCompletedAchievementsUseCase()
+            assertEquals(startingXp, container.getTotalXpUseCase())
+
+            val workout = requireNotNull(container.getWorkoutUseCase("test-workout-001"))
+            repeat(3) { index ->
+                container.completeWorkoutSessionUseCase("completed-$index", workout, timestamp - 1, timestamp)
+            }
+            val grants = db.userAchievementQueries.selectAchievementsByUser(user).executeAsList()
+            assertEquals(setOf("first", "second"), grants.map { it.achievement_id }.toSet())
+            assertEquals(startingXp + 50, container.getTotalXpUseCase())
+            assertEquals(timestamp, container.getRewardsUseCase().single().obtainedAt)
+            assertEquals(setOf(initialKey, "next", "prize"), db.userRewardQueries
+                .selectRewardsByUser(user).executeAsList().map { it.reward_id }.toSet())
+
+            container.completeWorkoutSessionUseCase("completed-2", workout, timestamp - 1, timestamp)
+            container.awardCompletedAchievementsUseCase()
+            assertEquals(3, db.workoutSessionQueries.selectWorkoutSessionsByUser(user).executeAsList().size)
+            assertEquals(grants, db.userAchievementQueries.selectAchievementsByUser(user).executeAsList())
+            assertEquals(startingXp + 50, container.getTotalXpUseCase())
+        }
+    }
+
+    @Test
     fun readsProgressForEligibleAchievementsOnly() = runBlocking {
         withDatabase { db, _ ->
             val now = Clock.System.now().toEpochMilliseconds()
@@ -66,9 +109,9 @@ class AchievementProgressTest {
 
             val achievements = useCase().associateBy { it.id }
             assertEquals(setOf("workouts", "sets", "reps", "zero", "unsupported", "combined"), achievements.keys)
-            assertEquals(4L, achievements.getValue("workouts").progress)
-            assertEquals(2L, achievements.getValue("sets").progress)
-            assertEquals(13L, achievements.getValue("reps").progress)
+            assertEquals(5L, achievements.getValue("workouts").progress)
+            assertEquals(3L, achievements.getValue("sets").progress)
+            assertEquals(133L, achievements.getValue("reps").progress)
             assertEquals(2.5, achievements.getValue("reps").achievementGoal)
             assertEquals(0L, achievements.getValue("zero").progress)
             assertEquals(2, achievements.getValue("combined").conditions.size)
@@ -89,6 +132,7 @@ class AchievementProgressTest {
             removeVersionThreeSchema(driver)
             driver.execute(null, "ALTER TABLE AchievementCondition DROP COLUMN workout_id", 0)
 
+            driver.execute(null, "ALTER TABLE Achievement DROP COLUMN xp_reward", 0)
             RepItDoItDatabase.Schema.migrate(driver, 1, RepItDoItDatabase.Schema.version)
             val migrated = db.achievementConditionQueries.selectAchievementConditionById("legacy").executeAsOne()
             assertEquals(7L, migrated.period_days)
@@ -120,6 +164,7 @@ class AchievementProgressTest {
                 null, "UPDATE AchievementCondition SET workout_id = 'test-workout-001' WHERE id = 'legacy'", 0
             )
 
+            driver.execute(null, "ALTER TABLE Achievement DROP COLUMN xp_reward", 0)
             RepItDoItDatabase.Schema.migrate(driver, 1, RepItDoItDatabase.Schema.version)
             val migrated = db.achievementConditionQueries.selectAchievementConditionById("legacy").executeAsOne()
             assertEquals("test-workout-001", migrated.workout_id)
@@ -209,6 +254,7 @@ class AchievementProgressTest {
             db.addSession("legacy", user, workout, time, "908d354a-8282-5726-9115-9f322536e428", 8)
             removeVersionThreeSchema(driver)
 
+            driver.execute(null, "ALTER TABLE Achievement DROP COLUMN xp_reward", 0)
             RepItDoItDatabase.Schema.migrate(driver, 2, RepItDoItDatabase.Schema.version)
             db.workoutTypeAssignmentQueries.assignWorkoutType(workoutId = workout, workoutType = "CHEST", userId = user)
             db.addAchievement("chest", "EXERCISE_REPS", workoutType = "CHEST")
@@ -266,6 +312,82 @@ class AchievementProgressTest {
         }
     }
 
+    @Test
+    fun readsRoutineAndLevelProgressFromTheBeginningWithoutAwardingAnything() = runBlocking {
+        withDatabase { db, driver ->
+            testDb(db).seed()
+            val user = LOCAL_TEST_USER_ID
+            val now = Clock.System.now().toEpochMilliseconds()
+            db.rewardQueries.insertReward("key", "KEY", "Key", "KEY", null, null)
+            db.userRewardQueries.insertUserReward("late-key", user, "key", now)
+            db.addAchievement("created", "WORKOUT_CREATED_COUNT", days = 1)
+            db.addAchievement("size", "WORKOUT_EXERCISE_COUNT")
+            db.addAchievement("level", "USER_LEVEL")
+            db.addAchievement("empty", "WORKOUT_EXERCISE_COUNT", workout = "test-workout-002")
+            val repository = GamificationRepositoryImpl(db, Dispatchers.Unconfined, user)
+            val initial = repository.getAchievements().associate { it.id to it.progress }
+            assertEquals(mapOf("created" to 2L, "size" to 2L, "level" to 6L, "empty" to 0L), initial)
+
+            // Add exercises in successive edits; the count must be per routine.
+            for (position in 2L..4L) {
+                db.workoutExerciseQueries.insertWorkoutExercise(
+                    "extra-$position", "test-workout-001", "908d354a-8282-5726-9115-9f322536e428",
+                    position, null, null, null, null, null
+                )
+            }
+            db.workoutQueries.archiveWorkout(now, now, "test-workout-001", user)
+            db.userQueries.insertUser("other", "Other", "Other", null)
+            db.workoutQueries.insertWorkout("other-routine", "other", "Other", null, null, null, 0, 0)
+            driver.execute(null, "UPDATE User SET total_xp = 700 WHERE id = '$user'", 0)
+            val updated = repository.getAchievements().associate { it.id to it.progress }
+            assertEquals(mapOf("created" to 2L, "size" to 5L, "level" to 5L, "empty" to 0L), updated)
+            assertEquals(700L, repository.getTotalXp())
+            assertEquals(emptyList(), db.userAchievementQueries.selectAchievementsByUser(user).executeAsList())
+            assertEquals(false, repository.getRewards().any { it.isOwned })
+        }
+    }
+    @Test
+    fun countsDistinctCatalogExercisesInCompletedSessionsWithoutRequiringSets() = runBlocking {
+        withDatabase { db, driver ->
+            testDb(db).seed()
+            val user = LOCAL_TEST_USER_ID
+            val now = Clock.System.now().toEpochMilliseconds()
+            val old = now - 3 * 86_400_000L
+            val bench = "908d354a-8282-5726-9115-9f322536e428"
+            val press = "05997e70-373b-5097-8be8-2037ea2b82f0"
+            val third = "994fb7ee-33d7-556a-bf1f-c6f72906a062"
+            db.rewardQueries.insertReward("key", "KEY", "Key", "KEY", null, null)
+            db.userRewardQueries.insertUserReward("late-key", user, "key", now)
+            db.addAchievement("distinct", "DISTINCT_EXERCISE_COUNT", days = 1)
+            db.addAchievement("push-only", "DISTINCT_EXERCISE_COUNT", workout = "test-workout-001")
+            db.addAchievement("chest-only", "DISTINCT_EXERCISE_COUNT", workoutType = "CHEST")
+            db.addAchievement("bench-only", "DISTINCT_EXERCISE_COUNT", exercise = bench)
+            db.workoutTypeAssignmentQueries.assignWorkoutType(workoutId = "test-workout-001", workoutType = "CHEST", userId = user)
+            db.addSession("old-bench", user, "test-workout-001", old, bench, 0, setCompleted = false)
+            // Even an exercise without any sets counts, and repeated appearances count once.
+            driver.execute(null, "DELETE FROM SessionSet WHERE id = 'old-bench'", 0)
+            db.sessionExerciseQueries.insertSessionExercise(
+                id = "duplicate-bench", session_id = "old-bench", exercise_id = bench,
+                exercise_name_snapshot = bench, exercise_description_snapshot = null,
+                position = 1, notes = null, user_id = user
+            )
+            db.addSession("repeat-bench", user, "test-workout-002", old, bench, 0)
+            db.addSession("old-press", user, "test-workout-002", old, press, 0, setCompleted = false)
+            db.addSession("active-third", user, "test-workout-001", old, third, 0, status = "ACTIVE")
+            db.addSession("aborted-third", user, "test-workout-001", old, third, 0, status = "ABORTED")
+            db.addSession("future-third", user, "test-workout-001", now + 86_400_000L, third, 0)
+            db.userQueries.insertUser("other", "Other", "Other", null)
+            db.workoutQueries.insertWorkout("other-routine", "other", "Other", null, null, null, old, old)
+            db.addSession("other-third", "other", "other-routine", old, third, 0)
+            val repository = GamificationRepositoryImpl(db, Dispatchers.Unconfined, user)
+            assertEquals(
+                mapOf("distinct" to 2L, "push-only" to 1L, "chest-only" to 1L, "bench-only" to 1L),
+                repository.getAchievements().associate { it.id to it.progress }
+            )
+            assertEquals(1050L, repository.getTotalXp())
+            assertEquals(emptyList(), db.userAchievementQueries.selectAchievementsByUser(user).executeAsList())
+        }
+    }
     private fun removeVersionThreeSchema(driver: JdbcSqliteDriver) {
         driver.execute(null, "ALTER TABLE User DROP COLUMN total_xp", 0)
         driver.execute(null, "DROP TABLE WorkoutSessionType", 0)
@@ -283,6 +405,9 @@ class AchievementProgressTest {
         JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY, properties).use { driver ->
             RepItDoItDatabase.Schema.create(driver)
             testDb(RepItDoItDatabase(driver)).loadInitialDatabase()
+            // These repository tests define their own gamification catalog.
+            driver.execute(null, "DELETE FROM Achievement", 0)
+            driver.execute(null, "DELETE FROM Reward", 0)
             block(RepItDoItDatabase(driver), driver)
         }
     }

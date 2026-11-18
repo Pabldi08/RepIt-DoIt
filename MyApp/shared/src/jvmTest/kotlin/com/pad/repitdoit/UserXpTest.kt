@@ -48,6 +48,7 @@ class UserXpTest {
             val db = RepItDoItDatabase(driver)
             db.userQueries.insertUser("user", "username", "Name", null)
             driver.execute(null, "ALTER TABLE User DROP COLUMN total_xp", 0)
+            driver.execute(null, "ALTER TABLE Achievement DROP COLUMN xp_reward", 0)
             RepItDoItDatabase.Schema.migrate(driver, 4, RepItDoItDatabase.Schema.version)
             val user = db.userQueries.selectUserById("user").executeAsOne()
             assertEquals("Name", user.display_name)

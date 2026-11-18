@@ -17,6 +17,10 @@ interface WorkoutRepository {
     suspend fun getExerciseContext(exerciseId: String): ExerciseContext?
     suspend fun getWorkout(workoutId: String): Workout?
 
+    suspend fun completeWorkoutSession(
+        sessionId: String, workout: Workout, startedAt: Long, finishedAt: Long
+    )
+
     suspend fun createWorkout(name: String): Workout
     suspend fun renameWorkout(
         workoutId: String,

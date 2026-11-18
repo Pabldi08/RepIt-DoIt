@@ -53,7 +53,8 @@ fun ProgressSummary(
                         (xp.toDouble() / goal).toFloat().coerceIn(0f, 1f)
                     } else 0f
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                drawStopIndicator = {}
             )
             Text("${xp} / ${goal} XP")
         }

@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.gamification.presentation.screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ fun GamificationScreenRoot(
         )
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(viewModel) { viewModel.refresh() }
 
     GamificationLayout(
         state = state,

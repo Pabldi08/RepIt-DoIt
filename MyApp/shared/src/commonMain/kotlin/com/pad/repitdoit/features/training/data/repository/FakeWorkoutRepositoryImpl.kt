@@ -11,6 +11,10 @@ import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles
 
 class FakeWorkoutRepositoryImpl: WorkoutRepository {
+    override suspend fun completeWorkoutSession(
+        sessionId: String, workout: Workout, startedAt: Long, finishedAt: Long
+    ) = Unit
+
     private val workouts = mutableMapOf(
         "001" to Workout(
             id = "001",

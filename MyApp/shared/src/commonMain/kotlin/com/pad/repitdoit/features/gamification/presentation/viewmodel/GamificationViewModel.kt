@@ -20,10 +20,11 @@ class GamificationViewModel(
     private val _uiState = MutableStateFlow(GamificationState())
     val uiState: StateFlow<GamificationState> = _uiState.asStateFlow()
 
-    init {
+    fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
+                appContainer.awardCompletedAchievementsUseCase()
                 coroutineScope {
                     val achievements = async { appContainer.getAchievementsUseCase() }
                     val rewards = async { appContainer.getRewardsUseCase() }

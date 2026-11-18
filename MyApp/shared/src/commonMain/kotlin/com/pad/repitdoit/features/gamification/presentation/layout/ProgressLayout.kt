@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
+import com.pad.repitdoit.core.ui.common.OnBackHandler
+import com.pad.repitdoit.core.ui.common.ReturnButton
 import com.pad.repitdoit.features.gamification.presentation.screen.*
 import com.pad.repitdoit.features.gamification.presentation.state.GamificationState
 import kotlinx.coroutines.launch
@@ -43,6 +45,11 @@ fun ProgressLayout(
     val onNavigate: (String) -> Unit = { destination ->
         scope.launch { navigator.navigateTo(SupportingPaneScaffoldRole.Supporting, destination) }
     }
+    val backBehavior = BackNavigationBehavior.PopLatest
+    val onBack: () -> Unit = {
+        scope.launch { navigator.navigateBack(backBehavior) }
+    }
+    OnBackHandler(enabled = navigator.canNavigateBack(backBehavior), onBack = onBack)
 
     SupportingPaneScaffold(
         modifier = modifier.fillMaxSize(),
@@ -71,15 +78,14 @@ fun ProgressLayout(
                     ProgressSupportingScreen(state, Modifier.fillMaxSize(), onNavigate)
                 } else {
                     Column(Modifier.fillMaxSize().padding(16.dp)) {
-                        TextButton(onClick = {
-                            scope.launch {
-                                navigator.navigateBack(BackNavigationBehavior.PopLatest)
-                            }
-                        }) {
-                            Text("Volver")
-                        }
+                        ReturnButton(onBack = onBack)
                         Text(destination, style = MaterialTheme.typography.headlineSmall)
-                        Text("Contenido pendiente")
+                        when (destination) {
+                            "Logros" -> AchievementScreen(state = state)
+                            "Colección" -> RewardsScreen(state = state)
+                            "Retos" -> Text("Pantalla de retos pendiente")
+                            else -> Text("Contenido pendiente")
+                        }
                     }
                 }
             }

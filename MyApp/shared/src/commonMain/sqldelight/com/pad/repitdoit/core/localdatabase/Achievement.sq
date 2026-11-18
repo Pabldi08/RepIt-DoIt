@@ -6,6 +6,7 @@ CREATE TABLE Achievement (
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
     description TEXT,
     condition_logic TEXT NOT NULL CHECK (condition_logic IN ('ALL', 'ANY')),
+    xp_reward INTEGER NOT NULL DEFAULT 0 CHECK (xp_reward >= 0),
     icon_url TEXT,
     FOREIGN KEY (required_reward_id) REFERENCES Reward(id) ON DELETE RESTRICT
 );
@@ -55,3 +56,6 @@ FROM Achievement a
 LEFT JOIN UserReward ur ON ur.reward_id = a.required_reward_id AND ur.user_id = :userId
 LEFT JOIN UserAchievement ua ON ua.achievement_id = a.id AND ua.user_id = :userId
 ORDER BY a.name, a.id;
+
+updateAchievementXpReward:
+UPDATE Achievement SET xp_reward = :xp_reward WHERE id = :id;

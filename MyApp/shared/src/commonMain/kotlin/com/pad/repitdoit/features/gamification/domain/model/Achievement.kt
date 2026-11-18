@@ -14,7 +14,8 @@ data class Achievement(
     val availableFrom: Long?,
     val unlockedAt: Long?,
     val conditions: List<AchievementCondition>,
-    val rewards: List<Reward>
+    val rewards: List<Reward>,
+    val xpReward: Long = 0
 ) {
     val status: AchievementStatus get() = when {
         unlockedAt != null -> AchievementStatus.ACHIEVED
