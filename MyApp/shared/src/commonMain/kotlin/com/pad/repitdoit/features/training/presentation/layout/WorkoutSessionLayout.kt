@@ -45,9 +45,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
+import com.pad.repitdoit.getWindowSize
 import org.jetbrains.compose.resources.painterResource
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_timer_track_compact
@@ -76,6 +77,7 @@ internal fun WorkoutSessionLayout(
     onNext: () -> Unit
 ) {
     val adaptiveInfo = currentWindowAdaptiveInfo()
+    val isWideWindow = getWindowSize(adaptiveInfo.windowSizeClass) != AppWindowSize.Compact
     val posture = adaptiveInfo.windowPosture
     val windowSize = LocalWindowInfo.current.containerSize
     val isLandscape = windowSize.width > windowSize.height
@@ -92,8 +94,7 @@ internal fun WorkoutSessionLayout(
     ) {
         val layout = when {
             posture.isTabletop && isLandscape -> SessionLayout.Flex
-            adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND) ||
-                isLandscape -> SessionLayout.Wide
+            isWideWindow || isLandscape -> SessionLayout.Wide
             else -> SessionLayout.Portrait
         }
 
