@@ -21,12 +21,14 @@ fun ProfileScreenRoot(windowSize: AppWindowSize, appContainer: AppContainer) {
     val viewModel: ProfileViewModel = viewModel {
         ProfileViewModel(
             appContainer.getProfileUseCase,
-            appContainer.getWorkoutHistoryUseCase
+            appContainer.getWorkoutHistoryUseCase,
+            appContainer.getTotalXpUseCase
         )
 
     }
 
     LaunchedEffect(viewModel) {
+        viewModel.loadTotalXp()
         val timeZone = TimeZone.currentSystemDefault()
         val today = Clock.System.now().toLocalDateTime(timeZone).date
 

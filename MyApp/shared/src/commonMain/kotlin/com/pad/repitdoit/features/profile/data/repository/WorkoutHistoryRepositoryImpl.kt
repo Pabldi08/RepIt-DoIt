@@ -23,6 +23,7 @@ class WorkoutHistoryRepositoryImpl(
                 WorkoutHistoryEntry(
                     sessionId = session.id,
                     workoutName = session.workout_name_snapshot,
+                    startedAt = session.started_at,
                     finishedAt = checkNotNull(session.finished_at)
                 )
             }
