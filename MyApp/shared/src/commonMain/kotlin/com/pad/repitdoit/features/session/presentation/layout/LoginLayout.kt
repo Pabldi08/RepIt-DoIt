@@ -129,12 +129,13 @@ internal fun LoginLayout(
                 }
             }
         } else {
-            Box(
+            Column(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopCenter
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
                     modifier = Modifier
+                        .weight(1f)
                         .widthIn(max = 440.dp)
                         .fillMaxWidth()
                         .imePadding()
@@ -202,25 +203,25 @@ internal fun LoginLayout(
                         )
                     }
                 }
-            }
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Text(
-                    text = "¿No tienes cuenta?",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Text(
+                        text = "¿No tienes cuenta?",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
 
-                TextButton(
-                    enabled = !state.isLoading,
-                    onClick = {
-                        onAction(AuthAction.ShowRegister)
+                    TextButton(
+                        enabled = !state.isLoading,
+                        onClick = {
+                            onAction(AuthAction.ShowRegister)
+                        }
+                    ) {
+                        Text("Regístrate")
                     }
-                ) {
-                    Text("Regístrate")
                 }
             }
         }
