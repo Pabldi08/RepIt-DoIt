@@ -200,9 +200,13 @@ internal fun LoginLayout(
                             else "Iniciar sesión"
                         )
                     }
-
-                    Spacer(Modifier.height(4.dp))
-
+                }
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
                     Text(
                         text = "¿No tienes cuenta?",
                         color = MaterialTheme.colorScheme.onSurfaceVariant

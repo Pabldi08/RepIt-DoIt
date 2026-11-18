@@ -234,9 +234,13 @@ internal fun RegisterLayout(
                             else "Crear cuenta"
                         )
                     }
-
-                    Spacer(Modifier.height(4.dp))
-
+                }
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
                     Text(
                         text = "¿Ya tienes cuenta?",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
