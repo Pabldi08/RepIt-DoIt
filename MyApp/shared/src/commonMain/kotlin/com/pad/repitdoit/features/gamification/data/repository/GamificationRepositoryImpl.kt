@@ -12,9 +12,10 @@ import kotlin.time.Duration.Companion.days
 class GamificationRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,
-    private val userId: String
+    private val currentUserId: () -> String?
 ) : GamificationRepository {
     override suspend fun getAllowedAchievements(): List<Achievement> = withContext(dispatcher) {
+        val userId = currentUserId() ?: return@withContext emptyList()
         val now = Clock.System.now()
         val toTimestamp = now.toEpochMilliseconds()
         db.transactionWithResult {
@@ -27,7 +28,7 @@ class GamificationRepositoryImpl(
                     val fromTimestamp = it.period_days?.let { days ->
                         maxOf(row.available_from, (now - days.days).toEpochMilliseconds())
                     } ?: row.available_from
-                    readProgress(it, fromTimestamp, toTimestamp)
+                    readProgress(userId, it, fromTimestamp, toTimestamp)
                 }
 
                 Achievement(
@@ -42,6 +43,7 @@ class GamificationRepositoryImpl(
     }
 
     private fun readProgress(
+        userId: String,
         condition: AchievementCondition,
         fromTimestamp: Long,
         toTimestamp: Long

@@ -3,17 +3,21 @@ package com.pad.repitdoit.features.home.domain.usecase
 import com.pad.repitdoit.features.home.domain.model.HomeDailyWorkout
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
 
-class GetHomeDailyWorkoutsUseCase (
-    private val repository: HomeRepository
+class GetHomeDailyWorkoutsUseCase(
+    private val repository: HomeRepository,
+    private val currentUserId: () -> String?
 ) {
-    suspend operator fun invoke(userId: String, weekday: Int): List<HomeDailyWorkout> {
-        println("USECASE: Repositorio utilizado = ${repository::class.simpleName}")
-        println("USECASE: userId=$userId, weekday=$weekday")
 
-        val workouts = repository.getDailyWorkouts(userId, weekday)
+    suspend operator fun invoke(
+        weekday: Int
+    ): List<HomeDailyWorkout> {
 
-        println("HOME-USECASE: Resultado = ${workouts.size}")
+        val userId = currentUserId()
+            ?: return emptyList()
 
-        return workouts
+        return repository.getDailyWorkouts(
+            userId,
+            weekday
+        )
     }
 }

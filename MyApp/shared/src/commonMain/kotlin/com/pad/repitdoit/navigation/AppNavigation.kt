@@ -1,10 +1,14 @@
 package com.pad.repitdoit.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
@@ -13,13 +17,29 @@ import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutExerciseSetupScreenRoot
+import com.pad.repitdoit.features.training.presentation.rememberWorkoutSessionState
+import com.pad.repitdoit.features.training.presentation.screen.WorkoutSessionScreenRoot
 @Composable
 fun AppNavigation(
     navController: NavHostController,
     windowSize: AppWindowSize,
     appContainer: AppContainer,
-    qrCameraScreen: @Composable ((String) -> Unit) -> Unit
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit,
+    activeWorkoutId: String?,
+    onStartWorkout: (String) -> Unit,
+    onCloseWorkout: () -> Unit
 ) {
+    val currentEntry by navController.currentBackStackEntryAsState()
+    val activeSession = if (activeWorkoutId != null) {
+        key(activeWorkoutId) { rememberWorkoutSessionState(activeWorkoutId, appContainer) }
+    } else {
+        null
+    }
+
+    val session by rememberUpdatedState(activeSession)
+    val startWorkout by rememberUpdatedState(onStartWorkout)
+    val closeWorkout by rememberUpdatedState(onCloseWorkout)
+
     NavHost(
         navController = navController,
         startDestination = Route.Home
@@ -34,15 +54,25 @@ fun AppNavigation(
             )
         }
 
-        composable<Route.Training> {
-            TrainingScreenRoot(
-                appContainer = appContainer,
-                onAddExercise = { workoutId ->
-                    navController.navigate(
-                        Route.Catalogue(workoutId = workoutId)
-                    )
-                }
-            )
+        composable<Route.Training> { entry ->
+            val workoutSession = session
+            if (workoutSession != null) {
+                WorkoutSessionScreenRoot(
+                    session = workoutSession,
+                    isCurrent = currentEntry == entry,
+                    onExit = closeWorkout
+                )
+            } else {
+                TrainingScreenRoot(
+                    appContainer = appContainer,
+                    onStartWorkout = startWorkout,
+                    onAddExercise = { workoutId ->
+                        navController.navigate(
+                            Route.Catalogue(workoutId = workoutId)
+                        )
+                    }
+                )
+            }
         }
 
         composable<Route.Scanner> {
@@ -66,6 +96,7 @@ fun AppNavigation(
             TrainingScreenRoot(
                 appContainer = appContainer,
                 initialWorkoutId = route.workoutId,
+                onStartWorkout = startWorkout,
                 onAddExercise = { workoutId ->
                     navController.navigate(
                         Route.Catalogue(workoutId = workoutId)

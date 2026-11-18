@@ -32,6 +32,12 @@ SELECT * FROM User ORDER BY username ASC;
 selectUserByUsername:
 SELECT * FROM User WHERE username = :username;
 
+updateUserProfile:
+UPDATE User
+SET username = :username,
+    display_name = :display_name
+WHERE id = :id;
+
 -- Local metadata only. Authorization is enforced by business logic/backend.
 updateUser:
 UPDATE User

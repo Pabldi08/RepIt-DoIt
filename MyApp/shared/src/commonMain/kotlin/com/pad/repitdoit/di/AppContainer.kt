@@ -9,7 +9,6 @@ import com.pad.repitdoit.features.training.domain.usecase.AddWorkoutToPlanUseCas
 import com.pad.repitdoit.features.training.domain.usecase.RemoveWorkoutFromPlanUseCase
 import com.pad.repitdoit.features.training.domain.usecase.MoveWorkoutToPlanDayUseCase
 
-import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.features.catalogue.data.repository.CatalogueRepositoryImpl
 import com.pad.repitdoit.features.catalogue.data.repository.FakeCatalogueRepositoryImpl
@@ -31,6 +30,19 @@ import com.pad.repitdoit.features.training.data.repository.WorkoutRepositoryImpl
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
 import com.pad.repitdoit.features.catalogue.domain.usecase.GetExercisesUseCase
+import com.pad.repitdoit.features.profile.data.repository.ProfileRepositoryImpl
+import com.pad.repitdoit.features.session.domain.usecase.CreateUserUseCase
+import com.pad.repitdoit.features.profile.domain.usecase.UpdateUserUseCase
+import com.pad.repitdoit.features.session.data.repositories.FakeSessionRepositoryImpl
+import com.pad.repitdoit.features.session.data.repositories.SessionRepositoryImpl
+import com.pad.repitdoit.features.session.domain.repository.SessionRepository
+import com.pad.repitdoit.features.session.domain.usecase.GetCurrentSessionUseCase
+import com.pad.repitdoit.features.session.domain.usecase.LoginUseCase
+import com.pad.repitdoit.features.session.domain.usecase.LogoutUseCase
+import com.pad.repitdoit.features.session.domain.usecase.VerifyUserUseCase
+import com.pad.repitdoit.features.dummy.data.repository.FakeDummyRepositoryImpl
+import com.pad.repitdoit.features.dummy.domain.repository.DummyRepository
+import com.pad.repitdoit.features.dummy.domain.usecase.GetMuscleNameByIdUseCase
 import com.pad.repitdoit.features.training.domain.usecase.AddExerciseToWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.UpdateWorkoutExerciseUseCase
 import com.pad.repitdoit.features.training.domain.usecase.RemoveExerciseFromWorkoutUseCase
@@ -41,11 +53,20 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersTrainingPlansU
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetExerciseContextUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
+import com.pad.repitdoit.features.dummy.domain.model.Exercise
+import com.pad.repitdoit.features.dummy.domain.usecase.GetExercisesByMuscleUseCase
 
-interface AppContainer : GamificationUseCaseAC, TrainingUseCasesAC, HomeUseCasesAC, CatalogueUseCasesAC, WorkoutExerciseSetupUseCasesAC {
-    val getProfileUseCase: GetProfileUseCase
-
-}
+interface AppContainer :
+    SessionUseCasesAC,
+    ProfileUseCasesAC,
+    DummyUseCasesAC,
+    GamificationUseCaseAC,
+    TrainingUseCasesAC,
+    HomeUseCasesAC,
+    CatalogueUseCasesAC,
+    WorkoutExerciseSetupUseCasesAC
+{}
 
 
 class DefaultAppContainer(
@@ -54,14 +75,22 @@ class DefaultAppContainer(
 ) : AppContainer {
 
     /*
-        REPOSITORIES
-     */
+    REPOSITORIES
+*/
+
+    private val sessionRepository: SessionRepository = FakeSessionRepositoryImpl()
+
+    private fun currentUserId(): String? {
+        return sessionRepository.activeSession.value?.userId
+    }
+
     private val homeRepository: HomeRepository =
         if (db == null || dispatcher == null) {
             FakeHomeRepositoryImpl()
         } else {
             HomeRepositoryImpl(db, dispatcher)
         }
+
     private val catalogueRepository: CatalogueRepository =
         if (db == null || dispatcher == null) {
             FakeCatalogueRepositoryImpl()
@@ -73,24 +102,47 @@ class DefaultAppContainer(
         if (db == null || dispatcher == null) {
             FakeWorkoutRepositoryImpl()
         } else {
-            WorkoutRepositoryImpl(db, dispatcher)
+            WorkoutRepositoryImpl(
+                db,
+                dispatcher,
+                ::currentUserId
+            )
         }
 
     private val gamificationRepository: GamificationRepository =
         if (db == null || dispatcher == null) {
             FakeGamificationRepositoryImpl()
         } else {
-            GamificationRepositoryImpl(db, dispatcher, LOCAL_TEST_USER_ID)
+            GamificationRepositoryImpl(
+                db,
+                dispatcher,
+                ::currentUserId
+            )
         }
 
-
-    private val profileRepository: ProfileRepository = FakeProfileRepositoryImpl()
+    private val profileRepository: ProfileRepository =
+        if (db == null || dispatcher == null) {
+            FakeProfileRepositoryImpl()
+        } else {
+            ProfileRepositoryImpl(
+                db,
+                dispatcher,
+                ::currentUserId
+            )
+        }
+        
+    private val dummyRepository: DummyRepository =
+        if (db == null || dispatcher == null) {
+            FakeDummyRepositoryImpl()
+        } else {
+            DummyRepositoryImpl(db, dispatcher)
+        }
 
     /*
         USE CASES
      */
     override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(gamificationRepository)
-    override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository)
+    override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository, ::currentUserId)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
     override val getExerciseContextUseCase = GetExerciseContextUseCase(workoutRepository)
     override val getUsersWorkoutsUseCase = GetUsersWorkoutsUseCase(workoutRepository)
@@ -111,5 +163,13 @@ class DefaultAppContainer(
     override val removeWorkoutUseCase = RemoveWorkoutUseCase(workoutRepository)
     override val renameWorkoutUseCase = RenameWorkoutUseCase(workoutRepository)
     override val getProfileUseCase = GetProfileUseCase(profileRepository)
+    override val createUserUseCase = CreateUserUseCase(sessionRepository)
+    override val updateUserUseCase = UpdateUserUseCase(profileRepository)
+    override val verifyUserUseCase = VerifyUserUseCase(sessionRepository)
+    override val loginUseCase = LoginUseCase(sessionRepository)
+    override val logoutUseCase = LogoutUseCase(sessionRepository)
+    override val getCurrentSessionUseCase = GetCurrentSessionUseCase(sessionRepository)
+    override val getMuscleNameByIdUseCase = GetMuscleNameByIdUseCase(dummyRepository)
+    override val getExercisesByMuscleUseCase = GetExercisesByMuscleUseCase(dummyRepository)
 
 }

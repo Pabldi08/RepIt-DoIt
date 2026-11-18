@@ -1,11 +1,20 @@
 package com.pad.repitdoit.features.profile.data.repository
 
-import com.pad.repitdoit.features.profile.domain.model.UserProfile
+import com.pad.repitdoit.features.profile.domain.model.User
 import com.pad.repitdoit.features.profile.domain.repository.ProfileRepository
 
 class FakeProfileRepositoryImpl : ProfileRepository {
-    override suspend fun getProfile() = UserProfile(
-        displayName = "Test",
-        username = "TestUser"
+
+    private var currentUser = User(
+        username = "TestUser",
+        displayName = "Test"
     )
+
+    override suspend fun getProfile(): User {
+        return currentUser
+    }
+
+    override suspend fun updateUser(user: User) {
+        currentUser = user
+    }
 }
