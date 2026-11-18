@@ -19,7 +19,8 @@ import repitdoit.shared.generated.resources.placeholder
 class WorkoutRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,
-    private val currentUserId: () -> String?
+    private val currentUserId: () -> String?,
+    private val awardAchievements: (String) -> Unit = {}
 ) : WorkoutRepository {
 
     private fun requireUserId(): String =
@@ -366,6 +367,33 @@ class WorkoutRepositoryImpl(
         )
     }
 
+    override suspend fun completeWorkoutSession(
+        sessionId: String, workout: Workout, startedAt: Long, finishedAt: Long
+    ) = withContext(dispatcher) {
+        db.transaction {
+            val userId = requireUserId()
+            if (db.workoutSessionQueries.selectWorkoutSessionById(sessionId, userId)
+                    .executeAsOneOrNull() != null
+            ) return@transaction
+
+            val savedWorkout = db.workoutQueries.selectWorkoutById(workout.id, userId).executeAsOne()
+            db.workoutSessionQueries.insertWorkoutSession(
+                id = sessionId, user_id = userId, workout_id = workout.id,
+                workout_name_snapshot = workout.name,
+                workout_description_snapshot = savedWorkout.description,
+                started_at = startedAt, finished_at = finishedAt, status = "COMPLETED", notes = null
+            )
+            workout.workoutExercises.forEachIndexed { index, exercise ->
+                db.sessionExerciseQueries.insertSessionExercise(
+                    id = generateId(), session_id = sessionId, exercise_id = exercise.exerciseId,
+                    exercise_name_snapshot = exercise.name, exercise_description_snapshot = null,
+                    position = index.toLong(), notes = null, user_id = userId
+                )
+            }
+            awardAchievements(userId)
+        }
+    }
+
     override suspend fun createWorkout(
         name: String
     ): Workout = withContext(dispatcher) {
@@ -375,16 +403,19 @@ class WorkoutRepositoryImpl(
         val id = generateId()
         val timestamp = Clock.System.now().toEpochMilliseconds()
 
-        db.workoutQueries.insertWorkout(
-            id = id,
-            user_id = userId,
-            name = name,
-            description = "",
-            image_url = null,
-            estimated_time = null,
-            created_at = timestamp,
-            updated_at = timestamp
-        )
+        db.transaction {
+            db.workoutQueries.insertWorkout(
+                id = id,
+                user_id = userId,
+                name = name,
+                description = "",
+                image_url = null,
+                estimated_time = null,
+                created_at = timestamp,
+                updated_at = timestamp,
+            )
+            awardAchievements(userId)
+        }
 
         Workout(
             id = id,
@@ -503,6 +534,7 @@ class WorkoutRepositoryImpl(
                 null
             )
 
+            awardAchievements(userId)
             WorkoutExercise(
                 id,
                 exerciseId,

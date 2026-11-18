@@ -23,6 +23,19 @@ class InitialCatalogTest {
             )
             loader.loadInitialDatabase()
 
+            val achievements = db.achievementQueries.selectAllAchievements().executeAsList()
+            assertEquals(12, achievements.size)
+            assertEquals(listOf(50L, 100L, 150L, 250L, 400L, 750L, 100L, 150L, 50L, 75L, 100L, 150L),
+                achievements.sortedBy { it.code }.map { it.xp_reward })
+            assertEquals(7, db.rewardQueries.selectAllRewards().executeAsList().size)
+            assertEquals("PROFILE_FRAME", db.rewardQueries.selectRewardByCode("R01").executeAsOne().reward_type)
+            assertEquals(15L, db.rewardQueries.selectRewardByCode("R02").executeAsOne().unlock_level)
+            achievements.forEach {
+                assertEquals("KEY_LEVEL_0", it.required_reward_id)
+                assertEquals(1, db.achievementConditionQueries.selectConditionsByAchievement(it.id).executeAsList().size)
+            }
+            assertEquals("R08", db.achievementRewardQueries.selectRewardsByAchievement("A03").executeAsOne().reward_id)
+            assertEquals("DISTINCT_EXERCISE_COUNT", db.achievementConditionQueries.selectConditionsByAchievement("D02").executeAsOne().condition_type)
             val exercises = db.exerciseQueries.selectAllExercises().executeAsList()
             assertEquals(112, exercises.size)
             assertEquals(35, db.equipmentQueries.selectAllEquipment().executeAsList().size)
@@ -40,6 +53,7 @@ class InitialCatalogTest {
 
             loader.seed()
             loader.seed()
+            assertEquals(1, db.userRewardQueries.selectRewardsByUser(com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID).executeAsList().size)
             assertEquals(exercises, db.exerciseQueries.selectAllExercises().executeAsList())
             val workoutExercises = db.workoutExerciseQueries
                 .selectExercisesByWorkout("test-workout-001").executeAsList()

@@ -17,7 +17,6 @@ import com.pad.repitdoit.core.ui.theme.AppTheme
 import com.pad.repitdoit.navigation.AppNavigation
 import com.pad.repitdoit.navigation.MainScaffold
 import com.pad.repitdoit.navigation.Route
-import com.pad.repitdoit.navigation.ScannerScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -30,7 +29,7 @@ enum class AppWindowSize {
 @Composable
 fun App(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable ((String) -> Unit) -> Unit = { _ -> ScannerScreen() },
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit = { _ -> },
     nfcEquipmentIds: Flow<String> = emptyFlow(),
     toScreen: Route? = null
 ) {

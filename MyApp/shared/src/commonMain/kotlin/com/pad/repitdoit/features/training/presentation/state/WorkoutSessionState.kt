@@ -1,8 +1,9 @@
-package com.pad.repitdoit.features.training.presentation
+package com.pad.repitdoit.features.training.presentation.state
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.pad.repitdoit.core.utility.generateId
 import com.pad.repitdoit.di.TrainingUseCasesAC
 import com.pad.repitdoit.features.training.domain.model.Workout
 import kotlinx.coroutines.CancellationException
@@ -10,7 +11,11 @@ import kotlin.time.Clock
 
 @Stable
 internal class WorkoutSessionState {
+    private var sessionId = generateId()
     var result by mutableStateOf<Result<Workout?>?>(null)
+    var completionResult by mutableStateOf<Result<Unit>?>(null)
+        private set
+    var completionAttempt by mutableIntStateOf(0)
     var loadAttempt by mutableIntStateOf(0)
     var exerciseIndex by mutableIntStateOf(0)
         private set
@@ -37,12 +42,27 @@ internal class WorkoutSessionState {
         restStarted = false
     }
 
+    suspend fun saveCompletion(appContainer: TrainingUseCasesAC, workout: Workout, duration: Int) {
+        completionResult = null
+        completionResult = try {
+            appContainer.completeWorkoutSessionUseCase(
+                sessionId, workout, startedAt, startedAt + duration * 1000L
+            )
+            Result.success(Unit)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            Result.failure(error)
+        }
+    }
+
     companion object {
         val Saver = listSaver<WorkoutSessionState, Any>(
             save = {
                 listOf(
                     it.exerciseIndex, it.configuredSeconds, it.pausedMillis,
-                    it.deadline ?: -1L, it.restStarted, it.startedAt, it.finishedElapsed ?: -1
+                    it.deadline ?: -1L, it.restStarted, it.startedAt, it.finishedElapsed ?: -1,
+                    it.sessionId
                 )
             },
             restore = { values ->
@@ -54,6 +74,7 @@ internal class WorkoutSessionState {
                     restStarted = values[4] as Boolean
                     startedAt = values[5] as Long
                     finishedElapsed = (values[6] as Int).takeIf { it >= 0 }
+                    sessionId = values.getOrNull(7) as? String ?: sessionId
                 }
             }
         )
@@ -73,6 +94,13 @@ internal fun rememberWorkoutSessionState(workoutId: String, appContainer: Traini
             throw cancelled
         } catch (error: Exception) {
             Result.failure(error)
+        }
+    }
+    val workout = session.result?.getOrNull()
+    val duration = session.finishedElapsed
+    LaunchedEffect(session, workout, duration, session.completionAttempt) {
+        if (workout != null && duration != null) {
+            session.saveCompletion(appContainer, workout, duration)
         }
     }
     return session

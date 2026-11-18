@@ -44,12 +44,6 @@ class TrainingViewModel(
 
     fun onAction(action: TrainingAction) {
         when(action) {
-            is TrainingAction.SelectExercise -> selectExercise(action.workoutExerciseId)
-            is TrainingAction.ChangeRestSec -> editExercise(action.workoutExerciseId, ExerciseField.Rest, action.value)
-            is TrainingAction.ChangeWeight -> editExercise(action.workoutExerciseId, ExerciseField.Weight, action.value)
-            is TrainingAction.ChangeNumSeries -> editExercise(action.workoutExerciseId, ExerciseField.Series, action.value)
-            is TrainingAction.ChangeNumReps -> editExercise(action.workoutExerciseId, ExerciseField.Reps, action.value)
-            is TrainingAction.RemoveWorkout -> removeWorkout(action.workoutId)
             is TrainingAction.CreatePlan -> updatePlan("No se pudo crear el plan") {
                 val plan = appContainer.createTrainingPlanUseCase(action.name)
                 appContainer.selectTrainingPlanUseCase(plan.id)
@@ -69,6 +63,12 @@ class TrainingViewModel(
             is TrainingAction.MoveWorkoutToPlanDay -> updatePlan("No se pudo cambiar la rutina de día") {
                 appContainer.moveWorkoutToPlanDayUseCase(action.planId, action.scheduleId, action.weekday)
             }
+            is TrainingAction.SelectExercise -> selectExercise(action.workoutExerciseId)
+            is TrainingAction.ChangeRestSec -> editExercise(action.workoutExerciseId, ExerciseField.Rest, action.value)
+            is TrainingAction.ChangeWeight -> editExercise(action.workoutExerciseId, ExerciseField.Weight, action.value)
+            is TrainingAction.ChangeNumSeries -> editExercise(action.workoutExerciseId, ExerciseField.Series, action.value)
+            is TrainingAction.ChangeNumReps -> editExercise(action.workoutExerciseId, ExerciseField.Reps, action.value)
+            is TrainingAction.RemoveWorkout -> removeWorkout(action.workoutId)
             is TrainingAction.createWorkout -> createWorkout(action.name)
             is TrainingAction.SelectPlan -> selectPlan(action.planId)
             is TrainingAction.renameWorkout -> renameWorkout(action.workoutId, action.name)

@@ -13,11 +13,12 @@ import androidx.navigation.toRoute
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.catalogue.presentation.screen.CatalogueScreenRoot
+import com.pad.repitdoit.features.gamification.presentation.screen.GamificationScreenRoot
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutExerciseSetupScreenRoot
-import com.pad.repitdoit.features.training.presentation.rememberWorkoutSessionState
+import com.pad.repitdoit.features.training.presentation.state.rememberWorkoutSessionState
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutSessionScreenRoot
 @Composable
 fun AppNavigation(
@@ -75,8 +76,8 @@ fun AppNavigation(
             }
         }
 
-        composable<Route.Scanner> {
-            ScannerScreen()
+        composable<Route.Gamification> {
+            GamificationScreenRoot(appContainer)
         }
 
         composable<Route.QrCamera> {

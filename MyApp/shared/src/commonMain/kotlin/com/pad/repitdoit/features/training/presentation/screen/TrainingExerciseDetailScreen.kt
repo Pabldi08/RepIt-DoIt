@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.ReturnButton
-import com.pad.repitdoit.features.training.presentation.TrainingSetPreview
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.presentation.action.TrainingAction
 import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseEditState

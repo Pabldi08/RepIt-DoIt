@@ -97,3 +97,28 @@ SET name = ?, updated_at = ?
 WHERE id = ?
   AND user_id = ?
   AND archived_at IS NULL;
+
+-- Includes archived routines: archiving does not undo having created a plan.
+getCreatedWorkoutCount:
+SELECT COUNT(*) FROM Workout w
+WHERE w.user_id = :userId AND w.created_at <= :toTimestamp
+  AND (:workoutId IS NULL OR w.id = :workoutId)
+  AND (:workoutType IS NULL OR EXISTS (
+      SELECT 1 FROM WorkoutTypeAssignment wt
+      WHERE wt.workout_id = w.id AND wt.workout_type = :workoutType
+  ));
+
+-- Current contents of a single routine, not additions across multiple operations.
+getMaxWorkoutExerciseCount:
+SELECT COALESCE(MAX(exercise_count), 0) FROM (
+    SELECT COUNT(we.id) AS exercise_count
+    FROM Workout w
+    LEFT JOIN WorkoutExercise we ON we.workout_id = w.id
+    WHERE w.user_id = :userId AND w.created_at <= :toTimestamp
+      AND (:workoutId IS NULL OR w.id = :workoutId)
+      AND (:workoutType IS NULL OR EXISTS (
+          SELECT 1 FROM WorkoutTypeAssignment wt
+          WHERE wt.workout_id = w.id AND wt.workout_type = :workoutType
+      ))
+    GROUP BY w.id
+);
