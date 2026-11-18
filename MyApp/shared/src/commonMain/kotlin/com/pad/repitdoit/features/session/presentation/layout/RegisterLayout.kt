@@ -25,8 +25,8 @@ internal fun RegisterLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .safeDrawingPadding()
-            .imePadding()
+            .systemBarsPadding()
+            .displayCutoutPadding()
     ) {
         val isWideScreen = maxWidth >= 900.dp
 
@@ -155,6 +155,7 @@ internal fun RegisterLayout(
                     modifier = Modifier
                         .widthIn(max = 440.dp)
                         .fillMaxWidth()
+                        .imePadding() // Añadir aquí
                         .verticalScroll(rememberScrollState())
                         .padding(
                             start = 24.dp,
@@ -235,25 +236,25 @@ internal fun RegisterLayout(
                         )
                     }
                 }
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
-                    Text(
-                        text = "¿Ya tienes cuenta?",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(
+                    text = "¿Ya tienes cuenta?",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
-                    TextButton(
-                        enabled = !state.isLoading,
-                        onClick = {
-                            onAction(AuthAction.ShowLogin)
-                        }
-                    ) {
-                        Text("Iniciar sesión")
+                TextButton(
+                    enabled = !state.isLoading,
+                    onClick = {
+                        onAction(AuthAction.ShowLogin)
                     }
+                ) {
+                    Text("Iniciar sesión")
                 }
             }
         }
