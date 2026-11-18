@@ -56,6 +56,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
 import com.pad.repitdoit.features.dummy.domain.model.Exercise
 import com.pad.repitdoit.features.dummy.domain.usecase.GetExercisesByMuscleUseCase
+import com.pad.repitdoit.features.profile.data.repository.WorkoutHistoryRepositoryImpl
+import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
+import com.pad.repitdoit.features.profile.domain.repository.WorkoutHistoryRepository
+import com.pad.repitdoit.features.profile.domain.usecase.GetWorkoutHistoryUseCase
 
 interface AppContainer :
     SessionUseCasesAC,
@@ -130,6 +134,18 @@ class DefaultAppContainer(
                 ::currentUserId
             )
         }
+    private val workoutHistoryRepository: WorkoutHistoryRepository =
+        if (db == null || dispatcher == null) {
+            object : WorkoutHistoryRepository {
+                override suspend fun getCompletedSessions(
+                    userId: String,
+                    fromTimestamp: Long,
+                    toTimestamp: Long
+                ): List<WorkoutHistoryEntry> = emptyList()
+            }
+        } else {
+            WorkoutHistoryRepositoryImpl(db, dispatcher)
+        }
         
     private val dummyRepository: DummyRepository =
         if (db == null || dispatcher == null) {
@@ -163,6 +179,7 @@ class DefaultAppContainer(
     override val removeWorkoutUseCase = RemoveWorkoutUseCase(workoutRepository)
     override val renameWorkoutUseCase = RenameWorkoutUseCase(workoutRepository)
     override val getProfileUseCase = GetProfileUseCase(profileRepository)
+    override val getWorkoutHistoryUseCase = GetWorkoutHistoryUseCase(workoutHistoryRepository, ::currentUserId)
     override val createUserUseCase = CreateUserUseCase(sessionRepository)
     override val updateUserUseCase = UpdateUserUseCase(profileRepository)
     override val verifyUserUseCase = VerifyUserUseCase(sessionRepository)

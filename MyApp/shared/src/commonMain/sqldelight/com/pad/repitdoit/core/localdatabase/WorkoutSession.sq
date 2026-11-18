@@ -80,3 +80,12 @@ WHERE id = :id AND user_id = :user_id;
 -- Explicit removal of this session also removes its exercises and sets.
 deleteWorkoutSession:
 DELETE FROM WorkoutSession WHERE id = :id AND user_id = :user_id;
+
+selectCompletedWorkoutSessionsByUser:
+SELECT *
+FROM WorkoutSession
+WHERE user_id = :userId
+  AND status = 'COMPLETED'
+  AND finished_at >= :fromTimestamp
+  AND finished_at < :toTimestamp
+ORDER BY finished_at DESC, id;
