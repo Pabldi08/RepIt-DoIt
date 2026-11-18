@@ -3,16 +3,12 @@ package com.pad.repitdoit.navigation
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -57,17 +53,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.pad.repitdoit.core.ui.common.NfcInfoPanel
 import com.pad.repitdoit.core.ui.common.OnBackHandler
+import com.pad.repitdoit.core.utility.loadImage
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.addManually
-import repitdoit.shared.generated.resources.addNFC
-import repitdoit.shared.generated.resources.addQR
-import repitdoit.shared.generated.resources.iconDumbbell
-import repitdoit.shared.generated.resources.iconHouse
-import repitdoit.shared.generated.resources.iconProfile
-import repitdoit.shared.generated.resources.iconScanner
-import repitdoit.shared.generated.resources.placeholder
 import kotlin.math.roundToInt
 
 @Composable
@@ -180,7 +168,7 @@ fun NavigationSuiteScope.AppNavigationItems(
         onClick = { onNavigate(Route.Home) },
         icon = {
             Icon (
-                painter = painterResource(Res.drawable.iconHouse),
+                painter = painterResource(loadImage("iconHouse")),
                 contentDescription = "Home",
                 modifier = Modifier.size(24.dp)
             )
@@ -192,7 +180,7 @@ fun NavigationSuiteScope.AppNavigationItems(
         onClick = { onNavigate(Route.Training) },
         icon = {
             Icon (
-                painter = painterResource(Res.drawable.iconDumbbell),
+                painter = painterResource(loadImage("iconDumbbell")),
                 contentDescription = "Training",
                 modifier = Modifier.size(24.dp)
             )
@@ -229,54 +217,32 @@ fun NavigationSuiteScope.AppNavigationItems(
                     )
                 }
             }
-
         )
     }
     item (
-        selected = currentDestination?.hasRoute<Route.Scanner>() == true,
-        onClick = { onNavigate(Route.Scanner) },
+        selected = currentDestination?.hasRoute<Route.Gamification>() == true,
+        onClick = { onNavigate(Route.Gamification) },
         icon = {
             Icon (
-                painter = painterResource(Res.drawable.iconScanner),
-                contentDescription = "Scanner",
+                painter = painterResource(loadImage("iconAchievement")),
+                contentDescription = "Game",
                 modifier = Modifier.size(24.dp)
             )
         },
-        label = { Text ("Scanner") }
+        label = { Text ("Game") }
     )
     item (
         selected = currentDestination?.hasRoute<Route.Profile>() == true,
         onClick = { onNavigate(Route.Profile) },
         icon = {
             Icon (
-                painter = painterResource(Res.drawable.iconProfile),
+                painter = painterResource(loadImage("iconProfile")),
                 contentDescription = "Profile",
                 modifier = Modifier.size(24.dp)
             )
         },
         label = { Text ("Profile") }
     )
-}
-
-@Composable
-fun ScannerScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painterResource(Res.drawable.placeholder),
-                null
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text( "Scanner screen" )
-        }
-    }
 }
 
 
@@ -338,13 +304,13 @@ private fun AddExerciseMenu(
                 if (showScanOptions) {
                     AddMenuAction(
                         text = "NFC",
-                        icon = Res.drawable.addNFC,
+                        icon = loadImage("addNFC"),
                         enabled = expanded,
                         onClick = onNfcClick
                     )
                     AddMenuAction(
                         text = "QR",
-                        icon = Res.drawable.addQR,
+                        icon = loadImage("addQR"),
                         enabled = expanded,
                         onClick = onQrClick
                     )

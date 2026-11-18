@@ -11,6 +11,7 @@ import com.pad.repitdoit.features.training.domain.usecase.MoveWorkoutToPlanDayUs
 
 import com.pad.repitdoit.features.training.domain.usecase.AddExerciseToWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.CreateWorkoutUseCase
+import com.pad.repitdoit.features.training.domain.usecase.CompleteWorkoutSessionUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersTrainingPlansUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
@@ -33,6 +34,7 @@ interface TrainingUseCasesAC {
     val getWorkoutUseCase: GetWorkoutUseCase
     val getUsersWorkoutsUseCase: GetUsersWorkoutsUseCase
     val createWorkoutUseCase: CreateWorkoutUseCase
+    val completeWorkoutSessionUseCase: CompleteWorkoutSessionUseCase
     val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase
     val updateWorkoutExerciseUseCase: UpdateWorkoutExerciseUseCase
     val removeExerciseFromWorkoutUseCase: RemoveExerciseFromWorkoutUseCase

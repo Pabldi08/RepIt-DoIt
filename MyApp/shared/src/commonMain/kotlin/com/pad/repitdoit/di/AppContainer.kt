@@ -52,6 +52,11 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCas
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersTrainingPlansUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetExerciseContextUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.AwardCompletedAchievementsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetAchievementsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetRewardsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetTotalXpUseCase
+import com.pad.repitdoit.features.training.domain.usecase.CompleteWorkoutSessionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
 import com.pad.repitdoit.features.dummy.domain.model.Exercise
@@ -102,26 +107,23 @@ class DefaultAppContainer(
             CatalogueRepositoryImpl(db, dispatcher)
         }
 
+    private val localGamificationRepository =
+        if (db != null && dispatcher != null) {
+            GamificationRepositoryImpl(db, dispatcher, ::currentUserId)
+        } else {
+            null
+        }
+
+    private val gamificationRepository: GamificationRepository =
+        localGamificationRepository ?: FakeGamificationRepositoryImpl()
+
     private val workoutRepository: WorkoutRepository =
         if (db == null || dispatcher == null) {
             FakeWorkoutRepositoryImpl()
         } else {
-            WorkoutRepositoryImpl(
-                db,
-                dispatcher,
-                ::currentUserId
-            )
-        }
-
-    private val gamificationRepository: GamificationRepository =
-        if (db == null || dispatcher == null) {
-            FakeGamificationRepositoryImpl()
-        } else {
-            GamificationRepositoryImpl(
-                db,
-                dispatcher,
-                ::currentUserId
-            )
+            WorkoutRepositoryImpl(db, dispatcher, ::currentUserId) { userId ->
+                localGamificationRepository?.awardCompletedAchievementsInTransaction(userId)
+            }
         }
 
     private val profileRepository: ProfileRepository =
@@ -157,6 +159,11 @@ class DefaultAppContainer(
     /*
         USE CASES
      */
+    override val awardCompletedAchievementsUseCase = AwardCompletedAchievementsUseCase(gamificationRepository)
+    override val getAchievementsUseCase = GetAchievementsUseCase(gamificationRepository)
+    override val getTotalXpUseCase = GetTotalXpUseCase(gamificationRepository)
+    override val getRewardsUseCase = GetRewardsUseCase(gamificationRepository)
+    override val completeWorkoutSessionUseCase = CompleteWorkoutSessionUseCase(workoutRepository)
     override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(gamificationRepository)
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository, ::currentUserId)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
