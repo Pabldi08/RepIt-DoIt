@@ -54,13 +54,13 @@ class TrainingViewModel(
             is TrainingAction.DeletePlan -> updatePlan("No se pudo eliminar el plan") {
                 appContainer.deleteTrainingPlanUseCase(action.planId)
             }
-            is TrainingAction.AddWorkoutToPlan -> updatePlan("No se pudo añadir la rutina al plan") {
+            is TrainingAction.AddWorkoutToPlan -> updatePlan("No se pudo añadir el entrenamiento al plan") {
                 appContainer.addWorkoutToPlanUseCase(action.planId, action.workoutId, action.weekday)
             }
-            is TrainingAction.RemoveWorkoutFromPlan -> updatePlan("No se pudo quitar la rutina del plan") {
+            is TrainingAction.RemoveWorkoutFromPlan -> updatePlan("No se pudo quitar el entrenamiento del plan") {
                 appContainer.removeWorkoutFromPlanUseCase(action.planId, action.scheduleId)
             }
-            is TrainingAction.MoveWorkoutToPlanDay -> updatePlan("No se pudo cambiar la rutina de día") {
+            is TrainingAction.MoveWorkoutToPlanDay -> updatePlan("No se pudo cambiar el día del entrenamiento") {
                 appContainer.moveWorkoutToPlanDayUseCase(action.planId, action.scheduleId, action.weekday)
             }
             is TrainingAction.SelectExercise -> selectExercise(action.workoutExerciseId)
@@ -348,7 +348,7 @@ class TrainingViewModel(
                 throw e
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = "No se pudo eliminar la rutina")
+                    it.copy(errorMessage = "No se pudo eliminar el entrenamiento")
                 }
             }
         }

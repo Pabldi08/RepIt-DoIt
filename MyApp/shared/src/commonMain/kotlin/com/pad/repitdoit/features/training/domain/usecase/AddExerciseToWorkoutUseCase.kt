@@ -14,7 +14,7 @@ class AddExerciseToWorkoutUseCase(
         weight: Double = 0.0,
         restSec: Int = 0
     ): WorkoutExercise {
-        require(workoutId.isNotBlank()) { "El identificador de la rutina no puede estar vacio" }
+        require(workoutId.isNotBlank()) { "El identificador del entrenamiento no puede estar vacío" }
         require(exerciseId.isNotBlank()) { "El identificador del ejercicio no puede estar vacio" }
         require(numReps > 0) { "Las repeticiones deben ser mayores que cero" }
         require(numSeries > 0) { "Las series deben ser mayores que cero" }

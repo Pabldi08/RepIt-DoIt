@@ -61,7 +61,7 @@ fun WorkoutExerciseSetupLayout(
                     else -> {
                         Text(
                             text = state.workoutError
-                                ?: "No tienes rutinas disponibles"
+                                ?: "No tienes entrenamientos disponibles"
                         )
                     }
                 }

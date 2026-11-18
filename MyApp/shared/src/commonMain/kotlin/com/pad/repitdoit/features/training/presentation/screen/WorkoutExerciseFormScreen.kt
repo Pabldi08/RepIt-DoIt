@@ -45,7 +45,7 @@ fun WorkoutExerciseFormScreen(
 
         state.selectedWorkout?.let { workout ->
             Text(
-                text = "Añadiendo a la rutina ${workout.name}",
+                text = "Añadiendo al entrenamiento ${workout.name}",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

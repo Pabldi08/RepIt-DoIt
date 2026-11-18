@@ -77,7 +77,7 @@ internal fun WorkoutSessionScreenRoot(
                     when {
                         result?.isFailure == true -> "No se pudo cargar el entrenamiento."
                         workout == null -> "El entrenamiento no está disponible."
-                        else -> "Añade ejercicios a la rutina para empezar."
+                        else -> "Añade ejercicios al entrenamiento para empezar."
                     }
                 )
                 if (result?.isFailure == true) {

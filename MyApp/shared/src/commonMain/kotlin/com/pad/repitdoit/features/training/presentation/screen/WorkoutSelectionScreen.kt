@@ -32,7 +32,7 @@ fun WorkoutSelectionScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Selecciona una rutina",
+                    text = "Selecciona un entrenamiento",
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
@@ -45,7 +45,7 @@ fun WorkoutSelectionScreen(
         if (workouts.isEmpty()) {
             item {
                 Text(
-                    text = "No tienes rutinas disponibles"
+                    text = "No tienes entrenamientos disponibles"
                 )
             }
         }

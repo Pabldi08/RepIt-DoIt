@@ -36,7 +36,7 @@ class testDb(
 
             seedInitialKey(userId)
 
-            // 2. Rutinas
+            // 2. Entrenamientos
             database.workoutQueries.insertWorkout(
                 id = "test-workout-001",
                 user_id = userId,
@@ -108,7 +108,7 @@ class testDb(
                 user_id = userId
             )
 
-            // 5. Programar ambas rutinas
+            // 5. Programar ambos entrenamientos
             // para todos los días de la semana
             for (day in 1L..7L) {
 
@@ -182,7 +182,7 @@ class testDb(
 
         seedCatalogAchievement("A01", "Primer paso", "¡Todo empieza con un primer entrenamiento!", "WORKOUT_COUNT", 1, 50, "R07")
         seedCatalogAchievement("A02", "Calentando motores", "Ya estás cogiendo el ritmo.", "WORKOUT_COUNT", 5, 100)
-        seedCatalogAchievement("A03", "En marcha", "El entrenamiento empieza a formar parte de tu rutina.", "WORKOUT_COUNT", 10, 150, "R08")
+        seedCatalogAchievement("A03", "En marcha", "Entrenar empieza a convertirse en un hábito.", "WORKOUT_COUNT", 10, 150, "R08")
         seedCatalogAchievement("A04", "No hay quien te pare", "¡25 entrenamientos a tus espaldas!", "WORKOUT_COUNT", 25, 250)
         seedCatalogAchievement("A05", "Máquina de entrenar", "El gimnasio ya es tu territorio.", "WORKOUT_COUNT", 50, 400)
         seedCatalogAchievement("A06", "Leyenda del gimnasio", "Has completado nada menos que 100 entrenamientos.", "WORKOUT_COUNT", 100, 750)
@@ -191,7 +191,7 @@ class testDb(
         seedCatalogAchievement("D02", "Nuevos horizontes", "La variedad también forma parte del progreso.", "DISTINCT_EXERCISE_COUNT", 10, 150, "R10")
         seedCatalogAchievement("E01", "Mi propio plan", "El primer paso es tener un plan.", "WORKOUT_CREATED_COUNT", 1, 50)
         // Maximum exercise count in a single routine, regardless of how it was edited.
-        seedCatalogAchievement("E02", "Todo preparado", "Una buena rutina comienza con una buena planificación.", "WORKOUT_EXERCISE_COUNT", 5, 75)
+        seedCatalogAchievement("E02", "Todo preparado", "Prepara tu entrenamiento con cinco ejercicios.", "WORKOUT_EXERCISE_COUNT", 5, 75)
         seedCatalogAchievement("F01", "Subiendo de nivel", "¡Ya estás en el nivel 5!", "USER_LEVEL", 5, 100, "R01")
         seedCatalogAchievement("F02", "Doble dígito", "¡Has alcanzado el nivel 10!", "USER_LEVEL", 10, 150, "R09")
     }
@@ -206,7 +206,16 @@ class testDb(
         code: String, name: String, description: String, type: String,
         target: Int, xp: Long, rewardCode: String? = null
     ) {
-        if (database.achievementQueries.selectAchievementByCode(code).executeAsOneOrNull() != null) return
+        val existing = database.achievementQueries.selectAchievementByCode(code).executeAsOneOrNull()
+        if (existing != null) {
+            if (existing.description != description) {
+                database.achievementQueries.updateAchievement(
+                    existing.required_reward_id, existing.code, existing.name,
+                    description, existing.condition_logic, existing.icon_url, existing.id
+                )
+            }
+            return
+        }
         seedCatalogReward("KEY_LEVEL_0", "Clave inicial", "KEY", "Acceso a los logros iniciales.")
         val key = database.rewardQueries.selectRewardByCode("KEY_LEVEL_0").executeAsOne()
         database.achievementQueries.insertAchievement(code, key.id, code, name, description, "ALL", null)

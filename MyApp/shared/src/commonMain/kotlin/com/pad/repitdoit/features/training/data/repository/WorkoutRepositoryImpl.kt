@@ -48,7 +48,7 @@ class WorkoutRepositoryImpl(
             .selectPlanScheduleEntry(scheduleId, planId, userId)
             .executeAsOneOrNull()
     ) {
-        "La rutina programada no pertenece a este plan"
+        "El entrenamiento programado no pertenece a este plan"
     }
 
     override suspend fun selectTrainingPlan(
@@ -167,11 +167,11 @@ class WorkoutRepositoryImpl(
                     .selectWorkoutById(workoutId, userId)
                     .executeAsOneOrNull()
             ) {
-                "La rutina no existe o no pertenece al usuario"
+                "El entrenamiento no existe o no pertenece al usuario"
             }
 
             require(workout.archived_at == null) {
-                "La rutina está archivada"
+                "El entrenamiento está archivado"
             }
 
             val scheduleId = generateId()
@@ -456,11 +456,11 @@ class WorkoutRepositoryImpl(
                     .selectWorkoutById(workoutId, userId)
                     .executeAsOneOrNull()
             ) {
-                "La rutina no existe o no pertenece al usuario"
+                "El entrenamiento no existe o no pertenece al usuario"
             }
 
             require(workout.archived_at == null) {
-                "La rutina está archivada"
+                "El entrenamiento está archivado"
             }
 
             val timestamp = maxOf(
@@ -495,11 +495,11 @@ class WorkoutRepositoryImpl(
                     .selectWorkoutById(workoutId, userId)
                     .executeAsOneOrNull()
             ) {
-                "La rutina no existe o no pertenece al usuario"
+                "El entrenamiento no existe o no pertenece al usuario"
             }
 
             require(workout.archived_at == null) {
-                "La rutina está archivada"
+                "El entrenamiento está archivado"
             }
 
             val exercise = requireNotNull(
@@ -561,11 +561,11 @@ class WorkoutRepositoryImpl(
                     .selectWorkoutById(workoutId, userId)
                     .executeAsOneOrNull()
             ) {
-                "La rutina no existe o no pertenece al usuario"
+                "El entrenamiento no existe o no pertenece al usuario"
             }
 
             require(workout.archived_at == null) {
-                "La rutina está archivada"
+                "El entrenamiento está archivado"
             }
 
             val existing = requireNotNull(
@@ -577,7 +577,7 @@ class WorkoutRepositoryImpl(
             }
 
             require(existing.workout_id == workoutId) {
-                "El ejercicio no pertenece a la rutina"
+                "El ejercicio no pertenece al entrenamiento"
             }
 
             require(existing.exercise_id == workoutExercise.exerciseId) {
@@ -609,11 +609,11 @@ class WorkoutRepositoryImpl(
                     .selectWorkoutById(workoutId, userId)
                     .executeAsOneOrNull()
             ) {
-                "La rutina no existe o no pertenece al usuario"
+                "El entrenamiento no existe o no pertenece al usuario"
             }
 
             require(workout.archived_at == null) {
-                "La rutina está archivada"
+                "El entrenamiento está archivado"
             }
 
             val existing = requireNotNull(
@@ -625,7 +625,7 @@ class WorkoutRepositoryImpl(
             }
 
             require(existing.workout_id == workoutId) {
-                "El ejercicio no pertenece a la rutina"
+                "El ejercicio no pertenece al entrenamiento"
             }
 
             db.workoutExerciseQueries.deleteWorkoutExercise(

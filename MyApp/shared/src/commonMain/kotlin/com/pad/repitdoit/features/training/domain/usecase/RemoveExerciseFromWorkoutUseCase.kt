@@ -6,7 +6,7 @@ class RemoveExerciseFromWorkoutUseCase(
     private val repository: WorkoutRepository
 ) {
     suspend operator fun invoke(workoutId: String, workoutExerciseId: String) {
-        require(workoutId.isNotBlank()) { "El identificador de la rutina no puede estar vacio" }
+        require(workoutId.isNotBlank()) { "El identificador del entrenamiento no puede estar vacío" }
         require(workoutExerciseId.isNotBlank()) { "El identificador de la entrada no puede estar vacio" }
         repository.removeWorkoutExercise(workoutId, workoutExerciseId)
     }
