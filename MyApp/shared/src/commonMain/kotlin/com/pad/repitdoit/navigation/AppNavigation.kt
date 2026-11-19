@@ -16,6 +16,7 @@ import com.pad.repitdoit.features.catalogue.presentation.screen.CatalogueScreenR
 import com.pad.repitdoit.features.gamification.presentation.screen.GamificationScreenRoot
 import com.pad.repitdoit.features.home.presentation.screen.HomeScreenRoot
 import com.pad.repitdoit.features.profile.presentation.screen.ProfileScreenRoot
+import com.pad.repitdoit.features.profile.presentation.screen.ProfileSettingsScreen
 import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoot
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutExerciseSetupScreenRoot
 import com.pad.repitdoit.features.training.presentation.state.rememberWorkoutSessionState
@@ -89,7 +90,28 @@ fun AppNavigation(
         }
 
         composable<Route.Profile> {
-            ProfileScreenRoot(windowSize, appContainer)
+            ProfileScreenRoot(
+                windowSize = windowSize,
+                appContainer = appContainer,
+                onOpenSettings = {
+                    navController.navigate(Route.ProfileSettings) { launchSingleTop = true }
+                }
+            )
+        }
+
+        composable<Route.ProfileSettings> { entry ->
+            ProfileSettingsScreen(
+                onBack = {
+                    if (navController.currentBackStackEntry == entry &&
+                        !navController.popBackStack<Route.Profile>(inclusive = false)
+                    ) {
+                        navController.navigate(Route.Profile) {
+                            popUpTo<Route.ProfileSettings> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
         }
 
         composable<Route.Workout> { backStackEntry ->

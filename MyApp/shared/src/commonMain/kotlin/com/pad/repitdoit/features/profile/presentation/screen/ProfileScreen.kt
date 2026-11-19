@@ -6,6 +6,6 @@ import com.pad.repitdoit.features.profile.presentation.ProfileUiState
 import com.pad.repitdoit.features.profile.presentation.layout.ProfileLayout
 
 @Composable
-fun ProfileScreen(windowSize: AppWindowSize, uiState: ProfileUiState) {
-    ProfileLayout(windowSize, uiState)
+fun ProfileScreen(windowSize: AppWindowSize, uiState: ProfileUiState, onOpenSettings: () -> Unit) {
+    ProfileLayout(windowSize, uiState, onOpenSettings)
 }

@@ -17,7 +17,11 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 @Composable
-fun ProfileScreenRoot(windowSize: AppWindowSize, appContainer: AppContainer) {
+fun ProfileScreenRoot(
+    windowSize: AppWindowSize,
+    appContainer: AppContainer,
+    onOpenSettings: () -> Unit
+) {
     val viewModel: ProfileViewModel = viewModel {
         ProfileViewModel(
             appContainer.getProfileUseCase,
@@ -45,6 +49,6 @@ fun ProfileScreenRoot(windowSize: AppWindowSize, appContainer: AppContainer) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ProfileScreen(windowSize, uiState)
+    ProfileScreen(windowSize, uiState, onOpenSettings)
 }
 

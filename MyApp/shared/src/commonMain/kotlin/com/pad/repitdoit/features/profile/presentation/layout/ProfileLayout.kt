@@ -13,7 +13,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.AppWindowSize
@@ -36,16 +38,21 @@ import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.number
 
 @Composable
-internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState) {
+internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState, onOpenSettings: () -> Unit) {
     val horizontalPadding = if (windowSize == AppWindowSize.Medium) 32.dp else 20.dp
 
     Column(
         modifier = Modifier.fillMaxSize().padding(top = 40.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Header(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).height(40.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Header(modifier = Modifier.weight(1f).height(40.dp))
+            TextButton(onClick = onOpenSettings) { Text("Ajustes") }
+        }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(
