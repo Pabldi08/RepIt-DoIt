@@ -67,6 +67,8 @@ kotlin {
             implementation(libs.kotlinxSerializationJson)
             implementation(libs.sqldelight.runtime)
             implementation(libs.kotlinx.coroutines.core)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation(libs.koalaplot.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

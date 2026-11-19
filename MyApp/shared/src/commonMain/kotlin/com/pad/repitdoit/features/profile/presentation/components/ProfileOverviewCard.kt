@@ -27,6 +27,7 @@ import org.jetbrains.compose.resources.painterResource
 fun ProfileOverviewCard(
     name: String,
     username: String,
+    totalXp: Long?,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
@@ -56,6 +57,11 @@ fun ProfileOverviewCard(
                     text = "@$username",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "${totalXp ?: "—"} XP",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }
