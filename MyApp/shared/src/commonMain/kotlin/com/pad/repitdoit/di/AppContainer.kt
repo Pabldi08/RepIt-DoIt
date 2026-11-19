@@ -87,7 +87,12 @@ class DefaultAppContainer(
     REPOSITORIES
 */
 
-    private val sessionRepository: SessionRepository = FakeSessionRepositoryImpl()
+    private val sessionRepository: SessionRepository =
+        if (db == null || dispatcher == null) {
+            FakeSessionRepositoryImpl()
+        } else {
+            SessionRepositoryImpl(db, dispatcher)
+        }
 
     private fun currentUserId(): String? {
         return sessionRepository.activeSession.value?.userId
@@ -119,7 +124,7 @@ class DefaultAppContainer(
 
     private val workoutRepository: WorkoutRepository =
         if (db == null || dispatcher == null) {
-            FakeWorkoutRepositoryImpl()
+            FakeWorkoutRepositoryImpl(::currentUserId)
         } else {
             WorkoutRepositoryImpl(db, dispatcher, ::currentUserId) { userId ->
                 localGamificationRepository?.awardCompletedAchievementsInTransaction(userId)
@@ -128,7 +133,9 @@ class DefaultAppContainer(
 
     private val profileRepository: ProfileRepository =
         if (db == null || dispatcher == null) {
-            FakeProfileRepositoryImpl()
+            FakeProfileRepositoryImpl(
+                sessionRepository as FakeSessionRepositoryImpl
+            )
         } else {
             ProfileRepositoryImpl(
                 db,

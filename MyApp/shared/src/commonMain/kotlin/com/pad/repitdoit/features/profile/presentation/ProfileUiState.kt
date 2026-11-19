@@ -10,5 +10,7 @@ data class ProfileUiState(
     val workoutHistory: List<WorkoutHistoryEntry> = emptyList(),
     val weeklyWorkoutProgress: List<DailyWorkoutProgress> = emptyList(),
     val isHistoryLoading: Boolean = false,
-    val historyError: String? = null
+    val historyError: String? = null,
+    val isLoggingOut: Boolean = false,
+    val error: String? = null
 )

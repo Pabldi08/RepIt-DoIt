@@ -13,7 +13,7 @@ fun main() {
     val db = createDatabase(JvmDatabaseDriverFactory())
     testDb(db).apply {
         loadInitialDatabase()
-        seed()
+        seedDemo()
     }
 
     val container = DefaultAppContainer(

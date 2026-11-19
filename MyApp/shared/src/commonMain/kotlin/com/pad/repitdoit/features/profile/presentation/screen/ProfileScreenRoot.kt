@@ -1,13 +1,13 @@
 package com.pad.repitdoit.features.profile.presentation.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.features.profile.presentation.ProfileViewModel
-import androidx.compose.runtime.LaunchedEffect
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -24,15 +24,16 @@ fun ProfileScreenRoot(
 ) {
     val viewModel: ProfileViewModel = viewModel {
         ProfileViewModel(
-            appContainer.getProfileUseCase,
-            appContainer.getWorkoutHistoryUseCase,
-            appContainer.getTotalXpUseCase
+            getProfileUseCase = appContainer.getProfileUseCase,
+            getWorkoutHistoryUseCase = appContainer.getWorkoutHistoryUseCase,
+            getTotalXpUseCase = appContainer.getTotalXpUseCase,
+            logoutUseCase = appContainer.logoutUseCase
         )
-
     }
 
     LaunchedEffect(viewModel) {
         viewModel.loadTotalXp()
+
         val timeZone = TimeZone.currentSystemDefault()
         val today = Clock.System.now().toLocalDateTime(timeZone).date
 
@@ -49,6 +50,10 @@ fun ProfileScreenRoot(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ProfileScreen(windowSize, uiState, onOpenSettings)
+    ProfileScreen(
+        windowSize = windowSize,
+        uiState = uiState,
+        onLogout = viewModel::logout,
+        onOpenSettings = onOpenSettings
+    )
 }
-

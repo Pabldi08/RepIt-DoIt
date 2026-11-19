@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,13 +37,22 @@ import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.rememberAxisContent
 import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.number
+import androidx.compose.foundation.layout.Spacer
 
 @Composable
-internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState, onOpenSettings: () -> Unit) {
+internal fun ProfileLayout(
+    windowSize: AppWindowSize,
+    state: ProfileUiState,
+    onLogout: () -> Unit,
+    onOpenSettings: () -> Unit
+) {
     val horizontalPadding = if (windowSize == AppWindowSize.Medium) 32.dp else 20.dp
 
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(top = 40.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 40.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
@@ -54,7 +64,9 @@ internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState, onO
             TextButton(onClick = onOpenSettings) { Text("Ajustes") }
         }
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             contentPadding = PaddingValues(
                 start = horizontalPadding,
                 end = horizontalPadding,
@@ -62,9 +74,17 @@ internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState, onO
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { Text("Mi perfil", style = MaterialTheme.typography.titleMediumEmphasized) }
+
+            item {
+                Text(
+                    "Mi perfil",
+                    style = MaterialTheme.typography.titleMediumEmphasized
+                )
+            }
+
             item {
                 val profile = state.profile
+
                 if (profile == null) {
                     Text("Cargando perfil…")
                 } else {
@@ -89,10 +109,37 @@ internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState, onO
                 item { WorkoutHistorySection(state) }
                 item { WorkoutProgressCard(state) }
             }
+
+            item {
+
+                Spacer(Modifier.height(16.dp))
+
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isLoggingOut,
+                    onClick = onLogout
+                ) {
+                    Text(
+                        if (state.isLoggingOut)
+                            "Cerrando sesión..."
+                        else
+                            "Cerrar sesión",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+            state.error?.let { error ->
+                item {
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
-
 @Composable
 private fun WorkoutHistorySection(state: ProfileUiState, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
