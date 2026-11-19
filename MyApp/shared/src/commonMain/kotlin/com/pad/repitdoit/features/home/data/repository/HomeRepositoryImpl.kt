@@ -5,6 +5,8 @@ import com.pad.repitdoit.features.home.domain.model.HomeDailyWorkout
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.isoDayNumber
 
 class HomeRepositoryImpl(
     private val db: RepItDoItDatabase,
@@ -13,17 +15,13 @@ class HomeRepositoryImpl(
 
     override suspend fun getDailyWorkouts(
         userId: String,
-        weekday: Int
+        weekday: DayOfWeek
     ): List<HomeDailyWorkout> = withContext(dispatcher) {
-
-        require(weekday in 1..7) {
-            "Dia de la semana debe estar entre 1 y 7"
-        }
 
         db.workoutScheduleQueries
             .selectDailyWorkouts(
                 user_id = userId,
-                weekday = weekday.toLong()
+                weekday = weekday.isoDayNumber.toLong()
             )
             .executeAsList()
             .map { workout ->
