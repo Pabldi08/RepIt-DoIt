@@ -1,10 +1,12 @@
 package com.pad.repitdoit.features.training.domain.model
 
-import org.jetbrains.compose.resources.DrawableResource
+import com.pad.repitdoit.features.training.domain.logic.WorkoutClassifier
 
-data class Workout (
+data class Workout(
     val id: String,
     val name: String,
-    val workoutExercises: List<WorkoutExercise> = emptyList(),
-    val image: DrawableResource
-)
+    val workoutExercises: List<WorkoutExercise> = emptyList()
+) {
+    val category: WorkoutCategory
+        get() = WorkoutClassifier.classify(workoutExercises)
+}

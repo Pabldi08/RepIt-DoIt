@@ -6,9 +6,8 @@ import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.domain.model.ScheduledWorkout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
+import com.pad.repitdoit.features.training.domain.model.MuscleGroup
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.training_muscles
 
 class FakeWorkoutRepositoryImpl(
     private val currentUserId: () -> String? = { "fake-local" }
@@ -21,11 +20,17 @@ class FakeWorkoutRepositoryImpl(
         finishedAt: Long
     ) = Unit
 
+    private val muscleGroupsByExercise = mapOf(
+        "10" to setOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
+        "20" to setOf(MuscleGroup.BACK, MuscleGroup.BICEPS, MuscleGroup.REAR_SHOULDERS),
+        "30" to setOf(MuscleGroup.BACK, MuscleGroup.BICEPS),
+        "40" to setOf(MuscleGroup.BICEPS, MuscleGroup.FOREARMS)
+    )
+
     private val seedWorkouts = mapOf(
         "001" to Workout(
             id = "001",
             name = "Tren Superior",
-            image = Res.drawable.training_muscles,
             workoutExercises = listOf(
                 WorkoutExercise(
                     id = "1",
@@ -34,7 +39,8 @@ class FakeWorkoutRepositoryImpl(
                     weight = 40.0,
                     numReps = 10,
                     numSets = 3,
-                    restSec = 30
+                    restSec = 30,
+                    muscleGroups = muscleGroupsByExercise["10"].orEmpty()
                 ),
                 WorkoutExercise(
                     id = "2",
@@ -43,7 +49,8 @@ class FakeWorkoutRepositoryImpl(
                     weight = 16.0,
                     numReps = 12,
                     numSets = 3,
-                    restSec = 30
+                    restSec = 30,
+                    muscleGroups = muscleGroupsByExercise["20"].orEmpty()
                 ),
                 WorkoutExercise(
                     id = "3",
@@ -52,7 +59,8 @@ class FakeWorkoutRepositoryImpl(
                     weight = 50.0,
                     numReps = 10,
                     numSets = 4,
-                    restSec = 30
+                    restSec = 30,
+                    muscleGroups = muscleGroupsByExercise["30"].orEmpty()
                 ),
                 WorkoutExercise(
                     id = "4",
@@ -61,7 +69,8 @@ class FakeWorkoutRepositoryImpl(
                     weight = 20.0,
                     numReps = 10,
                     numSets = 4,
-                    restSec = 30
+                    restSec = 30,
+                    muscleGroups = muscleGroupsByExercise["40"].orEmpty()
                 )
             )
         )
@@ -309,8 +318,7 @@ class FakeWorkoutRepositoryImpl(
 
         val workout = Workout(
             generateId(),
-            name,
-            image = Res.drawable.training_muscles
+            name
         )
 
         workouts[workout.id] = workout
@@ -363,7 +371,8 @@ class FakeWorkoutRepositoryImpl(
             weight,
             numReps,
             numSeries,
-            restSec
+            restSec,
+            muscleGroups = muscleGroupsByExercise[exerciseId].orEmpty()
         )
 
         workouts[workoutId] = workout.copy(

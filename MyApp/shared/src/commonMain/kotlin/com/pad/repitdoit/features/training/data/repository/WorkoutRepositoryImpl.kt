@@ -3,18 +3,17 @@ package com.pad.repitdoit.features.training.data.repository
 
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.core.utility.generateId
-import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.domain.model.ScheduledWorkout
 import com.pad.repitdoit.features.training.domain.model.ExerciseContext
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
+import com.pad.repitdoit.features.training.domain.model.MuscleGroup
+import com.pad.repitdoit.features.training.data.mapper.toMuscleGroup
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.placeholder
 
 class WorkoutRepositoryImpl(
     private val db: RepItDoItDatabase,
@@ -22,6 +21,22 @@ class WorkoutRepositoryImpl(
     private val currentUserId: () -> String?,
     private val awardAchievements: (String) -> Unit = {}
 ) : WorkoutRepository {
+
+    private fun loadMuscleGroups(
+        exerciseIds: Collection<String>
+    ): Map<String, Set<MuscleGroup>> {
+        // Evitar consultas vacias y el limite de parametros de SQLite.
+        return exerciseIds.distinct().chunked(500)
+            .flatMap { ids ->
+                db.muscleExerciseQueries.selectMusclesByExerciseIds(ids).executeAsList()
+            }
+            .groupBy { it.exercise_id }
+            .mapValues { (_, muscles) ->
+                muscles.mapNotNull { muscle ->
+                    toMuscleGroup(muscle.muscle_id, muscle.muscle_name, muscle.muscle_group)
+                }.toSet()
+            }
+    }
 
     private fun requireUserId(): String =
         checkNotNull(currentUserId()) {
@@ -343,27 +358,27 @@ class WorkoutRepositoryImpl(
             .executeAsOneOrNull()
             ?: return@withContext null
 
-        val exercises = db.workoutExerciseQueries
+        val exerciseRows = db.workoutExerciseQueries
             .selectExercisesByWorkout(workoutId)
             .executeAsList()
-            .map { exercise ->
-
-                WorkoutExercise(
-                    id = exercise.id,
-                    exerciseId = exercise.exercise_id,
-                    name = exercise.name,
-                    weight = exercise.target_weight ?: 0.0,
-                    numReps = exercise.target_reps?.toInt() ?: 0,
-                    numSets = exercise.target_sets?.toInt() ?: 0,
-                    restSec = exercise.rest_seconds?.toInt() ?: 0
-                )
-            }
+        val groupsByExercise = loadMuscleGroups(exerciseRows.map { it.exercise_id })
+        val exercises = exerciseRows.map { exercise ->
+            WorkoutExercise(
+                id = exercise.id,
+                exerciseId = exercise.exercise_id,
+                name = exercise.name,
+                weight = exercise.target_weight ?: 0.0,
+                numReps = exercise.target_reps?.toInt() ?: 0,
+                numSets = exercise.target_sets?.toInt() ?: 0,
+                restSec = exercise.rest_seconds?.toInt() ?: 0,
+                muscleGroups = groupsByExercise[exercise.exercise_id].orEmpty()
+            )
+        }
 
         Workout(
             id = workout.id,
             name = workout.name,
-            workoutExercises = exercises,
-            image = loadImage(workout.image_url)
+            workoutExercises = exercises
         )
     }
 
@@ -419,8 +434,7 @@ class WorkoutRepositoryImpl(
 
         Workout(
             id = id,
-            name = name,
-            image = Res.drawable.placeholder
+            name = name
         )
     }
 
@@ -542,7 +556,8 @@ class WorkoutRepositoryImpl(
                 weight,
                 numReps,
                 numSeries,
-                restSec
+                restSec,
+                muscleGroups = loadMuscleGroups(listOf(exerciseId))[exerciseId].orEmpty()
             )
         }
     }
@@ -646,10 +661,11 @@ class WorkoutRepositoryImpl(
                     .selectWorkoutsByUser(userId)
                     .executeAsList()
 
-                val exercisesByWorkout = db.workoutExerciseQueries
+                val exerciseRows = db.workoutExerciseQueries
                     .selectExercisesByUser(userId)
                     .executeAsList()
-                    .groupBy { it.workout_id }
+                val exercisesByWorkout = exerciseRows.groupBy { it.workout_id }
+                val groupsByExercise = loadMuscleGroups(exerciseRows.map { it.exercise_id })
 
                 workouts.map { workout ->
 
@@ -664,15 +680,15 @@ class WorkoutRepositoryImpl(
                                 weight = exercise.target_weight ?: 0.0,
                                 numReps = exercise.target_reps?.toInt() ?: 0,
                                 numSets = exercise.target_sets?.toInt() ?: 0,
-                                restSec = exercise.rest_seconds?.toInt() ?: 0
+                                restSec = exercise.rest_seconds?.toInt() ?: 0,
+                                muscleGroups = groupsByExercise[exercise.exercise_id].orEmpty()
                             )
                         }
 
                     Workout(
                         id = workout.id,
                         name = workout.name,
-                        workoutExercises = exercises,
-                        image = loadImage(workout.image_url)
+                        workoutExercises = exercises
                     )
                 }
             }

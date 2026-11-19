@@ -105,6 +105,15 @@ fun TrainingCard(
                     ExerciseView(exercise)
                 }
             }
+
+            Image(
+                painter = painterResource(image),
+                contentDescription = "Grupos musculares del entrenamiento",
+                modifier = Modifier
+                    .weight(1f)
+                    .height(140.dp),
+                contentScale = ContentScale.Fit
+            )
         }
         Column(
             modifier = Modifier.fillMaxWidth().padding(20.dp),

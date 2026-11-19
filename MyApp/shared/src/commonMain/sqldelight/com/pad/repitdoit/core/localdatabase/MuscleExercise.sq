@@ -32,3 +32,13 @@ WHERE muscle_id = :muscle_id AND exercise_id = :exercise_id;
 
 -- No non-key attributes: replace an association with DELETE + INSERT
 -- in a transaction.
+
+selectMusclesByExerciseIds:
+SELECT
+    me.exercise_id,
+    m.id AS muscle_id,
+    m.name AS muscle_name,
+    m.muscle_group
+FROM MuscleExercise AS me
+INNER JOIN Muscle AS m ON m.id = me.muscle_id
+WHERE me.exercise_id IN :exerciseIds;

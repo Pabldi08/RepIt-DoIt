@@ -14,6 +14,7 @@ import com.pad.repitdoit.core.ui.common.Header
 import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
 import com.pad.repitdoit.features.training.presentation.components.TrainingCard
 import com.pad.repitdoit.features.training.presentation.state.TrainingState
+import com.pad.repitdoit.features.training.presentation.mapper.toDrawable
 
 @Composable
 internal fun TrainingOverviewScreen(
@@ -179,7 +180,7 @@ internal fun TrainingOverviewScreen(
             TrainingCard(
                 title = workout.name,
                 exercises = workout.workoutExercises,
-                image = workout.image,
+                image = workout.category.toDrawable(),
                 xp = workout.workoutExercises.size * 50,
                 isSelected = workout.id == selectedWorkoutId,
                 onDetails = { onWorkoutDetails(workout.id) },
