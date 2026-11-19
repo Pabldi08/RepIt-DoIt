@@ -24,6 +24,7 @@ class AchievementProgressTest {
             val user = LOCAL_TEST_USER_ID
             val timestamp = Clock.System.now().toEpochMilliseconds() - 1000
             val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            container.loginAsDemoUser()
             val startingXp = container.getTotalXpUseCase()
             val initialKey = "KEY_LEVEL_0"
             db.rewardQueries.insertReward("next", "NEXT_KEY", "Next key", "KEY", null, null)
@@ -70,9 +71,11 @@ class AchievementProgressTest {
             val cardio = "test-workout-002"
             val bench = "908d354a-8282-5726-9115-9f322536e428"
             val press = "05997e70-373b-5097-8be8-2037ea2b82f0"
-            val useCase = DefaultAppContainer(db, Dispatchers.Unconfined).getAllowedAchievementsUseCase
-
             testDb(db).seed()
+            val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            container.loginAsDemoUser()
+            val useCase = container.getAllowedAchievementsUseCase
+
             db.rewardQueries.insertReward("key", "KEY", "Key", "KEY", null, null)
             db.rewardQueries.insertReward("locked", "LOCKED", "Locked", "KEY", null, null)
             db.addAchievement("workouts", "WORKOUT_COUNT", workout = push)
@@ -223,11 +226,12 @@ class AchievementProgressTest {
             )
             db.addSession("reclassified", user, push, time, bench, 10)
 
+            val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            container.loginAsDemoUser()
             assertEquals(
                 mapOf("chest" to 3L, "triceps" to 4L, "back" to 1L, "general" to 5L,
                     "sets" to 1L, "reps" to 8L, "wrong-workout" to 0L),
-                DefaultAppContainer(db, Dispatchers.Unconfined).getAllowedAchievementsUseCase()
-                    .associate { it.id to it.progress }
+                container.getAllowedAchievementsUseCase().associate { it.id to it.progress }
             )
             val otherUseCase = GetAllowedAchievementsUseCase(
                 GamificationRepositoryImpl(db, Dispatchers.Unconfined, {other})
@@ -259,7 +263,9 @@ class AchievementProgressTest {
             db.workoutTypeAssignmentQueries.assignWorkoutType(workoutId = workout, workoutType = "CHEST", userId = user)
             db.addAchievement("chest", "EXERCISE_REPS", workoutType = "CHEST")
 
-            val useCase = DefaultAppContainer(db, Dispatchers.Unconfined).getAllowedAchievementsUseCase
+            val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            container.loginAsDemoUser()
+            val useCase = container.getAllowedAchievementsUseCase
             assertEquals(mapOf("general" to 8L, "chest" to 0L), useCase().associate { it.id to it.progress })
             assertEquals("general", db.userAchievementQueries.selectAchievementsByUser(user).executeAsOne().achievement_id)
         }

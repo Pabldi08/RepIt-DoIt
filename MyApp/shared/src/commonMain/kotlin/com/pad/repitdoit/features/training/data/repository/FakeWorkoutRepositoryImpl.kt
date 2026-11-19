@@ -10,8 +10,18 @@ import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles
 
-class FakeWorkoutRepositoryImpl: WorkoutRepository {
-    private val workouts = mutableMapOf(
+class FakeWorkoutRepositoryImpl(
+    private val currentUserId: () -> String? = { "fake-local" }
+) : WorkoutRepository {
+
+    override suspend fun completeWorkoutSession(
+        sessionId: String,
+        workout: Workout,
+        startedAt: Long,
+        finishedAt: Long
+    ) = Unit
+
+    private val seedWorkouts = mapOf(
         "001" to Workout(
             id = "001",
             name = "Tren Superior",
