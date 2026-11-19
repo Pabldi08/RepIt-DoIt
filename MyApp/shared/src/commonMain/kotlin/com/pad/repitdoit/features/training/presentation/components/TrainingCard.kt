@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -95,7 +96,7 @@ fun TrainingCard(
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Column(
                 modifier = Modifier.weight(1.5f),
@@ -105,13 +106,12 @@ fun TrainingCard(
                     ExerciseView(exercise)
                 }
             }
-
             Image(
                 painter = painterResource(image),
                 contentDescription = "Grupos musculares del entrenamiento",
                 modifier = Modifier
                     .weight(1f)
-                    .height(140.dp),
+                    .aspectRatio(1f),
                 contentScale = ContentScale.Fit
             )
         }
