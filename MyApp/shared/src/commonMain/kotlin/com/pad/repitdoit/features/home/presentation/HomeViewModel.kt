@@ -23,13 +23,13 @@ class HomeViewModel (
     private fun loadDailyWorkouts() {
         viewModelScope.launch {
             val workouts = appContainer.getHomeDailyWorkoutsUseCase(1)
-            println("HOME_VM: Rutinas recibidas: ${workouts.size}")
+            println("HOME_VM: Entrenamientos recibidos: ${workouts.size}")
             _uiState.update {
                 it.copy(
                     dailyWorkouts = workouts
                 )
             }
-            println("HOME_VM: Rutinas en el estado: ${_uiState.value.dailyWorkouts.size}")
+            println("HOME_VM: Entrenamientos en el estado: ${_uiState.value.dailyWorkouts.size}")
         }
     }
 }

@@ -17,6 +17,15 @@ SELECT * FROM UserAchievement WHERE id = :id AND user_id = :user_id;
 selectAchievementsByUser:
 SELECT * FROM UserAchievement WHERE user_id = :user_id ORDER BY unlocked_at DESC, id;
 
+selectUsersMissingAchievementReward:
+SELECT ua.user_id, ua.unlocked_at
+FROM UserAchievement ua
+WHERE ua.achievement_id = :achievement_id
+  AND NOT EXISTS (
+      SELECT 1 FROM UserReward ur
+      WHERE ur.user_id = ua.user_id AND ur.reward_id = :reward_id
+  );
+
 insertUserAchievement:
 INSERT INTO UserAchievement (id, user_id, achievement_id, unlocked_at)
 VALUES (:id, :user_id, :achievement_id, :unlocked_at);

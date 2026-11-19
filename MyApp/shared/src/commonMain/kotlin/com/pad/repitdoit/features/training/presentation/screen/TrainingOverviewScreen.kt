@@ -57,7 +57,7 @@ internal fun TrainingOverviewScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "RUTINA SELECCIONADA",
+                    text = "PLAN SELECCIONADO",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )

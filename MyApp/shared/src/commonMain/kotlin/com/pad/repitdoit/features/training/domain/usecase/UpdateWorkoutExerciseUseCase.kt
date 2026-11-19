@@ -7,7 +7,7 @@ class UpdateWorkoutExerciseUseCase(
     private val repository: WorkoutRepository
 ) {
     suspend operator fun invoke(workoutId: String, workoutExercise: WorkoutExercise) {
-        require(workoutId.isNotBlank()) { "El identificador de la rutina no puede estar vacio" }
+        require(workoutId.isNotBlank()) { "El identificador del entrenamiento no puede estar vacío" }
         require(workoutExercise.id.isNotBlank()) { "El identificador de la entrada no puede estar vacio" }
         require(workoutExercise.exerciseId.isNotBlank()) { "El identificador del ejercicio no puede estar vacio" }
         require(workoutExercise.numReps > 0) { "Las repeticiones deben ser mayores que cero" }

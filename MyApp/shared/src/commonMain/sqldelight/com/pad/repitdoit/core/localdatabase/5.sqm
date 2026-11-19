@@ -1,0 +1,36 @@
+ALTER TABLE Achievement ADD COLUMN xp_reward INTEGER NOT NULL DEFAULT 0 CHECK (xp_reward >= 0);
+-- Preserve dependent rows while rebuilding the reward type constraint.
+CREATE TABLE MigrationAchievement AS SELECT id, required_reward_id, code, name, description, condition_logic, icon_url, xp_reward FROM Achievement;
+CREATE TABLE MigrationAchievementCondition AS SELECT id, achievement_id, condition_type, comparison_operator, target_value, exercise_id, period_days, workout_id, workout_type FROM AchievementCondition;
+CREATE TABLE MigrationAchievementReward AS SELECT achievement_id, reward_id FROM AchievementReward;
+CREATE TABLE MigrationUserAchievement AS SELECT id, user_id, achievement_id, unlocked_at FROM UserAchievement;
+CREATE TABLE MigrationUserReward AS SELECT id, user_id, reward_id, obtained_at FROM UserReward;
+DELETE FROM UserAchievement;
+DELETE FROM AchievementReward;
+DELETE FROM AchievementCondition;
+DELETE FROM Achievement;
+DELETE FROM UserReward;
+CREATE TABLE Reward_new (
+    id TEXT NOT NULL PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE CHECK (length(trim(code)) > 0),
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+    reward_type TEXT NOT NULL CHECK (reward_type IN ('KEY', 'BADGE', 'COSMETIC', 'COLLECTIBLE', 'PROFILE_FRAME')),
+    unlock_level INTEGER CHECK (unlock_level > 0),
+    asset_url TEXT,
+    description TEXT
+);
+
+
+INSERT INTO Reward_new (id, code, name, reward_type, asset_url, description) SELECT id, code, name, reward_type, asset_url, description FROM Reward;
+DROP TABLE Reward;
+ALTER TABLE Reward_new RENAME TO Reward;
+INSERT INTO Achievement (id, required_reward_id, code, name, description, condition_logic, icon_url, xp_reward) SELECT id, required_reward_id, code, name, description, condition_logic, icon_url, xp_reward FROM MigrationAchievement;
+INSERT INTO AchievementCondition (id, achievement_id, condition_type, comparison_operator, target_value, exercise_id, period_days, workout_id, workout_type) SELECT id, achievement_id, condition_type, comparison_operator, target_value, exercise_id, period_days, workout_id, workout_type FROM MigrationAchievementCondition;
+INSERT INTO AchievementReward (achievement_id, reward_id) SELECT achievement_id, reward_id FROM MigrationAchievementReward;
+INSERT INTO UserAchievement (id, user_id, achievement_id, unlocked_at) SELECT id, user_id, achievement_id, unlocked_at FROM MigrationUserAchievement;
+INSERT INTO UserReward (id, user_id, reward_id, obtained_at) SELECT id, user_id, reward_id, obtained_at FROM MigrationUserReward;
+DROP TABLE MigrationAchievement;
+DROP TABLE MigrationAchievementCondition;
+DROP TABLE MigrationAchievementReward;
+DROP TABLE MigrationUserAchievement;
+DROP TABLE MigrationUserReward;

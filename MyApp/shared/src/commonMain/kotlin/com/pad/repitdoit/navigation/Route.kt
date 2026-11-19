@@ -12,7 +12,10 @@ sealed interface Route {
     data object Profile: Route
 
     @Serializable
-    data object Scanner: Route
+    data object ProfileSettings: Route
+
+    @Serializable
+    data object Gamification: Route
 
     @Serializable
     data object QrCamera: Route

@@ -91,9 +91,9 @@ fun TrainingLayout(
                 val workoutName = state.workouts.find { it.id == dialog.workoutId }?.name
                 AlertDialog(
                     onDismissRequest = { activeDialog = null },
-                    title = { Text("Eliminar rutina") },
+                    title = { Text("Eliminar entrenamiento") },
                     text = {
-                        val subject = workoutName?.let { "la rutina «$it»" } ?: "esta rutina"
+                        val subject = workoutName?.let { "el entrenamiento «$it»" } ?: "este entrenamiento"
                         Text("¿Quieres eliminar $subject? Dejará de aparecer en tus entrenamientos y planes semanales. Los ejercicios del catálogo se conservarán.")
                     },
                     confirmButton = {
@@ -116,9 +116,9 @@ fun TrainingLayout(
                     text = {
                         Text(
                             if (exerciseName != null) {
-                                "¿Quieres quitar «$exerciseName» de esta rutina? El ejercicio seguirá disponible en el catálogo."
+                                "¿Quieres quitar «$exerciseName» de este entrenamiento? El ejercicio seguirá disponible en el catálogo."
                             } else {
-                                "¿Quieres quitar este ejercicio de la rutina? Seguirá disponible en el catálogo."
+                                "¿Quieres quitar este ejercicio del entrenamiento? Seguirá disponible en el catálogo."
                             }
                         )
                     },
@@ -150,7 +150,7 @@ fun TrainingLayout(
             is TrainingDialog.DeletePlan -> AlertDialog(
                 onDismissRequest = { activeDialog = null },
                 title = { Text("Eliminar plan") },
-                text = { Text("Se eliminará el plan y su distribución semanal. Las rutinas se conservarán.") },
+                text = { Text("Se eliminará el plan y su distribución semanal. Los entrenamientos se conservarán.") },
                 confirmButton = {
                     TextButton(onClick = {
                         onAction(TrainingAction.DeletePlan(dialog.planId))
@@ -163,10 +163,10 @@ fun TrainingLayout(
             )
             is TrainingDialog.AddWorkoutToPlan -> AlertDialog(
                 onDismissRequest = { activeDialog = null },
-                title = { Text("Añadir rutina al día") },
+                title = { Text("Añadir entrenamiento al día") },
                 text = {
                     if (state.workouts.isEmpty()) {
-                        Text("No tienes rutinas disponibles. Crea una desde Entrenamientos.")
+                        Text("No tienes entrenamientos disponibles. Crea uno desde Entrenamientos.")
                     } else {
                         LazyColumn(Modifier.heightIn(max = 400.dp)) {
                             items(state.workouts, key = { it.id }) { workout ->

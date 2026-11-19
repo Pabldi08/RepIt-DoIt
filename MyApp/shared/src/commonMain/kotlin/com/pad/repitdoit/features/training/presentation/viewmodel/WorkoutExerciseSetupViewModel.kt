@@ -78,7 +78,7 @@ class WorkoutExerciseSetupViewModel (
                     val workout = requireNotNull(
                         appContainer.getWorkoutUseCase(workoutId)
                     ) {
-                        "La rutina no está disponible"
+                        "El entrenamiento no está disponible"
                     }
 
                     _uiState.update {
@@ -103,7 +103,7 @@ class WorkoutExerciseSetupViewModel (
                 _uiState.update {
                     it.copy (
                         isLoadingWorkouts = false,
-                        workoutError = "No se pudieron cargar las rutinas"
+                        workoutError = "No se pudieron cargar los entrenamientos"
                     )
                 }
             }
@@ -204,7 +204,7 @@ class WorkoutExerciseSetupViewModel (
                 numSeriesError = numSeriesError,
                 restSecError = restSecError,
                 saveError = when {
-                    workout == null -> "Selecciona una rutina antes de guardar"
+                    workout == null -> "Selecciona un entrenamiento antes de guardar"
                     exerciseId.isBlank() -> "El identificador del ejercicio no es válido"
                     else -> null
                 }
@@ -244,7 +244,7 @@ class WorkoutExerciseSetupViewModel (
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        saveError = "No se pudo añadir el ejercicio a la rutina"
+                        saveError = "No se pudo añadir el ejercicio al entrenamiento"
                     )
                 }
             } finally {

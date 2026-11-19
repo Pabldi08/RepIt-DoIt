@@ -70,7 +70,7 @@ fun PlanSelectionScreen(
 
         if (!state.isLoadingPlans && state.plansError == null && state.plans.isEmpty()) {
             item {
-                Text("Todavía no tienes planes. Crea uno para organizar tus rutinas.")
+                Text("Todavía no tienes planes. Crea uno para organizar tus entrenamientos.")
             }
         }
 

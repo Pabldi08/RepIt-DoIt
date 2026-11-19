@@ -1,4 +1,3 @@
-
 package com.pad.repitdoit.features.training.data.repository
 
 import com.pad.repitdoit.core.utility.generateId
@@ -11,11 +10,8 @@ import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 import repitdoit.shared.generated.resources.Res
 import repitdoit.shared.generated.resources.training_muscles
 
-class FakeWorkoutRepositoryImpl(
-    private val currentUserId: () -> String? = { "fake-local" }
-) : WorkoutRepository {
-
-    private val seedWorkouts = mapOf(
+class FakeWorkoutRepositoryImpl: WorkoutRepository {
+    private val workouts = mutableMapOf(
         "001" to Workout(
             id = "001",
             name = "Tren Superior",
@@ -242,16 +238,8 @@ class FakeWorkoutRepositoryImpl(
     ) {
 
         val plan = requirePlan(planId)
-
-        require(plan.schedule.any { it.id == scheduleId }) {
-            "La rutina programada no pertenece a este plan"
-        }
-
-        plans[planId] = plan.copy(
-            schedule = plan.schedule.filterNot {
-                it.id == scheduleId
-            }
-        )
+        require(plan.schedule.any { it.id == scheduleId }) { "La rutina programada no pertenece a este plan" }
+        plans[planId] = plan.copy(schedule = plan.schedule.filterNot { it.id == scheduleId })
     }
 
     override suspend fun moveWorkoutToPlanDay(
@@ -261,10 +249,7 @@ class FakeWorkoutRepositoryImpl(
     ) {
 
         val plan = requirePlan(planId)
-
-        val entry = requireNotNull(
-            plan.schedule.find { it.id == scheduleId }
-        ) {
+        val entry = requireNotNull(plan.schedule.find { it.id == scheduleId }) {
             "La rutina programada no pertenece a este plan"
         }
 
@@ -385,12 +370,7 @@ class FakeWorkoutRepositoryImpl(
     ) {
 
         val workout = requireActiveWorkout(workoutId)
-
-        val existing = requireNotNull(
-            workout.workoutExercises.find {
-                it.id == workoutExercise.id
-            }
-        ) {
+        val existing = requireNotNull(workout.workoutExercises.find { it.id == workoutExercise.id }) {
             "El ejercicio no pertenece a la rutina"
         }
 
@@ -425,21 +405,8 @@ class FakeWorkoutRepositoryImpl(
     ) {
 
         val workout = requireActiveWorkout(workoutId)
-
-        require(
-            workout.workoutExercises.any {
-                it.id == workoutExerciseId
-            }
-        ) {
-            "El ejercicio no pertenece a la rutina"
-        }
-
-        workouts[workoutId] = workout.copy(
-            workoutExercises = workout.workoutExercises
-                .filterNot {
-                    it.id == workoutExerciseId
-                }
-        )
+        require(workout.workoutExercises.any { it.id == workoutExerciseId }) { "El ejercicio no pertenece a la rutina" }
+        workouts[workoutId] = workout.copy(workoutExercises = workout.workoutExercises.filterNot { it.id == workoutExerciseId })
     }
 
     override suspend fun getAllWorkouts(): List<Workout> {
@@ -449,20 +416,9 @@ class FakeWorkoutRepositoryImpl(
         }
     }
 
-    private fun requireActiveWorkout(
-        workoutId: String
-    ): Workout {
-
-        val workout = requireNotNull(
-            workouts[workoutId]
-        ) {
-            "La rutina no existe o no pertenece al usuario"
-        }
-
-        require(workoutId !in archivedWorkoutIds) {
-            "La rutina esta archivada"
-        }
-
+    private fun requireActiveWorkout(workoutId: String): Workout {
+        val workout = requireNotNull(workouts[workoutId]) { "La rutina no existe o no pertenece al usuario" }
+        require(workoutId !in archivedWorkoutIds) { "La rutina esta archivada" }
         return workout
     }
 }

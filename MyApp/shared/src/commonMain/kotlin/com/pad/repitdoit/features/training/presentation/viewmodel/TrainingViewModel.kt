@@ -44,12 +44,6 @@ class TrainingViewModel(
 
     fun onAction(action: TrainingAction) {
         when(action) {
-            is TrainingAction.SelectExercise -> selectExercise(action.workoutExerciseId)
-            is TrainingAction.ChangeRestSec -> editExercise(action.workoutExerciseId, ExerciseField.Rest, action.value)
-            is TrainingAction.ChangeWeight -> editExercise(action.workoutExerciseId, ExerciseField.Weight, action.value)
-            is TrainingAction.ChangeNumSeries -> editExercise(action.workoutExerciseId, ExerciseField.Series, action.value)
-            is TrainingAction.ChangeNumReps -> editExercise(action.workoutExerciseId, ExerciseField.Reps, action.value)
-            is TrainingAction.RemoveWorkout -> removeWorkout(action.workoutId)
             is TrainingAction.CreatePlan -> updatePlan("No se pudo crear el plan") {
                 val plan = appContainer.createTrainingPlanUseCase(action.name)
                 appContainer.selectTrainingPlanUseCase(plan.id)
@@ -60,15 +54,21 @@ class TrainingViewModel(
             is TrainingAction.DeletePlan -> updatePlan("No se pudo eliminar el plan") {
                 appContainer.deleteTrainingPlanUseCase(action.planId)
             }
-            is TrainingAction.AddWorkoutToPlan -> updatePlan("No se pudo añadir la rutina al plan") {
+            is TrainingAction.AddWorkoutToPlan -> updatePlan("No se pudo añadir el entrenamiento al plan") {
                 appContainer.addWorkoutToPlanUseCase(action.planId, action.workoutId, action.weekday)
             }
-            is TrainingAction.RemoveWorkoutFromPlan -> updatePlan("No se pudo quitar la rutina del plan") {
+            is TrainingAction.RemoveWorkoutFromPlan -> updatePlan("No se pudo quitar el entrenamiento del plan") {
                 appContainer.removeWorkoutFromPlanUseCase(action.planId, action.scheduleId)
             }
-            is TrainingAction.MoveWorkoutToPlanDay -> updatePlan("No se pudo cambiar la rutina de día") {
+            is TrainingAction.MoveWorkoutToPlanDay -> updatePlan("No se pudo cambiar el día del entrenamiento") {
                 appContainer.moveWorkoutToPlanDayUseCase(action.planId, action.scheduleId, action.weekday)
             }
+            is TrainingAction.SelectExercise -> selectExercise(action.workoutExerciseId)
+            is TrainingAction.ChangeRestSec -> editExercise(action.workoutExerciseId, ExerciseField.Rest, action.value)
+            is TrainingAction.ChangeWeight -> editExercise(action.workoutExerciseId, ExerciseField.Weight, action.value)
+            is TrainingAction.ChangeNumSeries -> editExercise(action.workoutExerciseId, ExerciseField.Series, action.value)
+            is TrainingAction.ChangeNumReps -> editExercise(action.workoutExerciseId, ExerciseField.Reps, action.value)
+            is TrainingAction.RemoveWorkout -> removeWorkout(action.workoutId)
             is TrainingAction.createWorkout -> createWorkout(action.name)
             is TrainingAction.SelectPlan -> selectPlan(action.planId)
             is TrainingAction.renameWorkout -> renameWorkout(action.workoutId, action.name)
@@ -348,7 +348,7 @@ class TrainingViewModel(
                 throw e
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = "No se pudo eliminar la rutina")
+                    it.copy(errorMessage = "No se pudo eliminar el entrenamiento")
                 }
             }
         }

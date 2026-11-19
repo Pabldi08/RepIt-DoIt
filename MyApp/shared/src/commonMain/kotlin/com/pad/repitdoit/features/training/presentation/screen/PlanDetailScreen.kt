@@ -50,14 +50,14 @@ fun PlanDetailScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
-                        Text("Rutinas del día", style = MaterialTheme.typography.titleMedium)
+                        Text("Entrenamientos del día", style = MaterialTheme.typography.titleMedium)
                         TextButton(enabled = !isSaving, onClick = {
                             onShowDialog(TrainingDialog.AddWorkoutToPlan(plan.id, weekday))
-                        }) { Text("Añadir rutina") }
+                        }) { Text("Añadir entrenamiento") }
                     }
                     if (entries.isEmpty()) {
                         Text(
-                            "No hay rutinas programadas para este día. Puedes añadir una.",
+                            "No hay entrenamientos programados para este día. Puedes añadir uno.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -72,7 +72,7 @@ fun PlanDetailScreen(
                         Text(entry.workoutName, style = MaterialTheme.typography.titleMedium)
                         Text("${entry.numEx} ejercicios")
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            TextButton(onClick = { onWorkoutDetails(entry.workoutId) }) { Text("Ver rutina") }
+                            TextButton(onClick = { onWorkoutDetails(entry.workoutId) }) { Text("Ver entrenamiento") }
                             TextButton(enabled = !isSaving, onClick = {
                                 onAction(TrainingAction.RemoveWorkoutFromPlan(plan.id, entry.id))
                             }) { Text("Quitar de este día", color = MaterialTheme.colorScheme.error) }

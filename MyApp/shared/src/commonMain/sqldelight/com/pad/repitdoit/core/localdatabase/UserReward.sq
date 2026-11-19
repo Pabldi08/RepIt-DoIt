@@ -23,6 +23,13 @@ insertUserReward:
 INSERT INTO UserReward (id, user_id, reward_id, obtained_at)
 VALUES (:id, :user_id, :reward_id, :obtained_at);
 
+grantUserReward:
+INSERT INTO UserReward (id, user_id, reward_id, obtained_at)
+SELECT :id, :user_id, :reward_id, :obtained_at
+WHERE NOT EXISTS (
+    SELECT 1 FROM UserReward WHERE user_id = :user_id AND reward_id = :reward_id
+);
+
 -- Explicit correction only: this changes the progress window of achievements that require this reward.
 -- Normal grants must preserve obtained_at and handle already-owned rewards.
 updateUserReward:

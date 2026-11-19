@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 private val Background = Color(0xFF0E100F)
 private val Surface = Color(0xFF171A18)
 private val Elevated = Color(0xFF212522)
-private val Accent = Color(0xFFADF238)
+private val Accent = Color(0xFF32C96B)
 private val Text = Color(0xFFF0F2F0)
 private val SecondaryText = Color(0xFF9EA6A1)
 

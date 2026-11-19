@@ -52,10 +52,19 @@ import com.pad.repitdoit.features.training.domain.usecase.GetUsersWorkoutsUseCas
 import com.pad.repitdoit.features.training.domain.usecase.GetUsersTrainingPlansUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.GetExerciseContextUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.AwardCompletedAchievementsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetAchievementsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetRewardsUseCase
+import com.pad.repitdoit.features.gamification.domain.usecase.GetTotalXpUseCase
+import com.pad.repitdoit.features.training.domain.usecase.CompleteWorkoutSessionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
 import com.pad.repitdoit.features.dummy.domain.model.Exercise
 import com.pad.repitdoit.features.dummy.domain.usecase.GetExercisesByMuscleUseCase
+import com.pad.repitdoit.features.profile.data.repository.WorkoutHistoryRepositoryImpl
+import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
+import com.pad.repitdoit.features.profile.domain.repository.WorkoutHistoryRepository
+import com.pad.repitdoit.features.profile.domain.usecase.GetWorkoutHistoryUseCase
 
 interface AppContainer :
     SessionUseCasesAC,
@@ -103,26 +112,23 @@ class DefaultAppContainer(
             CatalogueRepositoryImpl(db, dispatcher)
         }
 
+    private val localGamificationRepository =
+        if (db != null && dispatcher != null) {
+            GamificationRepositoryImpl(db, dispatcher, ::currentUserId)
+        } else {
+            null
+        }
+
+    private val gamificationRepository: GamificationRepository =
+        localGamificationRepository ?: FakeGamificationRepositoryImpl()
+
     private val workoutRepository: WorkoutRepository =
         if (db == null || dispatcher == null) {
             FakeWorkoutRepositoryImpl(::currentUserId)
         } else {
-            WorkoutRepositoryImpl(
-                db,
-                dispatcher,
-                ::currentUserId
-            )
-        }
-
-    private val gamificationRepository: GamificationRepository =
-        if (db == null || dispatcher == null) {
-            FakeGamificationRepositoryImpl()
-        } else {
-            GamificationRepositoryImpl(
-                db,
-                dispatcher,
-                ::currentUserId
-            )
+            WorkoutRepositoryImpl(db, dispatcher, ::currentUserId) { userId ->
+                localGamificationRepository?.awardCompletedAchievementsInTransaction(userId)
+            }
         }
 
     private val profileRepository: ProfileRepository =
@@ -137,6 +143,18 @@ class DefaultAppContainer(
                 ::currentUserId
             )
         }
+    private val workoutHistoryRepository: WorkoutHistoryRepository =
+        if (db == null || dispatcher == null) {
+            object : WorkoutHistoryRepository {
+                override suspend fun getCompletedSessions(
+                    userId: String,
+                    fromTimestamp: Long,
+                    toTimestamp: Long
+                ): List<WorkoutHistoryEntry> = emptyList()
+            }
+        } else {
+            WorkoutHistoryRepositoryImpl(db, dispatcher)
+        }
         
     private val dummyRepository: DummyRepository =
         if (db == null || dispatcher == null) {
@@ -148,6 +166,11 @@ class DefaultAppContainer(
     /*
         USE CASES
      */
+    override val awardCompletedAchievementsUseCase = AwardCompletedAchievementsUseCase(gamificationRepository)
+    override val getAchievementsUseCase = GetAchievementsUseCase(gamificationRepository)
+    override val getTotalXpUseCase = GetTotalXpUseCase(gamificationRepository)
+    override val getRewardsUseCase = GetRewardsUseCase(gamificationRepository)
+    override val completeWorkoutSessionUseCase = CompleteWorkoutSessionUseCase(workoutRepository)
     override val getAllowedAchievementsUseCase = GetAllowedAchievementsUseCase(gamificationRepository)
     override val getHomeDailyWorkoutsUseCase = GetHomeDailyWorkoutsUseCase(homeRepository, ::currentUserId)
     override val getWorkoutUseCase = GetWorkoutUseCase(workoutRepository)
@@ -170,6 +193,7 @@ class DefaultAppContainer(
     override val removeWorkoutUseCase = RemoveWorkoutUseCase(workoutRepository)
     override val renameWorkoutUseCase = RenameWorkoutUseCase(workoutRepository)
     override val getProfileUseCase = GetProfileUseCase(profileRepository)
+    override val getWorkoutHistoryUseCase = GetWorkoutHistoryUseCase(workoutHistoryRepository, ::currentUserId)
     override val createUserUseCase = CreateUserUseCase(sessionRepository)
     override val updateUserUseCase = UpdateUserUseCase(profileRepository)
     override val verifyUserUseCase = VerifyUserUseCase(sessionRepository)

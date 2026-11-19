@@ -7,6 +7,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
@@ -22,6 +23,8 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.pad.repitdoit.features.session.presentation.screen.AuthRoot
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 enum class AppWindowSize {
     Compact,
@@ -32,13 +35,12 @@ enum class AppWindowSize {
 @Composable
 fun App(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit = {
-        ScannerScreen()
-    }
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit = { _ -> },
+    nfcEquipmentIds: Flow<String> = emptyFlow(),
+    toScreen: Route? = null
 ) {
 
     AppTheme {
-
         val session by appContainer
             .getCurrentSessionUseCase()
             .collectAsStateWithLifecycle()
@@ -66,7 +68,9 @@ fun App(
                 } else {
                     AppContent(
                         appContainer,
-                        qrCameraScreen
+                        qrCameraScreen,
+                        nfcEquipmentIds,
+                        toScreen
                     )
                 }
             }
@@ -77,13 +81,16 @@ fun App(
 @Composable
 private fun AppContent(
     appContainer: AppContainer,
-    qrCameraScreen: @Composable () -> Unit
+    qrCameraScreen: @Composable ((String) -> Unit) -> Unit,
+    nfcEquipmentIds: Flow<String>,
+    toScreen: Route?
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize = getWindowSize(windowSizeClass)
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
+    var nfcPanelVisible by remember { mutableStateOf(false) }
     var activeWorkoutId by rememberSaveable { mutableStateOf<String?>(null) }
 
     MainScaffold(
@@ -96,6 +103,8 @@ private fun AppContent(
                 navController.navigate(route) { launchSingleTop = true }
             }
         },
+        nfcPanelVisible = nfcPanelVisible,
+        onNfcPanelVisibilityChange = { nfcPanelVisible = it },
         onQrClick = {
             navController.navigate(Route.QrCamera) {
                 launchSingleTop = true
@@ -116,6 +125,34 @@ private fun AppContent(
             },
             onCloseWorkout = { activeWorkoutId = null }
         )
+    }
+    LaunchedEffect(toScreen) {
+        val route = toScreen ?: return@LaunchedEffect
+        navController.navigate(route) {
+            launchSingleTop = true
+        }
+    }
+    LaunchedEffect(nfcEquipmentIds, navController) {
+        nfcEquipmentIds.collect { equipmentId ->
+            nfcPanelVisible = false
+
+            val currentEntry = navController.currentBackStackEntry
+            val currentMachineId = currentEntry
+                ?.takeIf { it.destination.hasRoute<Route.Catalogue>() }
+                ?.toRoute<Route.Catalogue>()
+                ?.machineId
+
+            if (currentMachineId == equipmentId) return@collect
+
+            navController.navigate(Route.Catalogue(machineId = equipmentId)) {
+                when {
+                    currentMachineId != null ->
+                        popUpTo<Route.Catalogue> { inclusive = true }
+                    currentEntry?.destination?.hasRoute<Route.QrCamera>() == true ->
+                        popUpTo<Route.QrCamera> { inclusive = true }
+                }
+            }
+        }
     }
 }
 

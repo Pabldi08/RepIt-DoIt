@@ -24,7 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
-fun QrCameraScreen() {
+fun QrCameraScreen(onEquipmentId: (String) -> Unit) {
     val context = LocalContext.current
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -71,7 +71,8 @@ fun QrCameraScreen() {
                 CameraPreview(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .weight(1f),
+                    onEquipmentId = onEquipmentId
                 )
             } else {
                 Column(
@@ -100,15 +101,19 @@ fun QrCameraScreen() {
 }
 
 @Composable
-private fun CameraPreview(modifier: Modifier = Modifier) {
+private fun CameraPreview(
+    modifier: Modifier = Modifier,
+    onEquipmentId: (String) -> Unit
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val currentOnEquipmentId by rememberUpdatedState(onEquipmentId)
 
     var viewSurfaceProvider by remember {
         mutableStateOf<Preview.SurfaceProvider?>(null)
     }
     var error by remember { mutableStateOf(false) }
-    var equipmentId by remember { mutableStateOf<String?>(null) }
+    var scanHandled by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier.background(Color.Black),
@@ -130,12 +135,6 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
                 color = Color.White
             )
         }
-
-        equipmentId?.let { id ->
-            Surface(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
-                Text("ID leído: $id", modifier = Modifier.padding(12.dp))
-            }
-        }
     }
 
     val previewSurfaceProvider = viewSurfaceProvider ?: return
@@ -150,12 +149,13 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
         var closed = false
         val mainExecutor = ContextCompat.getMainExecutor(context)
         val qrAnalyzer = QrCodeAnalyzer(mainExecutor) { id ->
-            if (!closed && equipmentId == null) {
-                equipmentId = id
+            if (!closed && !scanHandled) {
+                scanHandled = true
                 imageAnalysis.clearAnalyzer()
+                currentOnEquipmentId(id)
             }
         }
-        if (equipmentId == null) {
+        if (!scanHandled) {
             imageAnalysis.setAnalyzer(mainExecutor, qrAnalyzer.analyzer)
         }
 

@@ -1,10 +1,11 @@
 -- KEY rewards are hidden by presentation logic, not by a visibility column.
--- code identifies rewards such as KEY_LEVEL_0; UUIDs remain the primary keys.
+-- code identifies rewards such as KEY_LEVEL_0; IDs are stable catalog keys.
 CREATE TABLE Reward (
     id TEXT NOT NULL PRIMARY KEY,
     code TEXT NOT NULL UNIQUE CHECK (length(trim(code)) > 0),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
-    reward_type TEXT NOT NULL CHECK (reward_type IN ('KEY', 'BADGE', 'COSMETIC', 'COLLECTIBLE')),
+    reward_type TEXT NOT NULL CHECK (reward_type IN ('KEY', 'BADGE', 'COSMETIC', 'COLLECTIBLE', 'PROFILE_FRAME')),
+    unlock_level INTEGER CHECK (unlock_level > 0),
     asset_url TEXT,
     description TEXT
 );
@@ -31,3 +32,6 @@ WHERE id = :id;
 -- Required or granted rewards are protected by RESTRICT foreign keys.
 deleteReward:
 DELETE FROM Reward WHERE id = :id;
+
+updateRewardUnlockLevel:
+UPDATE Reward SET unlock_level = :unlock_level WHERE id = :id;

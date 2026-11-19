@@ -9,11 +9,13 @@ import com.pad.repitdoit.features.profile.presentation.layout.ProfileLayout
 fun ProfileScreen(
     windowSize: AppWindowSize,
     uiState: ProfileUiState,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onOpenSettings: () -> Unit
 ) {
     ProfileLayout(
         windowSize = windowSize,
         state = uiState,
-        onLogout = onLogout
+        onLogout = onLogout,
+        onOpenSettings = onOpenSettings
     )
 }

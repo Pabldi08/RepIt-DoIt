@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.OnBackHandler
 import com.pad.repitdoit.features.training.domain.model.Workout
-import com.pad.repitdoit.features.training.presentation.WorkoutSessionState
-import com.pad.repitdoit.features.training.presentation.workoutClockMillis
+import com.pad.repitdoit.features.training.presentation.state.WorkoutSessionState
+import com.pad.repitdoit.features.training.presentation.state.workoutClockMillis
 import com.pad.repitdoit.features.training.presentation.layout.WorkoutSessionLayout
 import kotlinx.coroutines.delay
 
@@ -21,8 +21,10 @@ internal fun WorkoutSessionScreenRoot(
 ) {
     var confirmExit by remember(session) { mutableStateOf(false) }
     val duration = session.finishedElapsed
+    val completion = session.completionResult
     OnBackHandler(enabled = isCurrent) {
-        if (duration == null) confirmExit = !confirmExit else onExit()
+        if (duration == null) confirmExit = !confirmExit
+        else if (completion?.isSuccess == true) onExit()
     }
 
     if (confirmExit && isCurrent) {
@@ -42,8 +44,23 @@ internal fun WorkoutSessionScreenRoot(
     if (workout != null && workout.workoutExercises.isNotEmpty()) {
         if (duration == null) {
             session.WorkoutSession(workout, isCurrent, onExitRequested = { confirmExit = true })
-        } else {
+        } else if (completion?.isSuccess == true) {
             WorkoutSessionSummaryScreen(workout, duration, onExit)
+        } else {
+            Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
+                if (completion == null) {
+                    CircularProgressIndicator()
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text("No se pudo guardar el entrenamiento.")
+                        Button(onClick = { session.completionAttempt++ }) { Text("Reintentar") }
+                        TextButton(onClick = { confirmExit = true }) { Text("Salir") }
+                    }
+                }
+            }
         }
         return
     }
@@ -60,7 +77,7 @@ internal fun WorkoutSessionScreenRoot(
                     when {
                         result?.isFailure == true -> "No se pudo cargar el entrenamiento."
                         workout == null -> "El entrenamiento no está disponible."
-                        else -> "Añade ejercicios a la rutina para empezar."
+                        else -> "Añade ejercicios al entrenamiento para empezar."
                     }
                 )
                 if (result?.isFailure == true) {

@@ -75,7 +75,7 @@ fun TrainingCard(
                 Text(
                     text = title,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Button(
@@ -93,19 +93,10 @@ fun TrainingCard(
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
-                painter = painterResource(image),
-                contentDescription = "Imagen del entrenamiento: $title",
-                modifier = Modifier
-                    .weight(1f)
-                    .height(160.dp),
-                contentScale = ContentScale.Fit
-            )
-
             Column(
                 modifier = Modifier.weight(1.5f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
