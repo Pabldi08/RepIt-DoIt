@@ -40,7 +40,7 @@ fun ProfileScreenRoot(windowSize: AppWindowSize, appContainer: AppContainer) {
             .atStartOfDayIn(timeZone)
             .toEpochMilliseconds()
 
-        viewModel.loadWorkoutHistory(fromTimestamp, toTimestamp)
+        viewModel.loadWorkoutHistory(fromTimestamp, toTimestamp, today, timeZone)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

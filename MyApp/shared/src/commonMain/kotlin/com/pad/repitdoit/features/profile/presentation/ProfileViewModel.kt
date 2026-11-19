@@ -10,14 +10,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.pad.repitdoit.features.profile.domain.usecase.WeeklyWorkoutProgressCalculator
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 
 class ProfileViewModel(
     getProfileUseCase: GetProfileUseCase,
     private val getWorkoutHistoryUseCase: GetWorkoutHistoryUseCase,
-    private val getTotalXpUseCase: GetTotalXpUseCase
+    private val getTotalXpUseCase: GetTotalXpUseCase,
+
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val getWeeklyWorkoutProgress = WeeklyWorkoutProgressCalculator()
 
     init {
         viewModelScope.launch {
@@ -26,14 +32,25 @@ class ProfileViewModel(
         }
     }
 
-    fun loadWorkoutHistory(fromTimestamp: Long, toTimestamp: Long) {
+    fun loadWorkoutHistory(
+        fromTimestamp: Long,
+        toTimestamp: Long,
+        today: LocalDate,
+        timeZone: TimeZone
+    ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isHistoryLoading = true, historyError = null) }
 
             try {
                 val history = getWorkoutHistoryUseCase(fromTimestamp, toTimestamp)
+                val weeklyProgress = getWeeklyWorkoutProgress(history, today, timeZone)
+
                 _uiState.update {
-                    it.copy(workoutHistory = history, isHistoryLoading = false)
+                    it.copy(
+                        workoutHistory = history,
+                        weeklyWorkoutProgress = weeklyProgress,
+                        isHistoryLoading = false
+                    )
                 }
             } catch (error: CancellationException) {
                 throw error

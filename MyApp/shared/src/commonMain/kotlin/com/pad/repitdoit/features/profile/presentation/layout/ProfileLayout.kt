@@ -25,6 +25,15 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.SolidColor
+import io.github.koalaplot.core.line.LinePlot
+import io.github.koalaplot.core.style.LineStyle
+import io.github.koalaplot.core.xygraph.DefaultPoint
+import io.github.koalaplot.core.xygraph.XYGraph
+import io.github.koalaplot.core.xygraph.rememberAxisContent
+import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
+import kotlinx.datetime.number
 
 @Composable
 internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState) {
@@ -66,12 +75,12 @@ internal fun ProfileLayout(windowSize: AppWindowSize, state: ProfileUiState) {
                         horizontalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         WorkoutHistorySection(state, Modifier.weight(1f))
-                        WorkoutProgressPlaceholder(Modifier.weight(1f))
+                        WorkoutProgressCard(state, Modifier.weight(1f))
                     }
                 }
             } else {
                 item { WorkoutHistorySection(state) }
-                item { WorkoutProgressPlaceholder() }
+                item { WorkoutProgressCard(state) }
             }
         }
     }
@@ -96,19 +105,83 @@ private fun WorkoutHistorySection(state: ProfileUiState, modifier: Modifier = Mo
 }
 
 @Composable
-private fun WorkoutProgressPlaceholder(modifier: Modifier = Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Progreso · Últimos 7 días", style = MaterialTheme.typography.titleMedium)
+private fun WorkoutProgressCard(
+    state: ProfileUiState,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Progreso de los últimos 7 días",
+            style = MaterialTheme.typography.titleMedium
+        )
+
         OutlinedCard(
-            modifier = Modifier.fillMaxWidth().height(180.dp),
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp)
         ) {
-            Text(
-                text = "Gráfica pendiente",
-                modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(modifier = Modifier.padding(16.dp)) {
+                when {
+                    state.isHistoryLoading -> Text("Cargando progreso…")
+                    state.historyError != null -> Text("No se pudo cargar el progreso.")
+                    state.weeklyWorkoutProgress.isEmpty() -> Text("Sin datos de progreso.")
+                    else -> {
+                        val week = state.weeklyWorkoutProgress
+                        val points = remember(week) {
+                            week.mapIndexed { index, day ->
+                                DefaultPoint((index + 1).toFloat(), day.minutes)
+                            }
+                        }
+
+                        val maxMinutes = week.maxOf { it.minutes }
+                        val axisMax = kotlin.math.ceil(maxMinutes / 60f)
+                            .coerceAtLeast(1f) * 60f
+
+                        XYGraph(
+                            xAxisModel = rememberFloatLinearAxisModel(
+                                range = 1f..7f,
+                                minimumMajorTickIncrement = 1f,
+                                minorTickCount = 0
+                            ),
+                            yAxisModel = rememberFloatLinearAxisModel(
+                                range = 0f..axisMax,
+                                minimumMajorTickIncrement = axisMax / 4f,
+                                minorTickCount = 0
+                            ),
+                            xAxisContent = rememberAxisContent(
+                                labels = { position ->
+                                    val date = week.getOrNull(position.toInt() - 1)?.date
+                                    if (date != null) {
+                                        Text(
+                                            text = "${date.day}/${date.month.number}",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
+                            ),
+                            yAxisContent = rememberAxisContent(
+                                labels = { minutes ->
+                                    Text(
+                                        text = "${minutes.toInt()} min",
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            ),
+                            modifier = Modifier.fillMaxWidth().height(200.dp)
+                        ) {
+                            LinePlot(
+                                data = points,
+                                lineStyle = LineStyle(
+                                    brush = SolidColor(MaterialTheme.colorScheme.primary),
+                                    strokeWidth = 2.dp
+                                )
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
