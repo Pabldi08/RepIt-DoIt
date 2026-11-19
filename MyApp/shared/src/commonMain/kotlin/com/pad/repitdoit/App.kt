@@ -17,7 +17,6 @@ import com.pad.repitdoit.core.ui.theme.AppTheme
 import com.pad.repitdoit.navigation.AppNavigation
 import com.pad.repitdoit.navigation.MainScaffold
 import com.pad.repitdoit.navigation.Route
-import com.pad.repitdoit.navigation.ScannerScreen
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle

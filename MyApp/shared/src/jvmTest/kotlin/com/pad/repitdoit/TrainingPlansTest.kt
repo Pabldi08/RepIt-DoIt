@@ -17,7 +17,7 @@ import java.nio.file.Files
 class TrainingPlansTest {
     @Test
     fun fakeSelectionKeepsOnlyOneActivePlan() = runBlocking {
-        val container = DefaultAppContainer()
+        val container = signedInFakeContainer()
         val first = container.createTrainingPlanUseCase("Primero")
         val second = container.createTrainingPlanUseCase("Segundo")
         container.selectTrainingPlanUseCase(first.id)
@@ -41,6 +41,7 @@ class TrainingPlansTest {
                 val db = RepItDoItDatabase(driver)
                 testDb(db).apply { loadInitialDatabase(); seed() }
                 val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+                container.loginAsDemoUser()
                 val first = container.createTrainingPlanUseCase("Primero")
                 val second = container.createTrainingPlanUseCase("Segundo")
                 selectedId = second.id
@@ -68,6 +69,7 @@ class TrainingPlansTest {
             }
             JdbcSqliteDriver("jdbc:sqlite:${file.toAbsolutePath()}").use { driver ->
                 val reopened = DefaultAppContainer(RepItDoItDatabase(driver), Dispatchers.Unconfined)
+                reopened.loginAsDemoUser()
                 assertEquals(selectedId, reopened.getUsersTrainingPlansUseCase().single { it.isActive }.id)
             }
         } finally {
@@ -136,7 +138,7 @@ class TrainingPlansTest {
 
     @Test
     fun editsPlansInFakeRepository() = runBlocking {
-        verifyPlanEditing(DefaultAppContainer(), "001")
+        verifyPlanEditing(signedInFakeContainer(), "001")
     }
 
     @Test
@@ -147,6 +149,7 @@ class TrainingPlansTest {
             val db = RepItDoItDatabase(driver)
             testDb(db).apply { loadInitialDatabase(); seed() }
             val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            container.loginAsDemoUser()
             verifyPlanEditing(container, "test-workout-001")
 
             db.userQueries.insertUser("other-user", "other-user", "Otro usuario", null)
@@ -195,7 +198,9 @@ class TrainingPlansTest {
                 "other-plan", "other-user", "Plan ajeno", 3000L, 3000L
             )
 
-            val load = DefaultAppContainer(db, Dispatchers.Unconfined).getUsersTrainingPlansUseCase
+            val container = DefaultAppContainer(db, Dispatchers.Unconfined)
+            container.loginAsDemoUser()
+            val load = container.getUsersTrainingPlansUseCase
             val plans = load()
             assertEquals(listOf("test-plan-001", "empty-plan"), plans.map { it.id })
             assertTrue(plans.single { it.id == "empty-plan" }.schedule.isEmpty())
