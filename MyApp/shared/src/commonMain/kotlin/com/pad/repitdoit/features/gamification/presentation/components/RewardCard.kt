@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.gamification.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,7 +37,9 @@ fun RewardCard(
 
     OutlinedCard(
         modifier = modifier,
-        onClick = { showDetails = true }
+        onClick = { showDetails = true },
+        border = if (reward.isOwned) BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                    else CardDefaults.outlinedCardBorder()
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(8.dp),

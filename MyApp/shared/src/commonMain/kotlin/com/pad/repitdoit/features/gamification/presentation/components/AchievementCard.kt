@@ -31,6 +31,7 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.gamification.domain.model.Achievement
 import com.pad.repitdoit.features.gamification.domain.model.AchievementStatus
 import com.pad.repitdoit.features.gamification.domain.model.ConditionLogic
+import com.pad.repitdoit.features.gamification.domain.model.RewardType
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -101,11 +102,13 @@ fun AchievementCard(
                         AchievementStatus.AVAILABLE -> AchievementProgress(achievement)
                         AchievementStatus.LOCKED -> Text("Bloqueado")
                     }
-                    if (achievement.xpReward > 0) {
-                        Text("+${achievement.xpReward} XP")
-                    }
-                    achievement.rewards.forEach { reward ->
-                        Text(reward.name)
+                    if (status != AchievementStatus.LOCKED) {
+                        if (achievement.xpReward > 0) {
+                            Text("+${achievement.xpReward} XP")
+                        }
+                        achievement.rewards.filterNot { it.type == RewardType.KEY }.forEach { reward ->
+                            Text(reward.name)
+                        }
                     }
                 }
             },

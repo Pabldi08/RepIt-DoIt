@@ -1,6 +1,7 @@
 package com.pad.repitdoit
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID
 import com.pad.repitdoit.core.localdatabase.RepItDoItDatabase
 import com.pad.repitdoit.core.localdatabase.testDb
 import kotlin.test.Test
@@ -27,14 +28,28 @@ class InitialCatalogTest {
             assertEquals(12, achievements.size)
             assertEquals(listOf(50L, 100L, 150L, 250L, 400L, 750L, 100L, 150L, 50L, 75L, 100L, 150L),
                 achievements.sortedBy { it.code }.map { it.xp_reward })
-            assertEquals(7, db.rewardQueries.selectAllRewards().executeAsList().size)
+            val predecessors = mapOf(
+                "A02" to "A01", "A03" to "A02", "A04" to "A03", "A05" to "A04",
+                "A06" to "A05", "D02" to "D01", "F02" to "F01"
+            )
+            assertEquals(14, db.rewardQueries.selectAllRewards().executeAsList().size)
             assertEquals("PROFILE_FRAME", db.rewardQueries.selectRewardByCode("R01").executeAsOne().reward_type)
             assertEquals(15L, db.rewardQueries.selectRewardByCode("R02").executeAsOne().unlock_level)
             achievements.forEach {
-                assertEquals("KEY_LEVEL_0", it.required_reward_id)
+                assertEquals(
+                    if (it.code in predecessors) "KEY_${it.code}" else "KEY_LEVEL_0",
+                    it.required_reward_id
+                )
                 assertEquals(1, db.achievementConditionQueries.selectConditionsByAchievement(it.id).executeAsList().size)
             }
-            assertEquals("R08", db.achievementRewardQueries.selectRewardsByAchievement("A03").executeAsOne().reward_id)
+            predecessors.forEach { (next, previous) ->
+                val key = db.rewardQueries.selectRewardByCode("KEY_$next").executeAsOne()
+                assertEquals("KEY", key.reward_type)
+                assertEquals(key.id,
+                    db.achievementRewardQueries.selectAchievementReward(previous, key.id).executeAsOne().reward_id)
+            }
+            assertEquals(setOf("R08", "KEY_A04"), db.achievementRewardQueries
+                .selectRewardsByAchievement("A03").executeAsList().map { it.reward_id }.toSet())
             assertEquals("DISTINCT_EXERCISE_COUNT", db.achievementConditionQueries.selectConditionsByAchievement("D02").executeAsOne().condition_type)
             val exercises = db.exerciseQueries.selectAllExercises().executeAsList()
             assertEquals(112, exercises.size)
@@ -53,7 +68,21 @@ class InitialCatalogTest {
 
             loader.seed()
             loader.seed()
-            assertEquals(1, db.userRewardQueries.selectRewardsByUser(com.pad.repitdoit.core.localdatabase.LOCAL_TEST_USER_ID).executeAsList().size)
+            assertEquals(1, db.userRewardQueries.selectRewardsByUser(LOCAL_TEST_USER_ID).executeAsList().size)
+            val second = db.achievementQueries.selectAchievementByCode("A02").executeAsOne()
+            db.achievementQueries.updateAchievement(
+                "KEY_LEVEL_0", second.code, second.name, second.description,
+                second.condition_logic, second.icon_url, second.id
+            )
+            db.achievementRewardQueries.deleteAchievementReward("A01", "KEY_A02")
+            db.userAchievementQueries.insertUserAchievement("old-award", LOCAL_TEST_USER_ID, "A01", 42L)
+            loader.loadInitialDatabase()
+            loader.loadInitialDatabase()
+            val owned = db.userRewardQueries.selectRewardsByUser(LOCAL_TEST_USER_ID).executeAsList()
+            assertEquals(setOf("KEY_LEVEL_0", "KEY_A02"), owned.map { it.reward_id }.toSet())
+            assertEquals(42L, owned.single { it.reward_id == "KEY_A02" }.obtained_at)
+            assertEquals("KEY_A02",
+                db.achievementQueries.selectAchievementByCode("A02").executeAsOne().required_reward_id)
             assertEquals(exercises, db.exerciseQueries.selectAllExercises().executeAsList())
             val workoutExercises = db.workoutExerciseQueries
                 .selectExercisesByWorkout("test-workout-001").executeAsList()

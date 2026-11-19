@@ -1,5 +1,7 @@
 package com.pad.repitdoit.core.localdatabase
 
+import com.pad.repitdoit.core.utility.generateId
+
 class testDb(
     private val database: RepItDoItDatabase
 ) {
@@ -180,20 +182,50 @@ class testDb(
         seedCatalogReward("R09", "Shaker de energía", "COLLECTIBLE", "Alcanza el nivel 10.", 10L, assetUrl = "imageRewardEnergyShaker")
         seedCatalogReward("R10", "Zapatillas veloces", "COLLECTIBLE", "Completa 10 ejercicios diferentes del catálogo.", assetUrl = "imageRewardSpeedyShoes")
 
-        seedCatalogAchievement("A01", "Primer paso", "¡Todo empieza con un primer entrenamiento!", "WORKOUT_COUNT", 1, 50, "R07")
-        seedCatalogAchievement("A02", "Calentando motores", "Ya estás cogiendo el ritmo.", "WORKOUT_COUNT", 5, 100)
-        seedCatalogAchievement("A03", "En marcha", "Entrenar empieza a convertirse en un hábito.", "WORKOUT_COUNT", 10, 150, "R08")
-        seedCatalogAchievement("A04", "No hay quien te pare", "¡25 entrenamientos a tus espaldas!", "WORKOUT_COUNT", 25, 250)
-        seedCatalogAchievement("A05", "Máquina de entrenar", "El gimnasio ya es tu territorio.", "WORKOUT_COUNT", 50, 400)
-        seedCatalogAchievement("A06", "Leyenda del gimnasio", "Has completado nada menos que 100 entrenamientos.", "WORKOUT_COUNT", 100, 750)
+        seedCatalogAchievement("A01", "Primer paso", "¡Todo empieza con un primer entrenamiento!\nCompleta 1 entrenamiento.", "WORKOUT_COUNT", 1, 50, "R07", icon_url = "iconLogroEntrenamiento")
+        seedCatalogAchievement("A02", "Calentando motores", "Ya estás cogiendo el ritmo.\nCompleta 5 entrenamientos.", "WORKOUT_COUNT", 5, 100, icon_url = "iconLogroEntrenamiento")
+        seedCatalogAchievement("A03", "En marcha", "Entrenar empieza a convertirse en un hábito.\nCompleta 10 entrenamientos.", "WORKOUT_COUNT", 10, 150, "R08", icon_url = "iconLogroEntrenamiento")
+        seedCatalogAchievement("A04", "No hay quien te pare", "¡Muchos entrenamientos a tus espaldas!\nCompleta 25 entrenamientos.", "WORKOUT_COUNT", 25, 250, icon_url = "iconLogroEntrenamiento")
+        seedCatalogAchievement("A05", "Máquina de entrenar", "El gimnasio ya es tu territorio.\nCompleta 50 entrenamientos.", "WORKOUT_COUNT", 50, 400, icon_url = "iconLogroEntrenamiento")
+        seedCatalogAchievement("A06", "Leyenda del gimnasio", "Has completado nada menos que 100 entrenamientos.", "WORKOUT_COUNT", 100, 750, icon_url = "iconLogroEntrenamiento")
         // Count distinct Exercise.id values, never WorkoutExercise appearances.
-        seedCatalogAchievement("D01", "Explorador", "Descubre nuevas formas de entrenar.", "DISTINCT_EXERCISE_COUNT", 5, 100)
-        seedCatalogAchievement("D02", "Nuevos horizontes", "La variedad también forma parte del progreso.", "DISTINCT_EXERCISE_COUNT", 10, 150, "R10")
-        seedCatalogAchievement("E01", "Mi propio plan", "El primer paso es tener un plan.", "WORKOUT_CREATED_COUNT", 1, 50)
+        seedCatalogAchievement("D01", "Explorador", "Descubre nuevas formas de entrenar.\nPrueba 5 ejercicios distintos.", "DISTINCT_EXERCISE_COUNT", 5, 100, icon_url = "iconLogroExploracion")
+        seedCatalogAchievement("D02", "Nuevos horizontes", "La variedad también forma parte del progreso.\nPrueba 10 ejercicios distintos.", "DISTINCT_EXERCISE_COUNT", 10, 150, "R10", icon_url = "iconLogroExploracion")
+        seedCatalogAchievement("E01", "Mi propio plan", "El primer paso es tener un plan.\nCrea tu primer entrenamiento.", "WORKOUT_CREATED_COUNT", 1, 50, icon_url = "iconLogroOrganizacion")
         // Maximum exercise count in a single routine, regardless of how it was edited.
-        seedCatalogAchievement("E02", "Todo preparado", "Prepara tu entrenamiento con cinco ejercicios.", "WORKOUT_EXERCISE_COUNT", 5, 75)
-        seedCatalogAchievement("F01", "Subiendo de nivel", "¡Ya estás en el nivel 5!", "USER_LEVEL", 5, 100, "R01")
-        seedCatalogAchievement("F02", "Doble dígito", "¡Has alcanzado el nivel 10!", "USER_LEVEL", 10, 150, "R09")
+        seedCatalogAchievement("E02", "Todo preparado", "Prepara tu entrenamiento con cinco ejercicios.", "WORKOUT_EXERCISE_COUNT", 5, 75, icon_url = "iconLogroOrganizacion")
+        seedCatalogAchievement("F01", "Subiendo de nivel", "¡Ya estás en el nivel 5!", "USER_LEVEL", 5, 100, "R01", icon_url = "iconLogroProgreso")
+        seedCatalogAchievement("F02", "Doble dígito", "¡Has alcanzado el nivel 10!", "USER_LEVEL", 10, 150, "R09", icon_url = "iconLogroProgreso")
+
+        seedAchievementChain("A01", "A02", "A03", "A04", "A05", "A06")
+        seedAchievementChain("D01", "D02")
+        seedAchievementChain("F01", "F02")
+    }
+
+    private fun seedAchievementChain(vararg achievementCodes: String) {
+        achievementCodes.toList().zipWithNext().forEach { (previousCode, nextCode) ->
+            val previous = database.achievementQueries.selectAchievementByCode(previousCode).executeAsOne()
+            val next = database.achievementQueries.selectAchievementByCode(nextCode).executeAsOne()
+            val keyCode = "KEY_$nextCode"
+            seedCatalogReward(keyCode, "Clave de ${next.name}", "KEY", "Desbloquea el logro ${next.name}.")
+            val key = database.rewardQueries.selectRewardByCode(keyCode).executeAsOne()
+
+            if (next.required_reward_id != key.id) {
+                database.achievementQueries.updateAchievement(
+                    key.id, next.code, next.name, next.description, next.condition_logic, next.icon_url, next.id
+                )
+            }
+            val achievementRewards = database.achievementRewardQueries
+            if (achievementRewards.selectAchievementReward(previous.id, key.id).executeAsOneOrNull() == null) {
+                achievementRewards.insertAchievementReward(previous.id, key.id)
+            }
+            database.userAchievementQueries.selectUsersMissingAchievementReward(previous.id, key.id)
+                .executeAsList().forEach { award ->
+                    database.userRewardQueries.grantUserReward(
+                        generateId(), award.user_id, key.id, award.unlocked_at
+                    )
+                }
+        }
     }
 
     private fun seedCatalogReward(code: String, name: String, type: String, description: String, level: Long? = null, assetUrl: String? = null) {
@@ -204,7 +236,7 @@ class testDb(
 
     private fun seedCatalogAchievement(
         code: String, name: String, description: String, type: String,
-        target: Int, xp: Long, rewardCode: String? = null
+        target: Int, xp: Long, rewardCode: String? = null, icon_url: String? = null
     ) {
         val existing = database.achievementQueries.selectAchievementByCode(code).executeAsOneOrNull()
         if (existing != null) {
@@ -218,7 +250,7 @@ class testDb(
         }
         seedCatalogReward("KEY_LEVEL_0", "Clave inicial", "KEY", "Acceso a los logros iniciales.")
         val key = database.rewardQueries.selectRewardByCode("KEY_LEVEL_0").executeAsOne()
-        database.achievementQueries.insertAchievement(code, key.id, code, name, description, "ALL", null)
+        database.achievementQueries.insertAchievement(code, key.id, code, name, description, "ALL", icon_url = icon_url)
         database.achievementQueries.updateAchievementXpReward(xp, code)
         database.achievementConditionQueries.insertAchievementCondition(
             id = "$code-condition", achievement_id = code, condition_type = type,
