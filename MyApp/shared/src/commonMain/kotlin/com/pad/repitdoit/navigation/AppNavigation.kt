@@ -48,7 +48,6 @@ fun AppNavigation(
     ) {
         composable<Route.Home>{
             HomeScreenRoot(
-                windowSize = windowSize,
                 appContainer = appContainer,
                 onWorkoutPreview = { workoutId ->
                     navController.navigate(Route.Workout(workoutId))
