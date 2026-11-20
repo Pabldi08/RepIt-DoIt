@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.training.domain.model
 
+// Representa un ejercicio de la rutina junto con sus series, repeticiones y peso.
 data class WorkoutExercise (
     val id: String,
     val exerciseId: String,

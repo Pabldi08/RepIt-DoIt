@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.training.data.mapper
 
 import com.pad.repitdoit.features.training.domain.model.MuscleGroup
 
+// Convierte la información muscular del catálogo a los grupos que usa entrenamiento.
 internal fun toMuscleGroup(
     muscleId: String,
     name: String,

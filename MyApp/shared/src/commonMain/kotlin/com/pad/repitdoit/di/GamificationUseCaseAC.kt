@@ -7,6 +7,7 @@ import com.pad.repitdoit.features.gamification.domain.usecase.GetAchievementsUse
 import com.pad.repitdoit.features.gamification.domain.usecase.GetRewardsUseCase
 import com.pad.repitdoit.features.gamification.domain.usecase.GetTotalXpUseCase
 
+// Agrupa los casos de uso necesarios para consultar el progreso, los logros y las recompensas.
 interface GamificationUseCaseAC {
     val awardCompletedAchievementsUseCase: AwardCompletedAchievementsUseCase
     val getAchievementsUseCase: GetAchievementsUseCase

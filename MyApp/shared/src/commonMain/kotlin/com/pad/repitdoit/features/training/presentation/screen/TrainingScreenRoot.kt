@@ -24,6 +24,7 @@ import com.pad.repitdoit.di.TrainingUseCasesAC
 import com.pad.repitdoit.features.training.presentation.viewmodel.TrainingViewModel
 import com.pad.repitdoit.features.training.presentation.layout.TrainingLayout
 
+// Conecta el estado y las acciones de entrenamiento con su interfaz.
 @Composable
 fun TrainingScreenRoot(
     appContainer: TrainingUseCasesAC,

@@ -15,6 +15,7 @@ import com.pad.repitdoit.features.profile.domain.usecase.WeeklyWorkoutProgressCa
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 
+// Gestiona la carga y actualización del perfil y su historial.
 class ProfileViewModel(
     getProfileUseCase: GetProfileUseCase,
     private val getWorkoutHistoryUseCase: GetWorkoutHistoryUseCase,
@@ -33,6 +34,7 @@ class ProfileViewModel(
         }
     }
 
+    // Carga el historial del periodo solicitado para actualizar el progreso semanal.
     fun loadWorkoutHistory(
         fromTimestamp: Long,
         toTimestamp: Long,
@@ -79,6 +81,7 @@ class ProfileViewModel(
         }
     }
 
+    // Evita iniciar un segundo cierre de sesión mientras hay uno en curso.
     fun logout() {
 
         if (_uiState.value.isLoggingOut) return

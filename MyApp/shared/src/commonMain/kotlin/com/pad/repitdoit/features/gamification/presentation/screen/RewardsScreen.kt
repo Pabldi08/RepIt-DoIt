@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.gamification.presentation.components.RewardCard
 import com.pad.repitdoit.features.gamification.presentation.state.GamificationState
 
+// Presenta las recompensas que el usuario puede consultar.
 @Composable
 fun RewardsScreen(
     state: GamificationState

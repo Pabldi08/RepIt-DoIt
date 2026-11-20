@@ -7,6 +7,7 @@ import com.pad.repitdoit.core.localdatabase.testDb
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+// Verifica el contenido del catálogo inicial.
 class InitialCatalogTest {
     @Test
     fun loadsCatalogWithForeignKeysAndCanBeRepeated() {

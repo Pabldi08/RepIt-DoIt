@@ -5,6 +5,7 @@ import com.pad.repitdoit.features.gamification.domain.repository.GamificationRep
 
 import com.pad.repitdoit.features.gamification.domain.model.Reward
 
+// Ofrece una implementación de prueba para trabajar con la experiencia, los logros y las recompensas.
 class FakeGamificationRepositoryImpl: GamificationRepository {
     override suspend fun awardCompletedAchievements() = Unit
     override suspend fun getTotalXp(): Long = 0

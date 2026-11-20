@@ -58,6 +58,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
 
+// Organiza el contenido principal, la barra de navegación y las opciones para añadir ejercicios.
 @Composable
 fun MainScaffold(
     currentDestination: NavDestination?,
@@ -72,6 +73,7 @@ fun MainScaffold(
     var addMenuExpanded by remember { mutableStateOf(false) }
     var addButtonCenter by remember { mutableStateOf<Offset?>(null) }
     var scaffoldOrigin by remember { mutableStateOf(Offset.Zero) }
+    // Adapta la navegación al tamaño, la orientación y la postura de la ventana.
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val windowSize = LocalWindowInfo.current.containerSize
     val isLandscape = windowSize.width > windowSize.height

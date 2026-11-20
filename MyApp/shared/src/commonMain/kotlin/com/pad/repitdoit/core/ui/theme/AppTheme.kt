@@ -5,6 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+// Centraliza los colores del tema que utilizan las pantallas de Compose.
 private val Background = Color(0xFF0E100F)
 private val Surface = Color(0xFF171A18)
 private val Elevated = Color(0xFF212522)

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 
+// Coloca los nodos de nivel a lo largo del recorrido de progreso.
 private const val LEVELS_PER_SECTION = 5
 
 private val nodeSize = 64.dp

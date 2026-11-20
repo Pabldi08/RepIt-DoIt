@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// Gestiona los formularios de acceso y registro y sus resultados.
 class AuthViewModel(
     private val createUserUseCase: CreateUserUseCase,
     private val loginUseCase: LoginUseCase
@@ -22,6 +23,7 @@ class AuthViewModel(
 
     fun onAction(action: AuthAction) {
 
+        // Ignora nuevas acciones mientras hay una solicitud de autenticación en curso.
         if (_uiState.value.isLoading) return
 
         when (action) {
@@ -129,6 +131,7 @@ class AuthViewModel(
         }
     }
 
+    // Valida los campos del registro antes de solicitar la creación de la cuenta.
     private fun register() {
 
         val state = _uiState.value

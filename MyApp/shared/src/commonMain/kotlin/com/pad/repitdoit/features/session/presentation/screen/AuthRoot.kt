@@ -10,6 +10,7 @@ import com.pad.repitdoit.features.session.presentation.AuthAction
 import com.pad.repitdoit.features.session.presentation.AuthMode
 import com.pad.repitdoit.features.session.presentation.AuthViewModel
 
+// Selecciona el flujo de acceso o registro según el estado de autenticación.
 @Composable
 fun AuthRoot(appContainer: AppContainer) {
 

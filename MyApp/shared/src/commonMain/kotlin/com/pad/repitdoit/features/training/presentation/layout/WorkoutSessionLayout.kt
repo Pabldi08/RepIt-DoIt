@@ -56,6 +56,7 @@ private enum class SessionLayout {
     Portrait, Wide, Flex
 }
 
+// Organiza el temporizador, los controles y los ejercicios de la sesión en curso.
 @Composable
 internal fun WorkoutSessionLayout(
     workout: Workout,
@@ -109,12 +110,14 @@ internal fun WorkoutSessionLayout(
         }
         val rowHeight = if (layout == SessionLayout.Portrait) 76.dp else 64.dp
         val listState = rememberLazyListState()
+        // Desplaza la lista al ejercicio activo cuando cambia la selección.
         LaunchedEffect(exerciseIndex) {
             if (exerciseIndex != 0 || listState.firstVisibleItemIndex != 0) {
                 listState.scrollToItem(exerciseIndex)
             }
         }
 
+        // Cambia la colocación de los controles y la lista según el formato de pantalla.
         when (layout) {
             SessionLayout.Portrait -> Column(
                 Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 16.dp),
@@ -230,6 +233,7 @@ private fun RestTimer(
     onReset: () -> Unit,
     onToggle: () -> Unit
 ) {
+    // Selecciona la imagen del temporizador según la distribución de la sesión.
     val track = when (layout) {
         SessionLayout.Portrait -> loadImage("training_timer_track_compact")
         SessionLayout.Wide -> loadImage("training_timer_track_wide")

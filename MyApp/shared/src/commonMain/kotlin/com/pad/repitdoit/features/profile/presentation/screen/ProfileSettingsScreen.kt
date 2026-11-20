@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Muestra las opciones de configuración del perfil.
 @Composable
 internal fun ProfileSettingsScreen(onBack: () -> Unit) {
     Column(

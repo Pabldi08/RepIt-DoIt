@@ -65,6 +65,7 @@ import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
 import com.pad.repitdoit.features.profile.domain.repository.WorkoutHistoryRepository
 import com.pad.repitdoit.features.profile.domain.usecase.GetWorkoutHistoryUseCase
 
+// Agrupa las dependencias y conecta los repositorios con los casos de uso de la aplicación.
 interface AppContainer :
     SessionUseCasesAC,
     ProfileUseCasesAC,

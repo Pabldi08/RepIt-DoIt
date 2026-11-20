@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+// Ofrece una implementación de prueba para trabajar con las operaciones de autenticación y sesión.
 class FakeSessionRepositoryImpl : SessionRepository {
 
     private val users = mutableMapOf<String, UserCredentials>()

@@ -9,6 +9,7 @@ import com.pad.repitdoit.features.training.domain.model.Workout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+// Verifica la clasificación de entrenamientos con distintas combinaciones de ejercicios.
 class WorkoutClassifierTest {
     private fun exercises(vararg groups: Set<MuscleGroup>): List<WorkoutExercise> =
         groups.mapIndexed { index, muscles ->

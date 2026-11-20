@@ -5,6 +5,7 @@ import com.pad.repitdoit.AppWindowSize
 import com.pad.repitdoit.features.profile.presentation.ProfileUiState
 import com.pad.repitdoit.features.profile.presentation.layout.ProfileLayout
 
+// Presenta la pantalla principal del perfil.
 @Composable
 fun ProfileScreen(
     windowSize: AppWindowSize,

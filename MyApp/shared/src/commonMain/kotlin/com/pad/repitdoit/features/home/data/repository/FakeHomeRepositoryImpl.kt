@@ -4,6 +4,7 @@ import com.pad.repitdoit.features.home.domain.model.HomeDailyWorkout
 import com.pad.repitdoit.features.home.domain.repository.HomeRepository
 import kotlinx.datetime.DayOfWeek
 
+// Ofrece una implementación de prueba para trabajar con los entrenamientos previstos para el inicio.
 class FakeHomeRepositoryImpl: HomeRepository {
     override suspend fun getDailyWorkouts(
         userId: String,

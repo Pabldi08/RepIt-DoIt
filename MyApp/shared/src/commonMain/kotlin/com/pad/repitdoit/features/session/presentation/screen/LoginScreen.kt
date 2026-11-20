@@ -5,6 +5,7 @@ import com.pad.repitdoit.features.session.presentation.AuthAction
 import com.pad.repitdoit.features.session.presentation.AuthUiState
 import com.pad.repitdoit.features.session.presentation.layout.LoginLayout
 
+// Presenta la pantalla de inicio de sesión.
 @Composable
 fun LoginScreen(
     uiState: AuthUiState,

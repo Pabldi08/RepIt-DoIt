@@ -21,6 +21,7 @@ enum class LevelStatus {
     LOCKED
 }
 
+// Representa visualmente un nivel según su estado en el recorrido.
 @Composable
 fun LevelNode(
     level: Int,

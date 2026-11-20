@@ -28,6 +28,7 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.gamification.domain.model.LevelProgress
 import org.jetbrains.compose.resources.painterResource
 
+// Resume el progreso del usuario en una tarjeta de inicio.
 @Composable
 fun ProgressCard(
     progress: LevelProgress?,

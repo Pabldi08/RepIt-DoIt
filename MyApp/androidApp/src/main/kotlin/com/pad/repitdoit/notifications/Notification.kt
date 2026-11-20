@@ -8,6 +8,7 @@ import com.pad.repitdoit.navigation.Route
 import kotlinx.serialization.json.Json
 import java.util.concurrent.TimeUnit
 
+// Reúne la configuración de las notificaciones de Android.
 object Notification {
     fun scheduleNotification(context: Context, title: String, message: String, delaySeconds: Long, toScreen: Route = Route.Home
     ) {

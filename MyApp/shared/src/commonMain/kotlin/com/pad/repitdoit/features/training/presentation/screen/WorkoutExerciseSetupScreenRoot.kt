@@ -9,6 +9,7 @@ import com.pad.repitdoit.di.TrainingUseCasesAC
 import com.pad.repitdoit.features.training.presentation.layout.WorkoutExerciseSetupLayout
 import com.pad.repitdoit.features.training.presentation.viewmodel.WorkoutExerciseSetupViewModel
 
+// Conecta el flujo de configuración de ejercicios con su estado y acciones.
 @Composable
 fun WorkoutExerciseSetupScreenRoot(
     appContainer: TrainingUseCasesAC,
@@ -23,6 +24,7 @@ fun WorkoutExerciseSetupScreenRoot(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val savedWorkoutId = state.selectedWorkout?.id
 
+    // Notifica el resultado cuando se ha guardado el ejercicio y se conoce su entrenamiento.
     LaunchedEffect(state.isSaved, savedWorkoutId) {
         if (state.isSaved && savedWorkoutId != null) {
             onSaved(savedWorkoutId)

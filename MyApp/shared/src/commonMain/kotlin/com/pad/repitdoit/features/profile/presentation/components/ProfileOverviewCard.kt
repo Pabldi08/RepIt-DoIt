@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.utility.loadImage
 import org.jetbrains.compose.resources.painterResource
 
+// Muestra la foto, el nombre y la información principal del perfil.
 @Composable
 fun ProfileOverviewCard(
     name: String,

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.pad.repitdoit.core.ui.common.AppLogo
 import com.pad.repitdoit.core.ui.common.AppName
 
+// Reutiliza la cabecera de las pantallas de autenticación.
 @Composable
 fun AuthHeader(subtitle: String = "") {
 

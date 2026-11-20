@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// Gestiona la selección del ejercicio y los valores que se guardan en el entrenamiento.
 class WorkoutExerciseSetupViewModel (
     private val appContainer: TrainingUseCasesAC,
     private val exerciseId: String,
@@ -174,6 +175,7 @@ class WorkoutExerciseSetupViewModel (
         }
     }
 
+    // Valida los datos del ejercicio y evita envíos repetidos durante el guardado.
     private fun sendForm() {
         val state = _uiState.value
         if (state.isSaving || state.isSaved) return

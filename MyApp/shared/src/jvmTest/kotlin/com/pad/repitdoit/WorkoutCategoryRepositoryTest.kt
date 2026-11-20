@@ -15,6 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertNull
 
+// Comprueba cómo se guarda y recupera la categoría de un entrenamiento.
 class WorkoutCategoryRepositoryTest {
     @Test
     fun realRepositoryLoadsGroupsWhenCreatingReadingAndAdding() = runBlocking {

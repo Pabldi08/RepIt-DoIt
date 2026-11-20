@@ -15,6 +15,7 @@ import com.pad.repitdoit.features.training.presentation.screen.WorkoutExerciseFo
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutSelectionScreen
 import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseSetupState
 
+// Organiza los pasos de selección y configuración de un ejercicio.
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun WorkoutExerciseSetupLayout(

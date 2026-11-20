@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.AppLogo
 import com.pad.repitdoit.core.ui.common.AppName
 
+// Presenta la marca en las pantallas de autenticación de escritorio.
 @Composable
 internal fun AuthDesktopBrand(
     subtitle: String

@@ -6,6 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
+// Verifica las operaciones relacionadas con la experiencia del usuario.
 class UserXpTest {
     @Test
     fun repositoryLoadsXpForTheRequestedUser() = kotlinx.coroutines.runBlocking {

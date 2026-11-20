@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.training.domain.model.ExerciseContext
 
+// Presenta la información de contexto de un ejercicio.
 @Composable
 fun ExerciseContextScreen(exerciseContext: ExerciseContext) {
     LazyColumn(

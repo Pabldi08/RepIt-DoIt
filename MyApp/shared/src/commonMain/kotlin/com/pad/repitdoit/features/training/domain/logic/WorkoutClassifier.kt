@@ -5,6 +5,7 @@ import com.pad.repitdoit.features.training.domain.model.MuscleGroup.*
 import com.pad.repitdoit.features.training.domain.model.WorkoutCategory
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 
+// Determina la categoría de un entrenamiento a partir de sus ejercicios.
 object WorkoutClassifier {
     private const val MIN_KNOWN = 0.60
     private const val DOMINANT = 0.60

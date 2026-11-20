@@ -19,6 +19,7 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
 import org.jetbrains.compose.resources.painterResource
 
+// Resume una sesión completada en el historial del usuario.
 @Composable
 internal fun WorkoutHistoryCard(
     entry: WorkoutHistoryEntry,

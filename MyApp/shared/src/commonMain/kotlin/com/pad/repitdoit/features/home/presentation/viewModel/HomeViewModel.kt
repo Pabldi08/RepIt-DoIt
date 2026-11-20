@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// Carga los entrenamientos del día y el progreso que se muestran en inicio.
 class HomeViewModel (
     private val appContainer: HomeUseCasesAC
 ) : ViewModel() {
@@ -35,6 +36,7 @@ class HomeViewModel (
         }
     }
 
+    // Convierte la experiencia acumulada en el progreso que muestra la pantalla.
     fun loadProgress() {
         progressLoadJob?.cancel()
         progressLoadJob = viewModelScope.launch {
@@ -50,6 +52,7 @@ class HomeViewModel (
         }
     }
 
+    // Actualiza la lista que se muestra como programación del día.
     fun loadDailyWorkouts() {
         viewModelScope.launch {
             val workouts = appContainer.getHomeDailyWorkoutsUseCase()

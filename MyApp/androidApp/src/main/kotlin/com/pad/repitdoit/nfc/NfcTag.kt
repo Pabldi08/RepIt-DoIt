@@ -5,6 +5,7 @@ import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import androidx.core.content.IntentCompat
 
+// Extrae el identificador del equipo de los datos recibidos por NFC.
 private const val EQUIPMENT_MIME_TYPE = "application/vnd.com.example.repitdoit"
 
 internal fun Intent.readNfcEquipmentId(): String? {

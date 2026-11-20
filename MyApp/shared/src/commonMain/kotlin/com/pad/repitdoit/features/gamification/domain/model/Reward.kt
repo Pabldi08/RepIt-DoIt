@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.gamification.domain.model
 
+// Representa una recompensa y su tipo.
 enum class RewardType { KEY, BADGE, COSMETIC, COLLECTIBLE, PROFILE_FRAME }
 
 data class Reward(

@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.training.presentation.state
 import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.domain.model.Workout
 
+// Mantiene los planes, entrenamientos y selecciones que se muestran en la interfaz.
 data class TrainingState(
     val editingExerciseId: String? = null,
     val exerciseEdit: WorkoutExerciseEditState = WorkoutExerciseEditState(),

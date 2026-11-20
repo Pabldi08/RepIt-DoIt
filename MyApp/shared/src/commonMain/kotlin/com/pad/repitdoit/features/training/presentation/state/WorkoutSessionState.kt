@@ -9,6 +9,7 @@ import com.pad.repitdoit.features.training.domain.model.Workout
 import kotlinx.coroutines.CancellationException
 import kotlin.time.Clock
 
+// Mantiene el avance y el temporizador de una sesión activa.
 @Stable
 internal class WorkoutSessionState {
     private var sessionId = generateId()

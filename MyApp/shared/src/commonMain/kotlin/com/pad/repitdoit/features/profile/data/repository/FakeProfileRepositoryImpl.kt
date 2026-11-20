@@ -4,6 +4,7 @@ import com.pad.repitdoit.features.profile.domain.model.User
 import com.pad.repitdoit.features.profile.domain.repository.ProfileRepository
 import com.pad.repitdoit.features.session.data.repositories.FakeSessionRepositoryImpl
 
+// Ofrece una implementación de prueba para trabajar con los datos del perfil.
 class FakeProfileRepositoryImpl(
     private val sessionRepository: FakeSessionRepositoryImpl? = null
 ) : ProfileRepository {

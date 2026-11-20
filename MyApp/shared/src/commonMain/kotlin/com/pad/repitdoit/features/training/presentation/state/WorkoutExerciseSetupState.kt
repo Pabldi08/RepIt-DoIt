@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.training.presentation.state
 import com.pad.repitdoit.features.training.domain.model.ExerciseContext
 import com.pad.repitdoit.features.training.domain.model.Workout
 
+// Agrupa la selección del ejercicio y los valores del formulario de configuración.
 data class WorkoutExerciseSetupState(
     val exerciseContext: ExerciseContext? = null,
     val availableWorkouts: List<Workout> = emptyList(),

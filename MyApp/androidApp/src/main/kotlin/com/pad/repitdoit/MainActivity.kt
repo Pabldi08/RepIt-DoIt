@@ -21,6 +21,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.json.Json
 
+// Aloja la interfaz Android y recibe las lecturas NFC de la actividad.
 class MainActivity : ComponentActivity() {
     private val nfcScans = Channel<String>(Channel.BUFFERED)
     private val nfcEquipmentIds = nfcScans.receiveAsFlow()
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Procesa lecturas NFC recibidas mientras la actividad ya está abierta.
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         toScreen = jsonToRoute(intent)
@@ -65,6 +67,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    // Recupera el destino que se incluyó al crear la notificación.
     private fun jsonToRoute(intent: Intent?): Route? {
         val json = intent?.getStringExtra(EXTRA_TO_SCREEN) ?: return null
         return runCatching { Json.decodeFromString(Route.serializer(), json) }.getOrNull()

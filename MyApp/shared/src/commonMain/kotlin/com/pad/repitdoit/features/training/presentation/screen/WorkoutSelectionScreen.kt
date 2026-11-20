@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.training.domain.model.Workout
 
+// Muestra los entrenamientos disponibles para seleccionar.
 @Composable
 fun WorkoutSelectionScreen(
     workouts: List<Workout>,

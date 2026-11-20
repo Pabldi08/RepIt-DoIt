@@ -16,6 +16,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
+// Conecta el estado y las acciones del perfil con sus pantallas.
 @Composable
 fun ProfileScreenRoot(
     windowSize: AppWindowSize,
@@ -31,6 +32,7 @@ fun ProfileScreenRoot(
         )
     }
 
+    // Inicia la carga del perfil cuando la pantalla recibe su modelo de vista.
     LaunchedEffect(viewModel) {
         viewModel.loadTotalXp()
 

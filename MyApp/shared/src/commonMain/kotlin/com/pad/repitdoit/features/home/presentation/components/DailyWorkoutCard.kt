@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.pad.repitdoit.features.home.domain.model.HomeDailyWorkout
 
+// Presenta el entrenamiento previsto para el día.
 @Composable
 fun DailyWorkoutCard(
     workout: HomeDailyWorkout,

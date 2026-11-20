@@ -39,6 +39,7 @@ import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
 import kotlinx.datetime.number
 import androidx.compose.foundation.layout.Spacer
 
+// Distribuye la información del perfil, el progreso semanal y el historial.
 @Composable
 internal fun ProfileLayout(
     windowSize: AppWindowSize,
@@ -247,6 +248,7 @@ private fun historyDayLabel(finishedAt: Long): String {
         .toLocalDateTime(timeZone)
         .date
 
+    // Muestra «Hoy» para distinguir las sesiones de la fecha actual.
     if (sessionDate == today) return "Hoy"
 
     val weekdays = listOf(

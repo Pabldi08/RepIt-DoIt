@@ -8,6 +8,7 @@ import com.pad.repitdoit.di.AppContainer
 import com.pad.repitdoit.di.DefaultAppContainer
 import kotlinx.coroutines.Dispatchers
 
+// Prepara las dependencias de la aplicación para el proceso de Android.
 class RepItDoItApplication : Application() {
 
     lateinit var appContainer: AppContainer

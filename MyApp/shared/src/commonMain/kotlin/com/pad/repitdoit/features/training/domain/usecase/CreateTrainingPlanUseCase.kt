@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.training.domain.usecase
 import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Crea un plan de entrenamiento.
 class CreateTrainingPlanUseCase(private val repository: WorkoutRepository) {
     suspend operator fun invoke(name: String): TrainingPlan {
         val trimmedName = name.trim()

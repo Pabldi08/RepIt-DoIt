@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.isoDayNumber
 
+// Implementa el acceso a los entrenamientos previstos para el inicio para la aplicación.
 class HomeRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher

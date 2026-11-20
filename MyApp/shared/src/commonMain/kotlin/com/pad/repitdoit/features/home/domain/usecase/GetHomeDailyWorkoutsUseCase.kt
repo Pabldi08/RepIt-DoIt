@@ -7,6 +7,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 
+// Consulta los entrenamientos del día para la pantalla de inicio.
 class GetHomeDailyWorkoutsUseCase(
     private val repository: HomeRepository,
     private val currentUserId: () -> String?

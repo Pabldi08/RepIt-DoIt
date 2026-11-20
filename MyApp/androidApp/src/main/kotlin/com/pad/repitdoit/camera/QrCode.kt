@@ -8,6 +8,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import java.util.concurrent.Executor
 
+// Extrae el identificador del equipo de un código QR y analiza las imágenes de la cámara.
 internal fun String.readQrEquipmentId(): String? {
     val uri = Uri.parse(this)
     if (uri.scheme != "repitdoit" || uri.pathSegments.isNotEmpty()) return null

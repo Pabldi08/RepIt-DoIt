@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
+// Implementa el acceso a los entrenamientos, los planes y las sesiones completadas para la aplicación.
 class WorkoutRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,
@@ -22,6 +23,7 @@ class WorkoutRepositoryImpl(
     private val awardAchievements: (String) -> Unit = {}
 ) : WorkoutRepository {
 
+    // Reúne los grupos musculares que se usan al clasificar el entrenamiento.
     private fun loadMuscleGroups(
         exerciseIds: Collection<String>
     ): Map<String, Set<MuscleGroup>> {
@@ -43,6 +45,7 @@ class WorkoutRepositoryImpl(
             "No hay ninguna sesión activa"
         }
 
+    // Comprueba que el plan pertenece al usuario antes de modificarlo.
     private fun requirePlan(
         planId: String,
         userId: String
@@ -242,6 +245,7 @@ class WorkoutRepositoryImpl(
         }
     }
 
+    // Ajusta la programación al mover un entrenamiento entre días.
     override suspend fun moveWorkoutToPlanDay(
         planId: String,
         scheduleId: String,
@@ -331,6 +335,7 @@ class WorkoutRepositoryImpl(
             .executeAsOneOrNull()
             ?: return@withContext null
 
+        // Impide configurar ejercicios que ya no están activos en el catálogo.
         if (exercise.is_active != 1L) {
             return@withContext null
         }
@@ -382,6 +387,7 @@ class WorkoutRepositoryImpl(
         )
     }
 
+    // Registra la sesión completada y actualiza el progreso asociado.
     override suspend fun completeWorkoutSession(
         sessionId: String, workout: Workout, startedAt: Long, finishedAt: Long
     ) = withContext(dispatcher) {

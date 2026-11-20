@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.training.domain.usecase
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Guarda cambios en la configuración de un ejercicio del entrenamiento.
 class UpdateWorkoutExerciseUseCase(
     private val repository: WorkoutRepository
 ) {

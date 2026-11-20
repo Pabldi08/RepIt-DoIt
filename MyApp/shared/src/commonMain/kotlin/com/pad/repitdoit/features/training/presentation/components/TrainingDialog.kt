@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.training.presentation.components
 
+// Representa los diálogos que puede abrir el flujo de entrenamiento.
 sealed interface TrainingDialog {
     data class RemoveWorkout(
         val workoutId: String

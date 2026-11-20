@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Muestra el saludo en las pantallas que lo reutilizan.
 @Composable
 fun Greetings(
     name: String,

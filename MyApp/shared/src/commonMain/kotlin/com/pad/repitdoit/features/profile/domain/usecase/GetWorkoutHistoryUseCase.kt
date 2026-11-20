@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.profile.domain.usecase
 import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
 import com.pad.repitdoit.features.profile.domain.repository.WorkoutHistoryRepository
 
+// Recupera el historial de sesiones completadas.
 class GetWorkoutHistoryUseCase(
     private val repository: WorkoutHistoryRepository,
     private val currentUserId: () -> String?

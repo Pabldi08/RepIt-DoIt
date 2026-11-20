@@ -11,6 +11,7 @@ import com.pad.repitdoit.core.ui.common.Header
 import com.pad.repitdoit.features.home.presentation.state.HomeUIState
 import com.pad.repitdoit.features.home.presentation.components.ProgressCard
 
+// Presenta el contenido principal que el usuario encuentra al entrar.
 @Composable
 fun HomeMainScreen(
     state: HomeUIState,

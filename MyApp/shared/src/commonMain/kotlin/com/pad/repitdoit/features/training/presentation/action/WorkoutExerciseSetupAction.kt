@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.training.presentation.action
 
+// Define los eventos que se pueden emitir al configurar un ejercicio.
 sealed interface WorkoutExerciseSetupAction {
     data class SelectWorkout(
         val workoutId: String

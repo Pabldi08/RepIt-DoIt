@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 
 
+// Reutiliza la presentación de un campo del formulario de entrenamiento.
 @Composable
 fun FormField(
     value: String,

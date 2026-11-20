@@ -16,6 +16,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.time.Clock
 
+// Comprueba el cálculo del progreso y la obtención de logros.
 class AchievementProgressTest {
     @Test
     fun awardsCompletedAchievementsAndChainedRewardsOnlyOnce() = runBlocking {

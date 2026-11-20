@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.training.domain.usecase
 
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Quita un ejercicio de un entrenamiento.
 class RemoveExerciseFromWorkoutUseCase(
     private val repository: WorkoutRepository
 ) {

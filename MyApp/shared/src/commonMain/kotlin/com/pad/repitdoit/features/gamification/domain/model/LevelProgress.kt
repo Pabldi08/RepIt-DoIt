@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.gamification.domain.model
 
+// Representa el nivel y el avance que corresponden a la experiencia acumulada.
 // Level 1 costs 100 XP to complete; each subsequent level costs 50 more.
 data class LevelProgress(
     val level: Int,

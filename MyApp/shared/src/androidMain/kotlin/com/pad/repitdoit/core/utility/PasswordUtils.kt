@@ -6,6 +6,7 @@ import java.util.Base64
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
+// Reúne las operaciones de derivación y comprobación de contraseñas.
 private const val ITERATIONS = 600_000
 
 private fun deriveHash(

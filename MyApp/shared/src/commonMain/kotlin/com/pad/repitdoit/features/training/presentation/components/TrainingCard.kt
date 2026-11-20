@@ -30,6 +30,7 @@ import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+// Resume un entrenamiento y ofrece acciones para consultarlo, iniciarlo o eliminarlo.
 @Composable
 fun TrainingCard(
     title: String,
@@ -94,6 +95,7 @@ fun TrainingCard(
                     ExerciseView(exercise)
                 }
             }
+            // Usa la imagen de la categoría recibida para ilustrar el entrenamiento.
             Image(
                 painter = painterResource(image),
                 contentDescription = "Grupos musculares del entrenamiento",

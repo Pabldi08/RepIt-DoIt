@@ -18,6 +18,7 @@ import com.pad.repitdoit.features.gamification.domain.model.AchievementStatus
 import com.pad.repitdoit.features.gamification.presentation.components.AchievementCard
 import com.pad.repitdoit.features.gamification.presentation.state.GamificationState
 
+// Presenta los logros que el usuario puede consultar.
 @Composable
 fun AchievementScreen(
     state: GamificationState

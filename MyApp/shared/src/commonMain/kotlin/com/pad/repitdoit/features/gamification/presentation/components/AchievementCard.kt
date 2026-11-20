@@ -34,6 +34,7 @@ import com.pad.repitdoit.features.gamification.domain.model.ConditionLogic
 import com.pad.repitdoit.features.gamification.domain.model.RewardType
 import org.jetbrains.compose.resources.painterResource
 
+// Resume un logro y el avance hacia sus condiciones.
 @Composable
 fun AchievementCard(
     achievement: Achievement,

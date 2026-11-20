@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.home.presentation.state.HomeUIState
 import com.pad.repitdoit.features.home.presentation.components.DailyWorkoutCard
 
+// Agrupa el contenido complementario de la pantalla de inicio.
 @Composable
 fun HomeSupportingScreen(
     state: HomeUIState,

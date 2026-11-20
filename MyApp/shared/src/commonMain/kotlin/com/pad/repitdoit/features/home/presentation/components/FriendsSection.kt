@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Presenta el espacio dedicado a amigos en la pantalla de inicio.
 @Composable
 fun FriendsSection(
     friendName: String,

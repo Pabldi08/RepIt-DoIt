@@ -9,6 +9,7 @@ import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.features.training.domain.model.MuscleGroup
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Ofrece una implementación de prueba para trabajar con los entrenamientos, los planes y las sesiones completadas.
 class FakeWorkoutRepositoryImpl(
     private val currentUserId: () -> String? = { "fake-local" }
 ) : WorkoutRepository {
@@ -106,6 +107,7 @@ class FakeWorkoutRepositoryImpl(
 
     private val dataByUser = mutableMapOf<String, UserData>()
 
+    // Obtiene los datos en memoria que corresponden al usuario actual.
     private fun getUserData(): UserData {
 
         val userId = checkNotNull(currentUserId()) {
@@ -272,6 +274,7 @@ class FakeWorkoutRepositoryImpl(
             "La rutina programada no pertenece a este plan"
         }
 
+        // Evita recalcular la programación cuando el entrenamiento ya está en el día solicitado.
         if (entry.weekday == weekday) return
 
         val position = plan.schedule

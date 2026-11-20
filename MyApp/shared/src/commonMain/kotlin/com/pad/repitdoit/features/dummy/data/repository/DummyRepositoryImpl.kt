@@ -6,6 +6,7 @@ import com.pad.repitdoit.features.dummy.domain.repository.DummyRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
+// Implementa el acceso a los ejercicios y músculos del módulo de ejemplo para la aplicación.
 class DummyRepositoryImpl (
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher

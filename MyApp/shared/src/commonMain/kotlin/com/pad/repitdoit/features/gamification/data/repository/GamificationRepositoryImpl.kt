@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
+// Implementa el acceso a la experiencia, los logros y las recompensas para la aplicación.
 class GamificationRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,
@@ -19,6 +20,7 @@ class GamificationRepositoryImpl(
         awardCompletedAchievementsInTransaction(userId)
     }
 
+    // Aplica la concesión de logros dentro de una transacción.
     internal fun awardCompletedAchievementsInTransaction(userId: String) = db.transaction {
         var totalXp = db.userQueries.selectUserById(userId).executeAsOneOrNull()?.total_xp
             ?: return@transaction
@@ -107,6 +109,7 @@ class GamificationRepositoryImpl(
         }
     }
 
+    // Interpreta las condiciones guardadas para calcular el avance del usuario.
     private fun readProgress(
         userId: String,
         condition: AchievementCondition,

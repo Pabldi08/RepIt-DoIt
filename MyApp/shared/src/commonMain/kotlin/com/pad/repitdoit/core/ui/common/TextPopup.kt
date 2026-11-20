@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
+// Presenta un mensaje en una ventana emergente.
 @Composable
 fun textPopup(
     title: String = "",

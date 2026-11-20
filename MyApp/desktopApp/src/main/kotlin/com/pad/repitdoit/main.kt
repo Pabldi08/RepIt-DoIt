@@ -8,6 +8,7 @@ import com.pad.repitdoit.core.localdatabase.testDb
 import com.pad.repitdoit.di.DefaultAppContainer
 import kotlinx.coroutines.Dispatchers
 
+// Abre la ventana de escritorio y monta la aplicación compartida.
 fun main() {
 
     val db = createDatabase(JvmDatabaseDriverFactory())

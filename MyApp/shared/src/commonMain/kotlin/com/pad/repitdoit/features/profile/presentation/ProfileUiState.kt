@@ -4,6 +4,7 @@ import com.pad.repitdoit.features.profile.domain.model.User
 import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
 import com.pad.repitdoit.features.profile.domain.usecase.DailyWorkoutProgress
 
+// Agrupa el perfil y el historial que se muestran al usuario.
 data class ProfileUiState(
     val profile: User? = null,
     val totalXp: Long? = null,

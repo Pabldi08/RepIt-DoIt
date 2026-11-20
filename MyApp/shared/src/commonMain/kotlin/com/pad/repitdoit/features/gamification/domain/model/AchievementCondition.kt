@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.gamification.domain.model
 
+// Describe un requisito que cuenta para completar un logro.
 data class AchievementCondition(
     val id: String,
     val type: String,

@@ -6,6 +6,7 @@ import com.pad.repitdoit.features.session.domain.usecase.LoginUseCase
 import com.pad.repitdoit.features.session.domain.usecase.LogoutUseCase
 import com.pad.repitdoit.features.session.domain.usecase.GetCurrentSessionUseCase
 
+// Agrupa los casos de uso necesarios para gestionar la autenticación y la sesión.
 interface SessionUseCasesAC {
 
     val createUserUseCase: CreateUserUseCase

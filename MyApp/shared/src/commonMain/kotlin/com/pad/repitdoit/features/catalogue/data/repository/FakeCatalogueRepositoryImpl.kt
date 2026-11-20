@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.catalogue.data.repository
 import com.pad.repitdoit.features.catalogue.domain.model.Exercise
 import com.pad.repitdoit.features.catalogue.domain.repository.CatalogueRepository
 
+// Ofrece una implementación de prueba para trabajar con los ejercicios del catálogo y sus asociaciones.
 class FakeCatalogueRepositoryImpl : CatalogueRepository {
     private val exercises = listOf(
         Exercise("10", "Press de banca", null),

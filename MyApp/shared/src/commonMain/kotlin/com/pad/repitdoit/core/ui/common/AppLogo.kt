@@ -7,6 +7,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.pad.repitdoit.core.utility.loadImage
 import org.jetbrains.compose.resources.painterResource
 
+// Muestra el logotipo con el tamaño y la escala indicados por el componente.
 @Composable
 fun AppLogo(
     modifier: Modifier = Modifier

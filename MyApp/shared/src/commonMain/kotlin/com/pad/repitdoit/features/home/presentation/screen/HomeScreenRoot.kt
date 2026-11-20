@@ -10,6 +10,7 @@ import com.pad.repitdoit.di.HomeUseCasesAC
 import com.pad.repitdoit.features.home.presentation.viewModel.HomeViewModel
 import com.pad.repitdoit.features.home.presentation.layout.HomeLayout
 
+// Conecta el estado de inicio con las acciones de la pantalla.
 @Composable
 fun HomeScreenRoot(
     appContainer: HomeUseCasesAC,

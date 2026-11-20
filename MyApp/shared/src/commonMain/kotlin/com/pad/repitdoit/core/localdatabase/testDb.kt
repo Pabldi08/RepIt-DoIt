@@ -5,6 +5,7 @@ import com.pad.repitdoit.core.utility.generateId
 import com.pad.repitdoit.core.utility.hashPassword
 import com.pad.repitdoit.core.utility.matchesPassword
 import kotlin.time.Clock
+// Agrupa las operaciones auxiliares para probar la base de datos.
 class testDb(
     private val database: RepItDoItDatabase
 ) {

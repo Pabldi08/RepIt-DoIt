@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Muestra la información que acompaña al escaneo por NFC.
 @Composable
 fun NfcInfoPanel(
     visible: Boolean,

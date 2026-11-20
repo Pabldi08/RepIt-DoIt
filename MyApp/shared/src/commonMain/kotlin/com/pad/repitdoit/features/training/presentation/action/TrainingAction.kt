@@ -1,6 +1,7 @@
 package com.pad.repitdoit.features.training.presentation.action
 
 
+// Define los eventos que recibe el flujo de planes y entrenamientos.
 //Actions to execute on Training Screens
 sealed interface TrainingAction {
     data class SelectExercise(val workoutExerciseId: String) : TrainingAction

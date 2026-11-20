@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
+// Ofrece una acción reutilizable para volver a la pantalla anterior.
 @Composable
 fun ReturnButton(
     onBack: () -> Unit

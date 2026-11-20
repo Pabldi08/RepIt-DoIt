@@ -24,6 +24,7 @@ private enum class GamificationTab {
     MUSCLES
 }
 
+// Organiza el acceso a las secciones de progreso, logros y recompensas.
 @Composable
 fun GamificationLayout(
     state: GamificationState,
@@ -32,6 +33,7 @@ fun GamificationLayout(
     var selectedTab by rememberSaveable {
         mutableStateOf(GamificationTab.PROGRESS.name)
     }
+    // Conserva el estado guardable de cada sección al cambiar de pestaña.
     val stateHolder = rememberSaveableStateHolder()
 
     Column (

@@ -7,6 +7,7 @@ import com.pad.repitdoit.features.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
+// Implementa el acceso a los datos del perfil para la aplicación.
 class ProfileRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher,

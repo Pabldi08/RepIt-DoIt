@@ -6,6 +6,7 @@ import com.pad.repitdoit.features.catalogue.domain.repository.CatalogueRepositor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
+// Implementa el acceso a los ejercicios del catálogo y sus asociaciones para la aplicación.
 class CatalogueRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher

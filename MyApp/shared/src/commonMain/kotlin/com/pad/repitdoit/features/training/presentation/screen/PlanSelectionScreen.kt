@@ -14,6 +14,7 @@ import com.pad.repitdoit.features.training.presentation.components.TrainingDialo
 import com.pad.repitdoit.features.training.presentation.state.TrainingState
 import org.jetbrains.compose.resources.painterResource
 
+// Lista los planes disponibles y permite seleccionar o gestionar un plan.
 @Composable
 fun PlanSelectionScreen(
     state: TrainingState,

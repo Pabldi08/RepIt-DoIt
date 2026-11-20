@@ -17,6 +17,7 @@ import com.pad.repitdoit.features.training.presentation.action.TrainingAction
 import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseEditState
 import com.pad.repitdoit.features.training.presentation.components.FormField
 
+// Presenta el detalle de un ejercicio dentro de un entrenamiento.
 @Composable
 fun TrainingExerciseDetailScreen(
     exercise: WorkoutExercise,

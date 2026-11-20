@@ -10,6 +10,7 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.gamification.presentation.state.GamificationState
 import org.jetbrains.compose.resources.painterResource
 
+// Complementa el recorrido de niveles con un resumen y accesos a otras secciones.
 @Composable
 fun ProgressSupportingScreen(
     state: GamificationState,

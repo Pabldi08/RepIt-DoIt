@@ -6,6 +6,7 @@ import com.pad.repitdoit.features.profile.domain.repository.WorkoutHistoryReposi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
+// Implementa el acceso a el historial de entrenamientos completados para la aplicación.
 class WorkoutHistoryRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher

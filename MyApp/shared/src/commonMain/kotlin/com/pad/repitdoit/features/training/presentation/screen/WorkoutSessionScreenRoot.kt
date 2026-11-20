@@ -13,6 +13,7 @@ import com.pad.repitdoit.features.training.presentation.state.workoutClockMillis
 import com.pad.repitdoit.features.training.presentation.layout.WorkoutSessionLayout
 import kotlinx.coroutines.delay
 
+// Coordina la sesión de entrenamiento desde la carga hasta el resumen final.
 @Composable
 internal fun WorkoutSessionScreenRoot(
     session: WorkoutSessionState,
@@ -27,6 +28,7 @@ internal fun WorkoutSessionScreenRoot(
         else if (completion?.isSuccess == true) onExit()
     }
 
+    // Pide confirmación antes de abandonar la sesión en curso.
     if (confirmExit && isCurrent) {
         AlertDialog(
             onDismissRequest = { confirmExit = false },
@@ -113,6 +115,7 @@ private fun WorkoutSessionState.WorkoutSession(
     val remaining = ((remainingMillis + 999L) / 1000).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
 
     // Deriving the countdown from the deadline avoids accumulating delay between ticks.
+    // Actualiza la cuenta atrás mientras la sesión está visible.
     LaunchedEffect(isCurrent, deadline) {
         if (!isCurrent) return@LaunchedEffect
         while (true) {

@@ -28,6 +28,7 @@ import com.pad.repitdoit.features.home.presentation.components.DailyWorkoutCard
 import com.pad.repitdoit.features.home.presentation.screen.HomeMainScreen
 import com.pad.repitdoit.features.home.presentation.screen.HomeSupportingScreen
 
+// Distribuye el contenido principal y complementario de inicio.
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun HomeLayout(
@@ -42,6 +43,7 @@ fun HomeLayout(
         maxHorizontalPartitions = if (isExpanded) 2 else 1,
         maxVerticalPartitions = 1
     )
+    // Organiza el contenido principal y el panel complementario con el navegador adaptable.
     val navigator = rememberSupportingPaneScaffoldNavigator<Nothing>(
         scaffoldDirective = directive,
         adaptStrategies = SupportingPaneScaffoldDefaults.adaptStrategies(

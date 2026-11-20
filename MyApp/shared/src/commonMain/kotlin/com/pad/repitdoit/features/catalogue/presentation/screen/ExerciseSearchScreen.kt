@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.features.catalogue.presentation.CatalogueAction
 import com.pad.repitdoit.features.catalogue.presentation.CatalogueState
 
+// Permite buscar ejercicios dentro del catálogo.
 @Composable
 fun ExerciseSearchScreen(
     state: CatalogueState,

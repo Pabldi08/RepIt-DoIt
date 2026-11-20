@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.profile.domain.usecase
 
 import com.pad.repitdoit.features.profile.domain.repository.ProfileRepository
 
+// Recupera los datos del perfil.
 class GetProfileUseCase(
     private val repository: ProfileRepository
 ) {

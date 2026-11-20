@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.gamification.domain.model
 
+// Representa un logro, sus condiciones y su estado.
 enum class AchievementStatus { LOCKED, AVAILABLE, ACHIEVED }
 enum class ConditionLogic { ALL, ANY }
 

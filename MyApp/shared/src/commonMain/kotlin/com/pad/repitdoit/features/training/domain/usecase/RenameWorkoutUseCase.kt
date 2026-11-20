@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.training.domain.usecase
 
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Cambia el nombre de un entrenamiento.
 class RenameWorkoutUseCase (
     private val repository: WorkoutRepository
 ) {

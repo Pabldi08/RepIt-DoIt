@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.session.presentation
 
+// Agrupa el modo de autenticación y los valores actuales del formulario.
 enum class AuthMode {
     LOGIN,
     REGISTER

@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+// Reutiliza el estilo de los campos de texto de acceso y registro.
 @Composable
 fun AuthTextField(
     value: String,

@@ -12,6 +12,7 @@ import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.presentation.action.TrainingAction
 import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
 
+// Muestra las sesiones del plan y permite gestionarlas por día.
 @Composable
 fun PlanDetailScreen(
     plan: TrainingPlan,

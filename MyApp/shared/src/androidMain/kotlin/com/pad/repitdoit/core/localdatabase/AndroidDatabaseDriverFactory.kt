@@ -5,6 +5,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 
+// Abre el controlador de base de datos para Android.
 class AndroidDatabaseDriverFactory (
     private val context: Context
 ) : DatabaseDriverFactory {

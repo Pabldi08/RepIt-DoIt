@@ -2,6 +2,7 @@ package com.pad.repitdoit.navigation
 
 import kotlinx.serialization.Serializable
 
+// Define los destinos que admite la navegación principal.
 @Serializable
 sealed interface Route {
 

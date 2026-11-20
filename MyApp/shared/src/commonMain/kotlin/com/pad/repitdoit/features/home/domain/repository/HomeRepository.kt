@@ -3,6 +3,7 @@ package com.pad.repitdoit.features.home.domain.repository
 import com.pad.repitdoit.features.home.domain.model.HomeDailyWorkout
 import kotlinx.datetime.DayOfWeek
 
+// Define las operaciones para consultar o gestionar los entrenamientos previstos para el inicio.
 interface HomeRepository {
     suspend fun getDailyWorkouts(
         userId: String,

@@ -26,6 +26,7 @@ internal fun TrainingOverviewScreen(
     onPlanDayDetails: (planId: String, weekday: Int) -> Unit,
     onStartWorkout: (String) -> Unit
 ) {
+    // Desplazamiento vertical para el plan semanal y los entrenamientos.
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         modifier = Modifier.fillMaxSize(),
@@ -39,6 +40,7 @@ internal fun TrainingOverviewScreen(
             Header(Modifier.fillMaxWidth().height(40.dp))
         }
 
+        // Agrupa las sesiones por día y cuenta los días activos del plan.
         val selectedPlan = state.selectedPlan
         val scheduleByDay = selectedPlan
             ?.schedule
@@ -51,6 +53,7 @@ internal fun TrainingOverviewScreen(
             .distinct()
             .size
 
+        // Resumen del plan activo y acceso a la selección de otro plan.
         item(
             span = { GridItemSpan(maxLineSpan) }
         ) {
@@ -90,6 +93,7 @@ internal fun TrainingOverviewScreen(
             }
         }
 
+        // El calendario muestra los siete días, incluidos los de descanso.
         val dayNames = listOf(
             "Lunes", "Martes", "Miércoles", "Jueves",
             "Viernes", "Sábado", "Domingo"
@@ -105,6 +109,7 @@ internal fun TrainingOverviewScreen(
                         .orEmpty()
                         .sortedBy { it.position }
 
+                    // La tarjeta destaca el primer entrenamiento e indica cuántos más hay.
                     val firstWorkout = workouts.firstOrNull()
                     val extraCount = workouts.size - 1
                     OutlinedCard(
@@ -173,6 +178,7 @@ internal fun TrainingOverviewScreen(
             }
         }
 
+        // Cada tarjeta permite consultar, iniciar o eliminar un entrenamiento.
         items(
             state.workouts,
             key = { it.id }

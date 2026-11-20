@@ -17,6 +17,7 @@ import com.pad.repitdoit.features.gamification.presentation.screen.*
 import com.pad.repitdoit.features.gamification.presentation.state.GamificationState
 import kotlinx.coroutines.launch
 
+// Distribuye el recorrido de progreso y el contenido complementario.
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ProgressLayout(

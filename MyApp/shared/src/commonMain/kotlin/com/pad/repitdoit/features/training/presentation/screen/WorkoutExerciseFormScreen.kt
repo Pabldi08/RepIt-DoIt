@@ -17,6 +17,7 @@ import com.pad.repitdoit.features.training.presentation.action.WorkoutExerciseSe
 import com.pad.repitdoit.features.training.presentation.components.FormField
 import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseSetupState
 
+// Recoge los valores de series, repeticiones y peso del ejercicio.
 @Composable
 fun WorkoutExerciseFormScreen(
     state: WorkoutExerciseSetupState,

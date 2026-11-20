@@ -16,6 +16,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import com.pad.repitdoit.features.training.presentation.state.WorkoutExerciseEditState
 
+// Gestiona la carga, selección y edición de planes y entrenamientos.
 class TrainingViewModel(
     private val appContainer: TrainingUseCasesAC
 ) : ViewModel() {
@@ -42,6 +43,7 @@ class TrainingViewModel(
         }
     }
 
+    // Envía cada acción de la interfaz a la operación correspondiente.
     fun onAction(action: TrainingAction) {
         when(action) {
             is TrainingAction.CreatePlan -> updatePlan("No se pudo crear el plan") {
@@ -95,6 +97,7 @@ class TrainingViewModel(
 
     private enum class ExerciseField { Weight, Series, Reps, Rest }
 
+    // Procesa los cambios en los campos del ejercicio seleccionado.
     private fun editExercise(id: String, field: ExerciseField, value: String) {
         selectExercise(id)
         val weight = value.trim().replace(',', '.').toDoubleOrNull()
@@ -167,6 +170,7 @@ class TrainingViewModel(
         }
     }
 
+    // Comparte el ciclo de guardado y actualización entre las operaciones sobre planes.
     private fun updatePlan(errorMessage: String, operation: suspend () -> Unit) {
         if (_uiState.value.isSavingPlan) return
         _uiState.update { it.copy(isSavingPlan = true, errorMessage = null) }
@@ -194,6 +198,7 @@ class TrainingViewModel(
         }
     }
 
+    // Actualiza los planes disponibles y la selección visible.
     private suspend fun loadPlans() {
         _uiState.update { it.copy(isLoadingPlans = true, plansError = null) }
         try {

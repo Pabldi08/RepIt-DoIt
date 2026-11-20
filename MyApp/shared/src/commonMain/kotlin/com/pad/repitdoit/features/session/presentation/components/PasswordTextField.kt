@@ -11,6 +11,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 
+// Presenta el campo de contraseña de los formularios de autenticación.
 @Composable
 fun PasswordTextField(
     value: String,

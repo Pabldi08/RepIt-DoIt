@@ -8,6 +8,7 @@ import com.pad.repitdoit.di.CatalogueUseCasesAC
 import com.pad.repitdoit.features.catalogue.presentation.CatalogueViewModel
 import com.pad.repitdoit.features.catalogue.presentation.layout.CatalogueLayout
 
+// Conecta el catálogo con su estado y sus acciones de navegación.
 @Composable
 fun CatalogueScreenRoot(
     appContainer: CatalogueUseCasesAC,

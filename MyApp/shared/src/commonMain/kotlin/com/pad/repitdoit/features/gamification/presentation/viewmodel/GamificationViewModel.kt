@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+// Carga los datos de progreso, logros y recompensas para la interfaz.
 class GamificationViewModel(
     private val appContainer: GamificationUseCaseAC
 ) : ViewModel() {

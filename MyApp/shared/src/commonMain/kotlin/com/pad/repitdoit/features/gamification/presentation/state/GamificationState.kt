@@ -5,6 +5,7 @@ import com.pad.repitdoit.features.gamification.domain.model.Achievement
 import com.pad.repitdoit.features.gamification.domain.model.Reward
 import com.pad.repitdoit.features.gamification.domain.model.RewardType
 
+// Agrupa los datos de progreso, logros y recompensas que se muestran al usuario.
 data class GamificationState(
     val achievements: List<Achievement> = emptyList(),
     val rewards: List<Reward> = emptyList(),

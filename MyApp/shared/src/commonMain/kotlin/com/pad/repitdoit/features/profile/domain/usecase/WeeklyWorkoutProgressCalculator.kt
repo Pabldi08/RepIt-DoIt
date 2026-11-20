@@ -8,6 +8,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
+// Agrupa las sesiones del historial por día para calcular el progreso semanal.
 data class DailyWorkoutProgress(
     val date: LocalDate,
     val minutes: Float

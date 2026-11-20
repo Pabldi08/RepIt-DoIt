@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.training.domain.model
 
+// Representa una sesión asignada a un día del plan semanal.
 data class ScheduledWorkout(
     val id: String,
     val workoutId: String,

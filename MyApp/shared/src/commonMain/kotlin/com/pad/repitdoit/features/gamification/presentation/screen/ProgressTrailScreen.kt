@@ -11,6 +11,7 @@ import com.pad.repitdoit.features.gamification.presentation.components.ProgressP
 import com.pad.repitdoit.features.gamification.presentation.state.GamificationState
 
 
+// Muestra el recorrido de niveles que puede alcanzar el usuario.
 private const val LEVELS_PER_SECTION = 5
 private const val TOTAL_SECTIONS = 100
 

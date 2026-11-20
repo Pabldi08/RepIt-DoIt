@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 
+// Implementa el acceso a las operaciones de autenticación y sesión para la aplicación.
 class SessionRepositoryImpl(
     private val db: RepItDoItDatabase,
     private val dispatcher: CoroutineDispatcher
@@ -60,6 +61,7 @@ class SessionRepositoryImpl(
         }
     }
 
+    // Recupera las credenciales guardadas y comprueba la contraseña antes de devolver el identificador.
     private suspend fun getVerifiedUserId(
         userCredentials: UserCredentials
     ): String? {

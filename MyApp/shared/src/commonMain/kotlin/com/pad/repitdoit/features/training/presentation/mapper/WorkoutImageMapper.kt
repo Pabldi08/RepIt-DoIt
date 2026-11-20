@@ -17,6 +17,7 @@ import repitdoit.shared.generated.resources.triceps
 import repitdoit.shared.generated.resources.core
 import repitdoit.shared.generated.resources.default
 
+// Asocia cada categoría de entrenamiento con su imagen.
 internal fun WorkoutCategory.toDrawable(): DrawableResource =
     when (this) {
         WorkoutCategory.PUSH -> Res.drawable.push

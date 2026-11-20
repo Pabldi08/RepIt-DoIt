@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.pad.repitdoit.features.catalogue.presentation.CatalogueAction
 import com.pad.repitdoit.features.catalogue.presentation.CatalogueState
 
+// Presenta la búsqueda de ejercicios asociados a máquinas.
 @Composable
 fun MachineSearchScreen(
     state: CatalogueState,

@@ -18,6 +18,7 @@ import com.pad.repitdoit.features.catalogue.presentation.screen.ExerciseSearchSc
 import com.pad.repitdoit.features.catalogue.presentation.screen.MachineSearchScreen
 import kotlinx.coroutines.launch
 
+// Organiza las pantallas de búsqueda y detalle del catálogo.
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun CatalogueLayout(
@@ -62,6 +63,7 @@ fun CatalogueLayout(
     OnBackHandler(enabled = canNavigateBack, onBack = onDetailBack)
 
     val onExerciseDetails: (String) -> Unit = { exerciseId ->
+        // Evita abrir otra vez el detalle del ejercicio que ya está seleccionado.
         if (navigator.currentDestination?.contentKey != exerciseId) {
             scope.launch {
                 navigator.navigateTo(

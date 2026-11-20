@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 
+// Muestra la cabecera reutilizable de la aplicación.
 @Composable
 fun Header(
     modifier: Modifier = Modifier

@@ -1,5 +1,6 @@
 package com.pad.repitdoit.features.session.presentation
 
+// Define las acciones que pueden emitir los formularios de autenticación.
 sealed interface AuthAction {
 
     data class UsernameChanged(

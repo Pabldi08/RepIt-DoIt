@@ -28,6 +28,7 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.gamification.domain.model.Reward
 import org.jetbrains.compose.resources.painterResource
 
+// Presenta la imagen y los datos de una recompensa.
 @Composable
 fun RewardCard(
     reward: Reward,

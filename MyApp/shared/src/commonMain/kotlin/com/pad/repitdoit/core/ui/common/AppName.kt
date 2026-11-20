@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 
+// Muestra el nombre de la aplicación con su estilo de marca.
 @Composable
 fun AppName(
     modifier: Modifier = Modifier,

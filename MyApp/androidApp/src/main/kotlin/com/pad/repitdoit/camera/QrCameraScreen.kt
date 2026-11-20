@@ -23,6 +23,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
+// Muestra la cámara y devuelve el identificador del equipo al reconocer un código.
 @Composable
 fun QrCameraScreen(onEquipmentId: (String) -> Unit) {
     val context = LocalContext.current

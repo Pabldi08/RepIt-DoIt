@@ -21,6 +21,7 @@ import com.pad.repitdoit.features.training.domain.usecase.RemoveWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.RenameWorkoutUseCase
 import com.pad.repitdoit.features.training.domain.usecase.UpdateWorkoutExerciseUseCase
 
+// Agrupa los casos de uso necesarios para gestionar los planes y entrenamientos.
 interface TrainingUseCasesAC {
     val selectTrainingPlanUseCase: SelectTrainingPlanUseCase
     val createTrainingPlanUseCase: CreateTrainingPlanUseCase

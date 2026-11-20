@@ -7,6 +7,7 @@ import com.pad.repitdoit.features.session.domain.model.UserCredentials
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+// Prepara sesiones de usuario reutilizables para las pruebas.
 private val demoCredentials = UserCredentials(username = "test", displayName = null, password = "test1234")
 
 internal suspend fun AppContainer.loginAsDemoUser() {

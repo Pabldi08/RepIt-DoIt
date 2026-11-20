@@ -31,6 +31,7 @@ enum class AppWindowSize {
     Extended
 }
 
+// Monta el tema y el contenido principal según el tamaño de la ventana.
 @Composable
 fun App(
     appContainer: AppContainer,
@@ -125,12 +126,14 @@ private fun AppContent(
             onCloseWorkout = { activeWorkoutId = null }
         )
     }
+    // Abre el destino solicitado desde fuera de la navegación principal.
     LaunchedEffect(toScreen) {
         val route = toScreen ?: return@LaunchedEffect
         navController.navigate(route) {
             launchSingleTop = true
         }
     }
+    // Escucha las lecturas NFC para abrir el catálogo del equipo escaneado.
     LaunchedEffect(nfcEquipmentIds, navController) {
         nfcEquipmentIds.collect { equipmentId ->
             nfcPanelVisible = false

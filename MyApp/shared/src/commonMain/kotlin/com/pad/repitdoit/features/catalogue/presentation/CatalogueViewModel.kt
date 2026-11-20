@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// Gestiona las consultas del catálogo y la selección de ejercicios.
 class CatalogueViewModel(
     private val appContainer: CatalogueUseCasesAC,
     private val machineId: String? = null
@@ -27,6 +28,7 @@ class CatalogueViewModel(
         }
     }
 
+    // Actualiza los resultados que utiliza la búsqueda de ejercicios.
     private fun loadExercises() {
         viewModelScope.launch {
             try {

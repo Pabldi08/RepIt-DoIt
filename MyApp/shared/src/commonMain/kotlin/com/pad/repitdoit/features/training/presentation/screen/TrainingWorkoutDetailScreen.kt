@@ -15,6 +15,7 @@ import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
 import org.jetbrains.compose.resources.painterResource
 
+// Muestra el contenido del entrenamiento y sus acciones de edición e inicio.
 @Composable
 fun TrainingWorkoutDetailScreen(
     workout: Workout,

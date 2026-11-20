@@ -11,6 +11,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.pad.repitdoit.MainActivity
 
+// Ejecuta el trabajo de envío de recordatorios fuera de la pantalla principal.
 const val EXTRA_TO_SCREEN = "toScreen"
 
 class NotificationWorker(

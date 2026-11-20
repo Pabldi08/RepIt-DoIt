@@ -16,6 +16,7 @@ import com.pad.repitdoit.features.session.presentation.components.AuthHeader
 import com.pad.repitdoit.features.session.presentation.components.AuthTextField
 import com.pad.repitdoit.features.session.presentation.components.PasswordTextField
 
+// Organiza el formulario de registro y sus acciones.
 @Composable
 internal fun RegisterLayout(
     state: AuthUiState,
@@ -30,6 +31,7 @@ internal fun RegisterLayout(
     ) {
         val isWideScreen = maxWidth >= 900.dp
 
+        // Aprovecha el espacio horizontal para mostrar la marca junto al formulario.
         if (isWideScreen) {
             Row(
                 modifier = Modifier

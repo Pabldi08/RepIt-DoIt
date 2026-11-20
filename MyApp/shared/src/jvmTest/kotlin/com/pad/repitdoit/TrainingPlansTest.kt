@@ -14,6 +14,7 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
 import java.nio.file.Files
 
+// Comprueba las operaciones sobre planes y su programación semanal.
 class TrainingPlansTest {
     @Test
     fun fakeSelectionKeepsOnlyOneActivePlan() = runBlocking {

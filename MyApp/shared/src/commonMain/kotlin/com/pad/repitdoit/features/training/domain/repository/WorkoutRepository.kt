@@ -5,6 +5,7 @@ import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.domain.model.ExerciseContext
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 
+// Define las operaciones para consultar o gestionar los entrenamientos, los planes y las sesiones completadas.
 interface WorkoutRepository {
     suspend fun getTrainingPlans(): List<TrainingPlan>
     suspend fun selectTrainingPlan(planId: String)

@@ -21,6 +21,7 @@ import com.pad.repitdoit.features.training.presentation.screen.TrainingScreenRoo
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutExerciseSetupScreenRoot
 import com.pad.repitdoit.features.training.presentation.state.rememberWorkoutSessionState
 import com.pad.repitdoit.features.training.presentation.screen.WorkoutSessionScreenRoot
+// Conecta cada destino de navegación con la pantalla que lo representa.
 @Composable
 fun AppNavigation(
     navController: NavHostController,

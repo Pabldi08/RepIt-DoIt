@@ -67,6 +67,7 @@ private sealed interface TrainingDetailDestination {
     ) : TrainingDetailDestination
 }
 
+// Distribuye el listado y el detalle de entrenamiento según el espacio disponible.
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 
@@ -78,14 +79,16 @@ fun TrainingLayout(
     onAddExercise: (workoutId: String) -> Unit
 ) {
     var activeDialog by remember { mutableStateOf<TrainingDialog?>(null) }
+    // Centraliza la apertura de los diálogos de gestión y edición.
     val onShowDialog: (TrainingDialog) -> Unit = { dialog ->
         if (activeDialog == null) {
             activeDialog = dialog
         }
     }
 
-    // One single dialog popup through both panels
+    // Un unico popup entre ambos paneles
     key(activeDialog) {
+        // Presenta el formulario o la confirmación correspondiente a la acción elegida.
         when (val dialog = activeDialog) {
             is TrainingDialog.RemoveWorkout -> {
                 val workoutName = state.workouts.find { it.id == dialog.workoutId }?.name
@@ -219,6 +222,7 @@ fun TrainingLayout(
 
     // Los tamaños de la app deciden cuándo mostrar ambos paneles, incluido Medium.
 
+    // Prepara la navegación inicial cuando se abre un entrenamiento concreto.
     val initialHistory = remember(initialWorkoutId) {
         buildList<ThreePaneScaffoldDestinationItem<String>> {
             add(
@@ -242,6 +246,7 @@ fun TrainingLayout(
             }
         }
     }
+    // Mantiene la navegación entre el listado y el panel de detalle.
     val navigator = rememberListDetailPaneScaffoldNavigator<String>(
         initialDestinationHistory = initialHistory
     )

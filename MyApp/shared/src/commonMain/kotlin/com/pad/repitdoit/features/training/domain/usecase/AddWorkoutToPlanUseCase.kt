@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.training.domain.usecase
 
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Asigna un entrenamiento a un día del plan.
 class AddWorkoutToPlanUseCase(private val repository: WorkoutRepository) {
     suspend operator fun invoke(planId: String, workoutId: String, weekday: Int) {
         require(planId.isNotBlank()) { "El identificador del plan no puede estar vacío" }

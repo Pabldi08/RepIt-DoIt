@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.training.domain.usecase
 
 import com.pad.repitdoit.features.training.domain.repository.WorkoutRepository
 
+// Mueve una sesión programada a otro día del plan.
 class MoveWorkoutToPlanDayUseCase(private val repository: WorkoutRepository) {
     suspend operator fun invoke(planId: String, scheduleId: String, weekday: Int) {
         require(planId.isNotBlank()) { "El identificador del plan no puede estar vacío" }

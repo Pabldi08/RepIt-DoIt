@@ -24,6 +24,7 @@ import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.getWindowSize
 import org.jetbrains.compose.resources.painterResource
 
+// Muestra la duración y el número de ejercicios de la sesión completada.
 @Composable
 internal fun WorkoutSessionSummaryScreen(workout: Workout, durationSeconds: Int, onContinue: () -> Unit) {
     val adaptiveInfo = currentWindowAdaptiveInfo()

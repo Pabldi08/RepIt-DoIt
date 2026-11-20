@@ -8,6 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
+// Comprueba la conversión de experiencia acumulada en progreso de nivel.
 class LevelProgressTest {
     @Test
     fun calculatesThresholdsAndCarriesXpAcrossLevels() {

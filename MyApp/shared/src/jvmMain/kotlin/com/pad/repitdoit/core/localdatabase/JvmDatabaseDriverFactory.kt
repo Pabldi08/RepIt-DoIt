@@ -6,6 +6,7 @@ import java.io.File
 import java.nio.file.Files
 import java.util.Properties
 
+// Abre el controlador de base de datos para la aplicación de escritorio.
 class JvmDatabaseDriverFactory : DatabaseDriverFactory {
     override fun createDriver(): SqlDriver {
         val dbDirectory = File(applicationDataDirectory(), "RepItDoIt")
