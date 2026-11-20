@@ -44,12 +44,13 @@ class AchievementProgressTest {
             assertEquals(startingXp, container.getTotalXpUseCase())
 
             val workout = requireNotNull(container.getWorkoutUseCase("test-workout-001"))
+            val expectedXp = startingXp + 3 * (2 * 5) + 50
             repeat(3) { index ->
                 container.completeWorkoutSessionUseCase("completed-$index", workout, timestamp - 1, timestamp)
             }
             val grants = db.userAchievementQueries.selectAchievementsByUser(user).executeAsList()
             assertEquals(setOf("first", "second"), grants.map { it.achievement_id }.toSet())
-            assertEquals(startingXp + 50, container.getTotalXpUseCase())
+            assertEquals(expectedXp, container.getTotalXpUseCase())
             assertEquals(timestamp, container.getRewardsUseCase().single().obtainedAt)
             assertEquals(setOf(initialKey, "next", "prize"), db.userRewardQueries
                 .selectRewardsByUser(user).executeAsList().map { it.reward_id }.toSet())
@@ -58,7 +59,7 @@ class AchievementProgressTest {
             container.awardCompletedAchievementsUseCase()
             assertEquals(3, db.workoutSessionQueries.selectWorkoutSessionsByUser(user).executeAsList().size)
             assertEquals(grants, db.userAchievementQueries.selectAchievementsByUser(user).executeAsList())
-            assertEquals(startingXp + 50, container.getTotalXpUseCase())
+            assertEquals(expectedXp, container.getTotalXpUseCase())
         }
     }
 
@@ -405,6 +406,17 @@ class AchievementProgressTest {
     @Test
     fun fakeContainerHasNoLocalAchievements() = runBlocking {
         assertEquals(emptyList(), DefaultAppContainer().getAllowedAchievementsUseCase())
+    }
+
+    @Test
+    fun fakeContainerAwardsWorkoutXpOnlyOncePerSession() = runBlocking {
+        val container = signedInFakeContainer()
+        val workout = requireNotNull(container.getWorkoutUseCase("001"))
+        val expectedXp = workout.workoutExercises.size * 5L
+        repeat(2) {
+            container.completeWorkoutSessionUseCase("session", workout, 1, 2)
+        }
+        assertEquals(expectedXp, container.getTotalXpUseCase())
     }
 
     private suspend fun withDatabase(block: suspend (RepItDoItDatabase, JdbcSqliteDriver) -> Unit) {

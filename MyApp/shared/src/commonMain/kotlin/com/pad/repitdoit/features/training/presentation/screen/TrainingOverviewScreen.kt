@@ -187,7 +187,7 @@ internal fun TrainingOverviewScreen(
                 title = workout.name,
                 exercises = workout.workoutExercises,
                 image = workout.category.toDrawable(),
-                xp = workout.workoutExercises.size * 50,
+                xp = workout.completionXp,
                 isSelected = workout.id == selectedWorkoutId,
                 onDetails = { onWorkoutDetails(workout.id) },
                 onStart = { onStartWorkout(workout.id) },

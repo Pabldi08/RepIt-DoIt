@@ -36,7 +36,7 @@ fun TrainingCard(
     title: String,
     exercises: List<WorkoutExercise> = emptyList(),
     image: DrawableResource,
-    xp: Int,
+    xp: Long,
     onDetails: () -> Unit,
     onStart: () -> Unit,
     onRemove: () -> Unit,

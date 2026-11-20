@@ -8,6 +8,9 @@ data class Workout(
     val name: String,
     val workoutExercises: List<WorkoutExercise> = emptyList()
 ) {
+    val completionXp: Long
+        get() = workoutExercises.size * 5L
+
     val category: WorkoutCategory
         get() = WorkoutClassifier.classify(workoutExercises)
 }

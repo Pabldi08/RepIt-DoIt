@@ -19,7 +19,12 @@ class FakeWorkoutRepositoryImpl(
         workout: Workout,
         startedAt: Long,
         finishedAt: Long
-    ) = Unit
+    ) {
+        getUserData().completedSessionXp.getOrPut(sessionId) { workout.completionXp }
+    }
+
+    internal fun getTotalXp(): Long =
+        currentUserId()?.let { dataByUser[it]?.completedSessionXp?.values?.sum() } ?: 0L
 
     private val muscleGroupsByExercise = mapOf(
         "10" to setOf(MuscleGroup.CHEST, MuscleGroup.SHOULDERS, MuscleGroup.TRICEPS),
@@ -102,7 +107,8 @@ class FakeWorkoutRepositoryImpl(
     private class UserData(
         val workouts: MutableMap<String, Workout>,
         val plans: MutableMap<String, TrainingPlan>,
-        val archivedWorkoutIds: MutableSet<String> = mutableSetOf()
+        val archivedWorkoutIds: MutableSet<String> = mutableSetOf(),
+        val completedSessionXp: MutableMap<String, Long> = mutableMapOf()
     )
 
     private val dataByUser = mutableMapOf<String, UserData>()

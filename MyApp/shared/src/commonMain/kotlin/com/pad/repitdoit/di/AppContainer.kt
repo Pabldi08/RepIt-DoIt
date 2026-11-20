@@ -119,12 +119,20 @@ class DefaultAppContainer(
             null
         }
 
+    private val fakeWorkoutRepository = if (db == null || dispatcher == null) {
+        FakeWorkoutRepositoryImpl(::currentUserId)
+    } else {
+        null
+    }
+
     private val gamificationRepository: GamificationRepository =
-        localGamificationRepository ?: FakeGamificationRepositoryImpl()
+        localGamificationRepository ?: FakeGamificationRepositoryImpl {
+            fakeWorkoutRepository?.getTotalXp() ?: 0L
+        }
 
     private val workoutRepository: WorkoutRepository =
         if (db == null || dispatcher == null) {
-            FakeWorkoutRepositoryImpl(::currentUserId)
+            checkNotNull(fakeWorkoutRepository)
         } else {
             WorkoutRepositoryImpl(db, dispatcher, ::currentUserId) { userId ->
                 localGamificationRepository?.awardCompletedAchievementsInTransaction(userId)

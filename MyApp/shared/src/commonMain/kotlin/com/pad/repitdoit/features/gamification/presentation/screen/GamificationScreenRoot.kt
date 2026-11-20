@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pad.repitdoit.di.GamificationUseCaseAC
 import com.pad.repitdoit.features.gamification.presentation.layout.GamificationLayout
+import com.pad.repitdoit.features.gamification.presentation.layout.ProgressLayout
 import com.pad.repitdoit.features.gamification.presentation.viewmodel.GamificationViewModel
 
 // Conecta el estado de gamificación con las pantallas de progreso y recompensas.
@@ -26,11 +27,20 @@ fun GamificationScreenRoot(
     // Solicita el progreso actualizado al entrar en la pantalla.
     LaunchedEffect(viewModel) { viewModel.refresh() }
 
-    GamificationLayout(
+//    GamificationLayout(
+//        state = state,
+//        modifier = Modifier.padding(
+//            top = 40.dp,
+//            bottom = 20.dp,
+//            start = 20.dp,
+//            end = 20.dp
+//        )
+//    )
+    ProgressLayout(
         state = state,
         modifier = Modifier.padding(
             top = 40.dp,
-            bottom = 20.dp,
+            bottom = 40.dp,
             start = 20.dp,
             end = 20.dp
         )

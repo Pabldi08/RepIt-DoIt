@@ -411,6 +411,9 @@ class WorkoutRepositoryImpl(
                     position = index.toLong(), notes = null, user_id = userId
                 )
             }
+            val totalXp = db.userQueries.selectUserById(userId).executeAsOne().total_xp
+            val earnedXp = workout.completionXp.coerceAtMost(Long.MAX_VALUE - totalXp)
+            db.userQueries.updateTotalXp(totalXp + earnedXp, userId)
             awardAchievements(userId)
         }
     }

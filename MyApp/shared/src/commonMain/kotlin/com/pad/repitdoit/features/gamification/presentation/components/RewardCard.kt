@@ -63,12 +63,12 @@ fun RewardCard(
                 text = reward.name,
                 textAlign = TextAlign.Center
             )
-            if (reward.isOwned) {
-                Text(
-                    text = "OBTAINED AT ${reward.obtainedAt}",
-                    textAlign = TextAlign.Center
-                )
-            }
+//            if (reward.isOwned) {
+//                Text(
+//                    text = "OBTAINED AT ${reward.obtainedAt}",
+//                    textAlign = TextAlign.Center
+//                )
+//            }
         }
     }
 

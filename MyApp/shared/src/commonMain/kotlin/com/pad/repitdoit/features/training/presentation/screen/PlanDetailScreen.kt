@@ -5,12 +5,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pad.repitdoit.core.ui.common.ReturnButton
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.TrainingPlan
 import com.pad.repitdoit.features.training.presentation.action.TrainingAction
 import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
+import org.jetbrains.compose.resources.painterResource
 
 // Muestra las sesiones del plan y permite gestionarlas por día.
 @Composable
@@ -49,12 +52,18 @@ fun PlanDetailScreen(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Entrenamientos del día", style = MaterialTheme.typography.titleMedium)
-                        TextButton(enabled = !isSaving, onClick = {
-                            onShowDialog(TrainingDialog.AddWorkoutToPlan(plan.id, weekday))
-                        }) { Text("Añadir entrenamiento") }
+                        Text(
+                            "Entrenamientos del día",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        TextButton(
+                            enabled = !isSaving,
+                            onClick = {
+                                onShowDialog(TrainingDialog.AddWorkoutToPlan(plan.id, weekday))
+                            }
+                        ) { Text("+ Añadir") }
                     }
                     if (entries.isEmpty()) {
                         Text(
@@ -70,13 +79,38 @@ fun PlanDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(entry.workoutName, style = MaterialTheme.typography.titleMedium)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                entry.workoutName,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Button(
+                                onClick = {
+                                    onAction(
+                                        TrainingAction.RemoveWorkoutFromPlan(
+                                            plan.id,
+                                            entry.id
+                                        )
+                                    )
+                                },
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error
+                                )
+                            ) {
+                                Icon(
+                                    painterResource(loadImage("iconTrash")),
+                                    contentDescription = "Delete Button"
+                                )
+                            }
+                        }
                         Text("${entry.numEx} ejercicios")
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             TextButton(onClick = { onWorkoutDetails(entry.workoutId) }) { Text("Ver entrenamiento") }
-                            TextButton(enabled = !isSaving, onClick = {
-                                onAction(TrainingAction.RemoveWorkoutFromPlan(plan.id, entry.id))
-                            }) { Text("Quitar de este día", color = MaterialTheme.colorScheme.error) }
                         }
                     }
                 }

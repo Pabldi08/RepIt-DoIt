@@ -74,7 +74,7 @@ fun TrainingWorkoutDetailScreen(
                     ) {
                         val size = workout.workoutExercises.size
                         Text(
-                            text = "$size ejercicios · +${size * 50} XP",
+                            text = "$size ejercicios · +${workout.completionXp} XP",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Button(
@@ -128,15 +128,35 @@ fun TrainingWorkoutDetailScreen(
                             .padding(all = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "EJERCICIO ${index + 1}",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = exercise.name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column() {
+                                Text(
+                                    text = "EJERCICIO ${index + 1}",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = exercise.name,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                            Button (
+                                onClick = { onDeleteExercise(exercise.id) },
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error
+                                )
+                            ) {
+                                Icon(
+                                    painterResource(loadImage("iconTrash")),
+                                    contentDescription = "Delete Button"
+                                )
+                            }
+                        }
                         Text(
                             text = "${exercise.numSets} series · Descanso ${exercise.restSec} s",
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -144,29 +164,6 @@ fun TrainingWorkoutDetailScreen(
                         Text(
                             text = "${exercise.numReps} repeticiones · ${exercise.weight} kg por serie"
                         )
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedButton(
-                                onClick = { onExercise(exercise.id) },
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                            ) {
-                                Icon(
-                                    painterResource(loadImage("icon_details")),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text(text = "Detalles")
-                            }
-                            OutlinedButton(
-                                onClick = { onDeleteExercise(exercise.id) },
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                            ) {
-                                Text(text = "Eliminar")
-                            }
-                        }
                     }
                 }
             }
