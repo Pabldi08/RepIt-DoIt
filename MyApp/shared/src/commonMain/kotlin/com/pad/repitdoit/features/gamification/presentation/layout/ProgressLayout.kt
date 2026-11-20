@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
+import com.pad.repitdoit.core.ui.common.Header
 import com.pad.repitdoit.core.ui.common.OnBackHandler
 import com.pad.repitdoit.core.ui.common.ReturnButton
 import com.pad.repitdoit.features.gamification.presentation.screen.*
@@ -63,6 +64,7 @@ fun ProgressLayout(
                     ProgressTrailScreen(state, Modifier.fillMaxSize())
                 } else {
                     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Header(modifier = Modifier.fillMaxWidth().height(40.dp))
                         ProgressSummary(state)
                         ProgressTrailScreen(state, Modifier.fillMaxWidth().weight(1f))
                         ProgressActions(state, horizontal = true, onNavigate = onNavigate)
