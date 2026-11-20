@@ -45,8 +45,9 @@ internal fun RegisterLayout(
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center
                 ) {
-                    AuthDesktopBrand(
-                        subtitle = "Empieza a entrenar"
+                    AuthHeader(
+                        subtitle = "Empieza a entrenar",
+                        isWide = true
                     )
                 }
 
@@ -168,7 +169,7 @@ internal fun RegisterLayout(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    AuthHeader()
+                    AuthHeader(isWide = false)
 
                     Spacer(Modifier.height(8.dp))
 

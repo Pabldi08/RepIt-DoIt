@@ -45,8 +45,9 @@ internal fun LoginLayout(
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center
                 ) {
-                    AuthDesktopBrand(
-                        subtitle = "Bienvenido de nuevo"
+                    AuthHeader(
+                        subtitle = "Bienvenido de nuevo",
+                        isWide = true
                     )
                 }
 
@@ -152,7 +153,8 @@ internal fun LoginLayout(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     AuthHeader(
-                        subtitle = "Bienvenido de nuevo"
+                        subtitle = "Bienvenido de nuevo",
+                        isWide = false
                     )
 
                     Spacer(Modifier.height(4.dp))
