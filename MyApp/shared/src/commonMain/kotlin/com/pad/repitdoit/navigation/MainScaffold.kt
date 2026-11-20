@@ -117,7 +117,13 @@ fun MainScaffold(
                 )
             }
         ) {
-            content()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 22.dp)
+            ) {
+                content()
+            }
         }
 
         OnBackHandler(enabled = addMenuExpanded || nfcPanelVisible) {

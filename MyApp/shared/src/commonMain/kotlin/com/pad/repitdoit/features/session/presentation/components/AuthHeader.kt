@@ -2,6 +2,7 @@ package com.pad.repitdoit.features.session.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,7 +22,9 @@ fun AuthHeader(subtitle: String = "") {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AppLogo(
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier
+                .size(200.dp)
+                .offset(y = 24.dp)
         )
 
         AppName(fontSize = 40.sp)
