@@ -11,8 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import com.pad.repitdoit.core.localdatabase.AndroidDatabaseDriverFactory
-import com.pad.repitdoit.core.localdatabase.createDatabase
 import com.pad.repitdoit.di.DefaultAppContainer
 import com.pad.repitdoit.camera.QrCameraScreen
 import com.pad.repitdoit.navigation.Route

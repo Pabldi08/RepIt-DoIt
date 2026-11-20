@@ -14,9 +14,6 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.presentation.components.TrainingDialog
 import org.jetbrains.compose.resources.painterResource
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.icon_details
-import repitdoit.shared.generated.resources.icon_play
 
 @Composable
 fun TrainingWorkoutDetailScreen(
@@ -83,7 +80,7 @@ fun TrainingWorkoutDetailScreen(
                             onClick = onStart,
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                         ) {
-                            Icon(painterResource(Res.drawable.icon_play),
+                            Icon(painterResource(loadImage("icon_play")),
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -154,7 +151,7 @@ fun TrainingWorkoutDetailScreen(
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                             ) {
                                 Icon(
-                                    painterResource(Res.drawable.icon_details),
+                                    painterResource(loadImage("icon_details")),
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp)
                                 )

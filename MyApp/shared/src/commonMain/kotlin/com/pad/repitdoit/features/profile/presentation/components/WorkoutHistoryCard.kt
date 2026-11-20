@@ -15,10 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry
 import org.jetbrains.compose.resources.painterResource
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.iconDumbbell
 
 @Composable
 internal fun WorkoutHistoryCard(
@@ -36,7 +35,7 @@ internal fun WorkoutHistoryCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                painter = painterResource(Res.drawable.iconDumbbell),
+                painter = painterResource(loadImage("iconDumbbell")),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary

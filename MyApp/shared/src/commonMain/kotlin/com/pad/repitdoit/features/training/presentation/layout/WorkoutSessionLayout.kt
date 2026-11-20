@@ -46,14 +46,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pad.repitdoit.AppWindowSize
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import com.pad.repitdoit.getWindowSize
 import org.jetbrains.compose.resources.painterResource
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.training_timer_track_compact
-import repitdoit.shared.generated.resources.training_timer_track_flex
-import repitdoit.shared.generated.resources.training_timer_track_wide
 
 private enum class SessionLayout {
     Portrait, Wide, Flex
@@ -234,9 +231,9 @@ private fun RestTimer(
     onToggle: () -> Unit
 ) {
     val track = when (layout) {
-        SessionLayout.Portrait -> Res.drawable.training_timer_track_compact
-        SessionLayout.Wide -> Res.drawable.training_timer_track_wide
-        SessionLayout.Flex -> Res.drawable.training_timer_track_flex
+        SessionLayout.Portrait -> loadImage("training_timer_track_compact")
+        SessionLayout.Wide -> loadImage("training_timer_track_wide")
+        SessionLayout.Flex -> loadImage("training_timer_track_flex")
     }
     val primary = MaterialTheme.colorScheme.primary
     val minutes = twoDigits(seconds / 60)

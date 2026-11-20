@@ -24,9 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.gamification.domain.model.LevelProgress
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.placeholder
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -83,7 +82,7 @@ private fun ProgressCharacter(progress: LevelProgress, username: String?) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(Res.drawable.placeholder),
+                    painter = painterResource(loadImage("placeholder")),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize().padding(8.dp),
                     contentScale = ContentScale.Fit

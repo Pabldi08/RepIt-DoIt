@@ -19,8 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.placeholder
+import com.pad.repitdoit.core.utility.loadImage
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -45,7 +44,7 @@ fun ProfileOverviewCard(
                 shape = CircleShape
             ) {
                 Image(
-                    painter = painterResource(Res.drawable.placeholder),
+                    painter = painterResource(loadImage("placeholder")),
                     contentDescription = "Imagen de perfil de $name",
                     modifier = Modifier.fillMaxSize().padding(8.dp),
                     contentScale = ContentScale.Fit

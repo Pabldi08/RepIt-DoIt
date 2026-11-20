@@ -59,7 +59,6 @@ import com.pad.repitdoit.features.gamification.domain.usecase.GetTotalXpUseCase
 import com.pad.repitdoit.features.training.domain.usecase.CompleteWorkoutSessionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import com.pad.repitdoit.features.dummy.data.repository.DummyRepositoryImpl
-import com.pad.repitdoit.features.dummy.domain.model.Exercise
 import com.pad.repitdoit.features.dummy.domain.usecase.GetExercisesByMuscleUseCase
 import com.pad.repitdoit.features.profile.data.repository.WorkoutHistoryRepositoryImpl
 import com.pad.repitdoit.features.profile.domain.model.WorkoutHistoryEntry

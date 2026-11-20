@@ -5,13 +5,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,15 +29,6 @@ import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.WorkoutExercise
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.icon_details
-import repitdoit.shared.generated.resources.icon_edit
-import repitdoit.shared.generated.resources.icon_play
-
-data class ExerciseItem(
-    val name: String,
-    val details: String
-)
 
 @Composable
 fun TrainingCard(
@@ -129,24 +117,12 @@ fun TrainingCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-//                OutlinedButton(
-//                    onClick = onDetails,
-//                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-//                ) {
-//                    Icon(
-//                        painter = painterResource(Res.drawable.icon_details),
-//                        contentDescription = null,
-//                        modifier = Modifier.size(16.dp)
-//                    )
-//                    Spacer(modifier = Modifier.width(4.dp))
-//                    Text("Detalles")
-//                }
                 Button(
                     onClick = onStart,
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.icon_play),
+                        painter = painterResource(loadImage("icon_play")),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp)
                     )

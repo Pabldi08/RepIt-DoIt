@@ -1,6 +1,5 @@
 package com.pad.repitdoit.features.dummy.domain.usecase
 
-import com.pad.repitdoit.features.dummy.domain.model.Exercise
 import com.pad.repitdoit.features.dummy.domain.repository.DummyRepository
 
 class GetMuscleNameByIdUseCase (

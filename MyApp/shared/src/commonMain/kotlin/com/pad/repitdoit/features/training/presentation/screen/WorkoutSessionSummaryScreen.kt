@@ -19,11 +19,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pad.repitdoit.AppWindowSize
+import com.pad.repitdoit.core.utility.loadImage
 import com.pad.repitdoit.features.training.domain.model.Workout
 import com.pad.repitdoit.getWindowSize
 import org.jetbrains.compose.resources.painterResource
-import repitdoit.shared.generated.resources.Res
-import repitdoit.shared.generated.resources.training_summary_success
 
 @Composable
 internal fun WorkoutSessionSummaryScreen(workout: Workout, durationSeconds: Int, onContinue: () -> Unit) {
@@ -115,7 +114,7 @@ private fun SummaryHeading(workoutName: String, centered: Boolean) {
     ) {
         if (centered) {
             Box(Modifier.size(58.dp), contentAlignment = Alignment.Center) {
-                Image(painterResource(Res.drawable.training_summary_success), null, Modifier.matchParentSize())
+                Image(painterResource(loadImage("training_summary_success")), null, Modifier.matchParentSize())
                 Text("✓", color = colors.primary, fontSize = 25.sp, fontWeight = FontWeight.Bold)
             }
         }
